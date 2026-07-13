@@ -8,8 +8,8 @@ const ASSETS = [
   '/src/speech.js',
   '/src/quiz.js',
   '/src/stats.js',
-  '/src/logo.jpg',
-  '/src/logo_luxury.jpg',
+  '/logo.jpg',
+  '/logo_luxury.jpg',
   '/manifest.json'
 ];
 
@@ -42,7 +42,6 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((cachedResponse) => {
       return cachedResponse || fetch(e.request).catch(() => {
-        // Fallback for document requests when offline
         if (e.request.mode === 'navigate') {
           return caches.match('/index.html');
         }
