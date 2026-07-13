@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>British English Vault</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <!-- British-themed Logo combining a Book, Union Jack and Speech Bubble -->
+        <svg class="app-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#FFD700" />
+              <stop offset="100%" stop-color="#C5A028" />
+            </linearGradient>
+            <clipPath id="book-clip">
+              <path d="M 15 15 C 35 18, 48 24, 50 25 C 52 24, 65 18, 85 15 L 85 70 C 65 73, 52 79, 50 80 C 48 79, 35 73, 15 70 Z" />
+            </clipPath>
+          </defs>
+          <!-- Speech Bubble Background -->
+          <path d="M 50 95 C 22 95, 5 78, 5 50 C 5 22, 28 5, 50 5 C 78 5, 95 22, 95 50 C 95 62, 90 73, 82 82 L 85 92 L 72 88 C 65 92, 58 95, 50 95 Z" fill="#00247D" />
+          
+          <!-- Inner White Border/Glow -->
+          <path d="M 50 91 C 25 91, 9 75, 9 50 C 9 25, 30 9, 50 9 C 75 9, 91 25, 91 50 C 91 60, 86 70, 79 78 L 81 87 L 70 83 C 64 87, 57 91, 50 91 Z" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.15" />
+          
+          <!-- Open Book with Union Jack Style inside it -->
+          <g clip-path="url(#book-clip)">
+            <!-- White Page Base -->
+            <rect x="0" y="0" width="100" height="100" fill="#FFFFFF" />
+            <!-- Union Jack diagonal stripes (Red and White) -->
+            <line x1="0" y1="0" x2="100" y2="100" stroke="#FFFFFF" stroke-width="12" />
+            <line x1="0" y1="0" x2="100" y2="100" stroke="#C8102E" stroke-width="6" />
+            <line x1="100" y1="0" x2="0" y2="100" stroke="#FFFFFF" stroke-width="12" />
+            <line x1="100" y1="0" x2="0" y2="100" stroke="#C8102E" stroke-width="6" />
+            
+            <!-- Union Jack cross (Red and White) -->
+            <line x1="50" y1="0" x2="50" y2="100" stroke="#FFFFFF" stroke-width="18" />
+            <line x1="50" y1="0" x2="50" y2="100" stroke="#C8102E" stroke-width="10" />
+            <line x1="0" y1="42" x2="100" y2="42" stroke="#FFFFFF" stroke-width="18" />
+            <line x1="0" y1="42" x2="100" y2="42" stroke="#C8102E" stroke-width="10" />
+            
+            <!-- Book Center Shadow line -->
+            <path d="M 50 15 L 50 80" stroke="#111111" stroke-width="2" opacity="0.3" />
+          </g>
+          <!-- Book outline & gold binding -->
+          <path d="M 15 15 C 35 18, 48 24, 50 25 C 52 24, 65 18, 85 15 L 85 70 C 65 73, 52 79, 50 80 C 48 79, 35 73, 15 70 Z" fill="none" stroke="url(#gold-grad)" stroke-width="3.5" stroke-linejoin="round" />
+          <path d="M 50 25 L 50 80" fill="none" stroke="url(#gold-grad)" stroke-width="3" />
+          
+          <!-- Crown detail at the top -->
+          <path d="M 45 4 L 47 7 L 50 5 L 53 7 L 55 4 L 57 11 L 43 11 Z" fill="url(#gold-grad)" />
+        </svg>
+        <div class="brand-text">
+          <h1>British English</h1>
+          <span class="vault-badge">Vault</span>
+        </div>
+      </div>
+      
+      <!-- Navigation Links -->
+      <nav class="nav-menu">
+        <a href="#words" class="nav-item active" data-view="words">
+          <i class="fa-solid fa-book-open"></i> <span>Words</span>
+        </a>
+        <a href="#slangs" class="nav-item" data-view="slangs">
+          <i class="fa-solid fa-comments"></i> <span>Slangs</span>
+        </a>
+        <a href="#phrases" class="nav-item" data-view="phrases">
+          <i class="fa-solid fa-feather-pointed"></i> <span>Phrases</span>
+        </a>
+        <a href="#idioms" class="nav-item" data-view="idioms">
+          <i class="fa-solid fa-crown"></i> <span>Idioms</span>
+        </a>
+        <a href="#quiz" class="nav-item" data-view="quiz">
+          <i class="fa-solid fa-graduation-cap"></i> <span>Quiz</span>
+        </a>
+        <a href="#stats" class="nav-item" data-view="stats">
+          <i class="fa-solid fa-chart-line"></i> <span>Statistics</span>
+        </a>
+        <a href="#settings" class="nav-item" data-view="settings">
+          <i class="fa-solid fa-gears"></i> <span>Settings</span>
+        </a>
+      </nav>
+      
+      <!-- Footer Settings / Local Storage indicator -->
+      <div class="sidebar-footer">
+        <div class="status-indicator local-mode" id="github-status-badge">
+          <span class="dot"></span> <span class="status-text">Local Mode</span>
+        </div>
+        <button id="theme-toggle-btn" class="theme-btn">
+          <i class="fa-solid fa-moon"></i> <span>Dark Mode</span>
+        </button>
+      </div>
+    </aside>
+    
+    <!-- Mobile Bottom Navigation -->
+    <nav class="mobile-nav">
+      <a href="#words" class="mobile-nav-item active" data-view="words">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Words</span>
+      </a>
+      <a href="#slangs" class="mobile-nav-item" data-view="slangs">
+        <i class="fa-solid fa-comments"></i>
+        <span>Slangs</span>
+      </a>
+      <a href="#phrases" class="mobile-nav-item" data-view="phrases">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <span>Phrases</span>
+      </a>
+      <a href="#idioms" class="mobile-nav-item" data-view="idioms">
+        <i class="fa-solid fa-crown"></i>
+        <span>Idioms</span>
+      </a>
+      <a href="#quiz" class="mobile-nav-item" data-view="quiz">
+        <i class="fa-solid fa-graduation-cap"></i>
+        <span>Quiz</span>
+      </a>
+      <a href="#stats" class="mobile-nav-item" data-view="stats">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Stats</span>
+      </a>
+      <a href="#settings" class="mobile-nav-item" data-view="settings">
+        <i class="fa-solid fa-gears"></i>
+        <span>Settings</span>
+      </a>
+    </nav>
+    
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Header with Mobile Logo and Actions -->
+      <header class="content-header">
+        <div class="mobile-brand">
+          <svg class="app-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <!-- Reuse book logo -->
+            <path d="M 50 95 C 22 95, 5 78, 5 50 C 5 22, 28 5, 50 5 C 78 5, 95 22, 95 50 C 95 62, 90 73, 82 82 L 85 92 L 72 88 C 65 92, 58 95, 50 95 Z" fill="#00247D" />
+            <g clip-path="url(#book-clip)">
+              <rect x="0" y="0" width="100" height="100" fill="#FFFFFF" />
+              <line x1="0" y1="0" x2="100" y2="100" stroke="#FFFFFF" stroke-width="12" />
+              <line x1="0" y1="0" x2="100" y2="100" stroke="#C8102E" stroke-width="6" />
+              <line x1="100" y1="0" x2="0" y2="100" stroke="#FFFFFF" stroke-width="12" />
+              <line x1="100" y1="0" x2="0" y2="100" stroke="#C8102E" stroke-width="6" />
+              <line x1="50" y1="0" x2="50" y2="100" stroke="#FFFFFF" stroke-width="18" />
+              <line x1="50" y1="0" x2="50" y2="100" stroke="#C8102E" stroke-width="10" />
+              <line x1="0" y1="42" x2="100" y2="42" stroke="#FFFFFF" stroke-width="18" />
+              <line x1="0" y1="42" x2="100" y2="42" stroke="#C8102E" stroke-width="10" />
+            </g>
+            <path d="M 15 15 C 35 18, 48 24, 50 25 C 52 24, 65 18, 85 15 L 85 70 C 65 73, 52 79, 50 80 C 48 79, 35 73, 15 70 Z" fill="none" stroke="#FFD700" stroke-width="3.5" />
+          </svg>
+          <h2>British English Vault</h2>
+        </div>
+        <h2 id="current-view-title" class="desktop-view-title">Words</h2>
+        
+        <div class="header-actions">
+          <div class="sync-status" id="github-sync-indicator" style="display: none;">
+            <i class="fa-solid fa-arrows-rotate fa-spin"></i> Syncing...
+          </div>
+          <button id="add-item-btn" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> <span>Add New</span>
+          </button>
+        </div>
+      </header>
+      
+      <!-- Notification Banner (Dynamic) -->
+      <div id="alert-banner" class="alert-banner" style="display: none;"></div>
+      
+      <!-- Content Sections -->
+      <div class="content-body">
+        
+        <!-- CARDS VIEW (Shared container for Words, Slangs, Phrases, Idioms) -->
+        <section id="view-cards-container" class="view-section active">
+          <!-- Filter/Search Bar -->
+          <div class="control-panel">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="search-input" placeholder="Search entries...">
+            </div>
+            
+            <div class="filter-options">
+              <button id="filter-fav-btn" class="btn-filter" title="Favorites Only">
+                <i class="fa-solid fa-star"></i> <span>Favorites</span>
+              </button>
+              
+              <div class="sort-selector">
+                <label for="sort-select"><i class="fa-solid fa-arrow-down-a-z"></i> Sort:</label>
+                <select id="sort-select">
+                  <option value="az">Alphabetical (A-Z)</option>
+                  <option value="za">Alphabetical (Z-A)</option>
+                  <option value="newest">Newest Added</option>
+                  <option value="oldest">Oldest Added</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Vocabulary Cards Grid -->
+          <div id="cards-grid" class="cards-grid">
+            <!-- Dynamic Cards Inserted Here -->
+            <div class="loader-container">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Loading...
+            </div>
+          </div>
+        </section>
+        
+        <!-- QUIZ VIEW -->
+        <section id="view-quiz" class="view-section">
+          <!-- Quiz Setup Panel -->
+          <div id="quiz-setup" class="quiz-panel card">
+            <h3 class="panel-title"><i class="fa-solid fa-graduation-cap"></i> Practice & Test Your Skills</h3>
+            <p class="panel-desc">Select a category and challenge yourself to recall the meanings and example sentences. Your progress and performance will be tracked in Statistics.</p>
+            
+            <div class="form-group">
+              <label class="form-label">Choose Category:</label>
+              <div class="category-grid">
+                <label class="cat-radio-card active">
+                  <input type="radio" name="quiz-cat" value="all" checked>
+                  <div class="cat-content">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>All Categories</span>
+                  </div>
+                </label>
+                <label class="cat-radio-card">
+                  <input type="radio" name="quiz-cat" value="words">
+                  <div class="cat-content">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Words</span>
+                  </div>
+                </label>
+                <label class="cat-radio-card">
+                  <input type="radio" name="quiz-cat" value="slangs">
+                  <div class="cat-content">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Slangs</span>
+                  </div>
+                </label>
+                <label class="cat-radio-card">
+                  <input type="radio" name="quiz-cat" value="phrases">
+                  <div class="cat-content">
+                    <i class="fa-solid fa-feather-pointed"></i>
+                    <span>Phrases</span>
+                  </div>
+                </label>
+                <label class="cat-radio-card">
+                  <input type="radio" name="quiz-cat" value="idioms">
+                  <div class="cat-content">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>Idioms</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <button id="start-quiz-btn" class="btn btn-primary btn-block btn-lg">
+              <i class="fa-solid fa-play"></i> Start Practice Session
+            </button>
+          </div>
+          
+          <!-- Quiz Active Play Panel -->
+          <div id="quiz-active" class="quiz-panel card" style="display: none;">
+            <div class="quiz-progress-header">
+              <span id="quiz-progress-text">Question 1 of 10</span>
+              <div class="quiz-progress-bar-bg">
+                <div id="quiz-progress-fill" style="width: 10%;"></div>
+              </div>
+            </div>
+            
+            <div class="quiz-card-wrapper">
+              <div class="quiz-card">
+                <div class="quiz-card-header">
+                  <span id="quiz-card-category" class="category-pill">Slangs</span>
+                  <button class="speech-btn text-speech-trigger" id="quiz-speak-btn" title="Listen (Long press for slow)">
+                    <i class="fa-solid fa-volume-high"></i>
+                  </button>
+                </div>
+                
+                <div class="quiz-card-word" id="quiz-card-word">Chuffed</div>
+                
+                <!-- Answer Reveal Block -->
+                <div id="quiz-answer-block" class="quiz-answer-block" style="display: none;">
+                  <hr>
+                  <div class="answer-item">
+                    <h4>Meaning:</h4>
+                    <p id="quiz-card-meaning">Very pleased or happy.</p>
+                  </div>
+                  <div class="answer-item">
+                    <h4>Example Sentence:</h4>
+                    <p id="quiz-card-example">I was absolutely chuffed with my exam results.</p>
+                    
+                    <!-- Example Pronunciation Bar -->
+                    <div class="sentence-speech-toolbar" id="quiz-sentence-toolbar">
+                      <!-- Filled dynamically in quiz.js -->
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Reveal Button -->
+                <button id="quiz-reveal-btn" class="btn btn-secondary btn-block">
+                  <i class="fa-solid fa-eye"></i> Show Answer
+                </button>
+              </div>
+            </div>
+            
+            <!-- Grading Buttons (Hidden until answer shown) -->
+            <div id="quiz-grade-buttons" class="quiz-grade-row" style="display: none;">
+              <button id="quiz-incorrect-btn" class="btn btn-danger">
+                <i class="fa-solid fa-xmark"></i> Incorrect
+              </button>
+              <button id="quiz-correct-btn" class="btn btn-success">
+                <i class="fa-solid fa-check"></i> Correct
+              </button>
+            </div>
+            
+            <button id="quiz-cancel-btn" class="btn btn-text">
+              <i class="fa-solid fa-arrow-left"></i> Exit Practice
+            </button>
+          </div>
+          
+          <!-- Quiz Score Panel -->
+          <div id="quiz-results" class="quiz-panel card text-center" style="display: none;">
+            <div class="trophy-icon">
+              <i class="fa-solid fa-trophy"></i>
+            </div>
+            <h3 class="panel-title">Session Complete!</h3>
+            <p id="quiz-results-summary-text">Splendid! Here's how you performed:</p>
+            
+            <div class="results-stats-row">
+              <div class="results-stat-card">
+                <span class="stat-val" id="quiz-res-total">10</span>
+                <span class="stat-lbl">Questions</span>
+              </div>
+              <div class="results-stat-card success">
+                <span class="stat-val" id="quiz-res-correct">8</span>
+                <span class="stat-lbl">Correct</span>
+              </div>
+              <div class="results-stat-card danger">
+                <span class="stat-val" id="quiz-res-incorrect">2</span>
+                <span class="stat-lbl">Incorrect</span>
+              </div>
+            </div>
+            
+            <!-- Circular Progress Indicator -->
+            <div class="progress-ring-container">
+              <svg width="120" height="120">
+                <circle class="progress-ring-bg" stroke="#E2E8F0" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                <circle class="progress-ring-progress" id="quiz-score-ring" stroke="#C8102E" stroke-width="8" stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round" fill="transparent" r="50" cx="60" cy="60"/>
+              </svg>
+              <div class="progress-ring-percentage" id="quiz-res-pct">80%</div>
+            </div>
+            
+            <div class="quiz-actions-footer">
+              <button id="quiz-retry-btn" class="btn btn-primary">
+                <i class="fa-solid fa-rotate-right"></i> Try Again
+              </button>
+              <button id="quiz-home-btn" class="btn btn-secondary">
+                <i class="fa-solid fa-house"></i> Home
+              </button>
+            </div>
+          </div>
+        </section>
+        
+        <!-- STATISTICS VIEW -->
+        <section id="view-stats" class="view-section">
+          <!-- Overview Cards -->
+          <div class="stats-overview-grid">
+            <div class="stat-box card">
+              <div class="stat-icon-wrapper blue">
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div class="stat-box-data">
+                <h3 id="stat-total-items">0</h3>
+                <p>Total Items</p>
+              </div>
+            </div>
+            <div class="stat-box card">
+              <div class="stat-icon-wrapper green">
+                <i class="fa-solid fa-graduation-cap"></i>
+              </div>
+              <div class="stat-box-data">
+                <h3 id="stat-total-quizzes">0</h3>
+                <p>Quizzes Completed</p>
+              </div>
+            </div>
+            <div class="stat-box card">
+              <div class="stat-icon-wrapper gold">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+              <div class="stat-box-data">
+                <h3 id="stat-avg-score">0%</h3>
+                <p>Average Accuracy</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="stats-detail-grid">
+            <!-- Category Distribution Card -->
+            <div class="card detail-card">
+              <h3><i class="fa-solid fa-chart-pie"></i> Category Breakdown</h3>
+              <div class="cat-progress-bars">
+                <div class="progress-bar-item">
+                  <div class="progress-bar-labels">
+                    <span>Words</span>
+                    <span id="stat-cnt-words">0</span>
+                  </div>
+                  <div class="bar-bg"><div class="bar-fill" id="bar-words" style="width: 0%;"></div></div>
+                </div>
+                <div class="progress-bar-item">
+                  <div class="progress-bar-labels">
+                    <span>Slangs</span>
+                    <span id="stat-cnt-slangs">0</span>
+                  </div>
+                  <div class="bar-bg"><div class="bar-fill" id="bar-slangs" style="width: 0%;"></div></div>
+                </div>
+                <div class="progress-bar-item">
+                  <div class="progress-bar-labels">
+                    <span>Phrases</span>
+                    <span id="stat-cnt-phrases">0</span>
+                  </div>
+                  <div class="bar-bg"><div class="bar-fill" id="bar-phrases" style="width: 0%;"></div></div>
+                </div>
+                <div class="progress-bar-item">
+                  <div class="progress-bar-labels">
+                    <span>Idioms</span>
+                    <span id="stat-cnt-idioms">0</span>
+                  </div>
+                  <div class="bar-bg"><div class="bar-fill" id="bar-idioms" style="width: 0%;"></div></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Most Mistaken Items Card -->
+            <div class="card detail-card">
+              <h3><i class="fa-solid fa-triangle-exclamation"></i> Most Challenging Items</h3>
+              <p class="panel-desc">Words or phrases you've gotten incorrect most frequently in quizzes.</p>
+              <ul class="mistake-list" id="stat-mistakes-list">
+                <!-- Dynamically populated -->
+                <li class="empty-state">Take quizzes to discover challenging words!</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Progress Chart Card -->
+          <div class="card chart-card">
+            <h3><i class="fa-solid fa-chart-line"></i> Performance Over Time</h3>
+            <p class="panel-desc">History of accuracy across your last 10 quiz attempts.</p>
+            <div class="chart-container">
+              <!-- Visualized using a custom HTML/CSS dynamic chart -->
+              <div class="bar-chart-visual" id="stats-history-chart">
+                <div class="chart-empty">No quiz attempts yet. Complete a quiz to see your progress chart!</div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- SETTINGS VIEW -->
+        <section id="view-settings" class="view-section">
+          <!-- GitHub Connection Card -->
+          <div class="card form-card">
+            <h3><i class="fa-brands fa-github"></i> GitHub Vault Sync</h3>
+            <p class="panel-desc">Enable cloud sync by connecting to your own GitHub repository. This ensures your learning records, custom vocabulary, and stats survive Vercel redeploys.</p>
+            
+            <form id="settings-github-form" class="settings-form">
+              <div class="form-group">
+                <label for="github-pat" class="form-label">Personal Access Token (PAT)</label>
+                <input type="password" id="github-pat" placeholder="ghp_xxxxxxxxxxxx" class="form-control">
+                <span class="form-help">Requires <code>repo</code> access scope. This token is stored locally in your browser.</span>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group col">
+                  <label for="github-owner" class="form-label">Repository Owner</label>
+                  <input type="text" id="github-owner" placeholder="github-username" class="form-control">
+                </div>
+                <div class="form-group col">
+                  <label for="github-repo" class="form-label">Repository Name</label>
+                  <input type="text" id="github-repo" placeholder="british-english-vault-data" class="form-control">
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group col">
+                  <label for="github-branch" class="form-label">Branch Name</label>
+                  <input type="text" id="github-branch" value="main" class="form-control">
+                </div>
+                <div class="form-group col">
+                  <label for="github-filepath" class="form-label">JSON File Path</label>
+                  <input type="text" id="github-filepath" value="data/vault.json" class="form-control">
+                </div>
+              </div>
+              
+              <div class="settings-actions">
+                <button type="button" id="btn-test-connection" class="btn btn-secondary">
+                  <i class="fa-solid fa-vial"></i> Test Connection
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Settings
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Pronunciation & Speech Preferences Card -->
+          <div class="card form-card">
+            <h3><i class="fa-solid fa-volume-high"></i> Speech & Audio Settings</h3>
+            <p class="panel-desc">Customize Text-to-Speech voices and behavior.</p>
+            
+            <div class="form-group">
+              <label for="voice-selector" class="form-label">Select British Voice (en-GB)</label>
+              <select id="voice-selector" class="form-control">
+                <!-- Loaded dynamically from SpeechSynthesis -->
+                <option value="">Searching for British voices...</option>
+              </select>
+            </div>
+            
+            <button id="btn-test-speech" class="btn btn-secondary">
+              <i class="fa-solid fa-circle-play"></i> Test selected voice
+            </button>
+          </div>
+          
+          <!-- Data Management Card -->
+          <div class="card danger-zone-card">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone / Backup</h3>
+            <p class="panel-desc">Manage local storage cache. These actions do not affect GitHub directly unless explicitly synced.</p>
+            
+            <div class="btn-group-row">
+              <button id="btn-export-data" class="btn btn-secondary">
+                <i class="fa-solid fa-download"></i> Export Data Backup
+              </button>
+              <button id="btn-reset-data" class="btn btn-danger-outline">
+                <i class="fa-solid fa-trash-can"></i> Reset App Data
+              </button>
+            </div>
+          </div>
+        </section>
+        
+      </div>
+    </main>
+  </div>
+  
+  <!-- ADD / EDIT ITEM MODAL -->
+  <div id="item-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Add New Entry</h3>
+        <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      </div>
+      <form id="item-form">
+        <input type="hidden" id="item-id">
+        
+        <div class="form-group">
+          <label for="item-category" class="form-label">Category</label>
+          <select id="item-category" class="form-control" required>
+            <option value="words">Words</option>
+            <option value="slangs">Slangs</option>
+            <option value="phrases">Phrases</option>
+            <option value="idioms">Idioms</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="item-term" class="form-label">Word / Phrase</label>
+          <input type="text" id="item-term" class="form-control" placeholder="e.g. Knackered" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="item-meaning" class="form-label">Meaning (Hebrew or English)</label>
+          <textarea id="item-meaning" class="form-control" rows="3" placeholder="e.g. Extremely tired or exhausted." required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="item-example" class="form-label">Example Sentence</label>
+          <textarea id="item-example" class="form-control" rows="3" placeholder="e.g. I was absolutely knackered after running the marathon." required></textarea>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" id="modal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- APP JAVASCRIPT MODULES -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
