@@ -202,18 +202,57 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       const contentString = atob(data.content.replace(/\s/g, ''));
       const parsedData = JSON.parse(decodeURIComponent(escape(contentString)));
       
+      // Merge local items with GitHub items to prevent data loss on connection
+      const localData = getLocalFallbackData();
+      const mergedItems = [...(parsedData.items || [])];
+      
+      (localData.items || []).forEach(localItem => {
+        const exists = mergedItems.some(gitItem => 
+          gitItem.id === localItem.id || 
+          gitItem.term.toLowerCase().trim() === localItem.term.toLowerCase().trim()
+        );
+        if (!exists) {
+          mergedItems.push(localItem);
+        }
+      });
+      
+      const mergedStats = {
+        quizzesCompleted: Math.max(parsedData.stats?.quizzesCompleted || 0, localData.stats?.quizzesCompleted || 0),
+        correctAnswers: Math.max(parsedData.stats?.correctAnswers || 0, localData.stats?.correctAnswers || 0),
+        incorrectAnswers: Math.max(parsedData.stats?.incorrectAnswers || 0, localData.stats?.incorrectAnswers || 0),
+        history: [...(parsedData.stats?.history || [])]
+      };
+      
+      (localData.stats?.history || []).forEach(localHist => {
+        const histExists = mergedStats.history.some(gitHist => 
+          gitHist.date === localHist.date && 
+          gitHist.percentage === localHist.percentage
+        );
+        if (!histExists) {
+          mergedStats.history.push(localHist);
+        }
+      });
+
+      const mergedData = {
+        items: mergedItems,
+        stats: mergedStats
+      };
+
       // Save locally as cache
-      saveLocalData(parsedData);
+      saveLocalData(mergedData);
       
       // Cache the file SHA in sessionStorage for subsequent commits
       sessionStorage.setItem('bev_github_file_sha', data.sha);
       
-      onSyncStateChange('synced');
-      return parsedData;
+      // Auto-upload merged data to GitHub in background to ensure sync
+      saveVaultData(mergedData, onSyncStateChange);
+      
+      return mergedData;
     } else if (response.status === 404) {
-      // File not found in GitHub. Let's create it on the first save.
-      onSyncStateChange('local-out-of-sync');
-      return getLocalFallbackData();
+      // File not found in GitHub. Create it immediately using local data.
+      const localData = getLocalFallbackData();
+      saveVaultData(localData, onSyncStateChange);
+      return localData;
     } else {
       throw new Error(`Status ${response.status}`);
     }
