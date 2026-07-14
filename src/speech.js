@@ -5,6 +5,7 @@
 // Cached list of available voices
 let voices = [];
 let selectedVoice = null;
+let activeAccent = 'en-GB'; // default: en-GB (British)
 
 // Initialize voices
 export function initSpeech() {
@@ -17,26 +18,28 @@ export function initSpeech() {
     const loadVoices = () => {
       voices = window.speechSynthesis.getVoices();
       
-      // Filter for British English (en-GB) voices
-      const brVoices = voices.filter(v => 
-        v.lang === 'en-GB' || v.lang.startsWith('en-GB')
+      // Load active accent preference
+      activeAccent = localStorage.getItem('bev_active_accent') || 'en-GB';
+
+      // Filter voices matching the active accent
+      const accentVoices = voices.filter(v => 
+        v.lang === activeAccent || v.lang.startsWith(activeAccent)
       );
 
       // Try to load saved voice preference
       const savedVoiceURI = localStorage.getItem('bev_selected_voice');
       if (savedVoiceURI) {
-        selectedVoice = brVoices.find(v => v.voiceURI === savedVoiceURI) || null;
+        selectedVoice = accentVoices.find(v => v.voiceURI === savedVoiceURI) || null;
       }
 
-      // Fallback: choose the first en-GB voice, or default
-      if (!selectedVoice && brVoices.length > 0) {
-        selectedVoice = brVoices[0];
+      // Fallback: choose the first matching voice, or default
+      if (!selectedVoice && accentVoices.length > 0) {
+        selectedVoice = accentVoices[0];
       }
 
-      resolve(brVoices);
+      resolve(accentVoices);
     };
 
-    // Chrome loads voices asynchronously
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
@@ -46,12 +49,39 @@ export function initSpeech() {
 }
 
 /**
- * Returns all available British voices
+ * Returns the current active accent code
  */
-export function getBritishVoices() {
+export function getActiveAccent() {
+  return activeAccent;
+}
+
+/**
+ * Sets the active accent (en-GB, en-US, en-AU, en-CA)
+ * Re-filters voices and selects a default voice for that accent.
+ */
+export function setActiveAccent(accentCode) {
+  activeAccent = accentCode;
+  localStorage.setItem('bev_active_accent', accentCode);
+  
+  // Find matching voices
+  const accentVoices = getVoicesForAccent(accentCode);
+  
+  if (accentVoices.length > 0) {
+    selectedVoice = accentVoices[0];
+    localStorage.setItem('bev_selected_voice', selectedVoice.voiceURI);
+  } else {
+    selectedVoice = null;
+  }
+  return accentVoices;
+}
+
+/**
+ * Returns voices for a specific accent code
+ */
+export function getVoicesForAccent(accentCode) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return [];
   return window.speechSynthesis.getVoices().filter(v => 
-    v.lang === 'en-GB' || v.lang.startsWith('en-GB')
+    v.lang === accentCode || v.lang.startsWith(accentCode)
   );
 }
 
@@ -59,8 +89,9 @@ export function getBritishVoices() {
  * Sets the active voice by URI
  */
 export function setSelectedVoice(voiceURI) {
-  const brVoices = getBritishVoices();
-  const voice = brVoices.find(v => v.voiceURI === voiceURI);
+  if (typeof window === 'undefined' || !window.speechSynthesis) return false;
+  const allVoices = window.speechSynthesis.getVoices();
+  const voice = allVoices.find(v => v.voiceURI === voiceURI);
   if (voice) {
     selectedVoice = voice;
     localStorage.setItem('bev_selected_voice', voiceURI);
@@ -226,16 +257,22 @@ export function getSpeechFriendlySyllable(syl, idx, totalSyllables, fullWord) {
   const isLast = idx === totalSyllables - 1;
   const isFirst = idx === 0;
 
-  // Rule 1: Trailing "er" in British English sounds like "uh" (Schwa)
-  if (phonetic.endsWith('er')) {
+  // en-GB (British) and en-AU (Australian) are non-rhotic, meaning trailing "er" sounds like a schwa "uh".
+  // en-US (American) and en-CA (Canadian) are rhotic, so we don't convert "er" to "uh".
+  const isNonRhotic = activeAccent.startsWith('en-GB') || activeAccent.startsWith('en-AU');
+
+  // Rule 1: Trailing "er" in British/Australian English sounds like "uh" (Schwa)
+  if (isNonRhotic && phonetic.endsWith('er')) {
     phonetic = phonetic.slice(0, -2) + 'uh';
   }
   
-  // Rule 2: Trailing "ered" (like knackered) or "erd" sounds like "uhd"
-  if (phonetic.endsWith('ered')) {
-    phonetic = phonetic.slice(0, -4) + 'uhd';
-  } else if (phonetic.endsWith('erd')) {
-    phonetic = phonetic.slice(0, -3) + 'uhd';
+  // Rule 2: Trailing "ered" (like knackered) or "erd" sounds like "uhd" in non-rhotic accents
+  if (isNonRhotic) {
+    if (phonetic.endsWith('ered')) {
+      phonetic = phonetic.slice(0, -4) + 'uhd';
+    } else if (phonetic.endsWith('erd')) {
+      phonetic = phonetic.slice(0, -3) + 'uhd';
+    }
   }
 
   // Rule 3: Single letter "a" at start (e.g. about) is a Schwa sound "uh"
