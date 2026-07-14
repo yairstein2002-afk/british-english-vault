@@ -218,6 +218,51 @@ export async function speakMultipleTimes(text, rate = 1.0, count = 1) {
 }
 
 /**
+ * Phonetic adaptation to prevent "Phonetic Context Loss" when speaking
+ * individual syllables standalone in a British accent (en-GB).
+ */
+export function getSpeechFriendlySyllable(syl, idx, totalSyllables, fullWord) {
+  let phonetic = syl.toLowerCase().trim();
+  const isLast = idx === totalSyllables - 1;
+  const isFirst = idx === 0;
+
+  // Rule 1: Trailing "er" in British English sounds like "uh" (Schwa)
+  if (phonetic.endsWith('er')) {
+    phonetic = phonetic.slice(0, -2) + 'uh';
+  }
+  
+  // Rule 2: Trailing "ered" (like knackered) or "erd" sounds like "uhd"
+  if (phonetic.endsWith('ered')) {
+    phonetic = phonetic.slice(0, -4) + 'uhd';
+  } else if (phonetic.endsWith('erd')) {
+    phonetic = phonetic.slice(0, -3) + 'uhd';
+  }
+
+  // Rule 3: Single letter "a" at start (e.g. about) is a Schwa sound "uh"
+  if (phonetic === 'a' && isFirst && totalSyllables > 1) {
+    phonetic = 'uh';
+  }
+
+  // Rule 4: Trailing "y" in the last syllable of a multi-syllable word sounds like "ee" (e.g. baby -> ba-bee, fancy -> fan-cee)
+  if (isLast && totalSyllables > 1 && phonetic.endsWith('y') && phonetic.length > 1) {
+    const charBeforeY = phonetic[phonetic.length - 2];
+    if (!"aeiou".includes(charBeforeY)) {
+      phonetic = phonetic.slice(0, -1) + 'ee';
+    }
+  }
+
+  // Rule 5: Trailing "le" after a consonant (like table -> ta-ble, uncle -> un-cle) sounds like "uhl"
+  if (isLast && phonetic.endsWith('le') && phonetic.length > 2) {
+    const charBeforeL = phonetic[phonetic.length - 3];
+    if (!"aeiou".includes(charBeforeL)) {
+      phonetic = phonetic.slice(0, -2) + 'uhl';
+    }
+  }
+
+  return phonetic;
+}
+
+/**
  * Long-Press Syllable Pronunciation:
  * 1. Reads word slowly (rate = 0.5)
  * 2. Hyphenates into syllables and reads each syllable with a 400ms pause
@@ -234,8 +279,11 @@ export async function speakSlowSyllables(word, onStateChange = () => {}) {
       const syl = syllables[idx];
       onStateChange({ status: 'speaking-syllables', activeSyllable: syl, index: idx });
       
-      // Speak the individual syllable slowly
-      await speakText(syl, { rate: 0.5 });
+      // Adapt the syllable spelling phonetically for standalone TTS playback
+      const phoneticSyl = getSpeechFriendlySyllable(syl, idx, syllables.length, word);
+      
+      // Speak the adapted syllable slowly
+      await speakText(phoneticSyl, { rate: 0.5 });
       
       // Delay before next syllable
       await new Promise(r => setTimeout(r, 450));
