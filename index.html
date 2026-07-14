@@ -19,8 +19,8 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-7AzQPYrV.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CYv_OA9V.css">
+  <script type="module" crossorigin src="/assets/index-BhANWUV9.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-fhLOdlMp.css">
 </head>
 <body>
   <!-- App Container -->
@@ -289,17 +289,31 @@
               <div class="quiz-card">
                 <div class="quiz-card-header">
                   <span id="quiz-card-category" class="category-pill">Slangs</span>
-                  <button class="speech-btn text-speech-trigger" id="quiz-speak-btn" title="Listen (Long press for slow)">
-                    <i class="fa-solid fa-volume-high"></i>
-                  </button>
+                  <div class="word-speech-controls">
+                    <select id="quiz-word-rate" title="Pronunciation Speed">
+                      <option value="1">1.0x</option>
+                      <option value="0.75">0.75x</option>
+                      <option value="0.5">0.5x</option>
+                      <option value="0.35">0.35x</option>
+                    </select>
+                    <button class="speech-btn text-speech-trigger" id="quiz-speak-btn" title="Listen (Long press for slow)">
+                      <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                  </div>
                 </div>
                 
                 <div class="quiz-card-word" id="quiz-card-word">Chuffed</div>
+
+                <!-- Multiple Choice Options -->
+                <div class="quiz-options-container" id="quiz-options">
+                  <!-- Generated dynamically in main.js -->
+                </div>
                 
-                <!-- Answer Reveal Block -->
+                <!-- Answer Reveal Block (Hidden until option is clicked) -->
                 <div id="quiz-answer-block" class="quiz-answer-block" style="display: none;">
                   <hr>
-                  <div class="answer-item">
+                  <div id="quiz-feedback-banner" class="quiz-feedback-banner"></div>
+                  <div class="answer-item" style="margin-top: 1rem;">
                     <h4>Meaning:</h4>
                     <p id="quiz-card-meaning">Very pleased or happy.</p>
                   </div>
@@ -309,27 +323,17 @@
                     
                     <!-- Example Pronunciation Bar -->
                     <div class="sentence-speech-toolbar" id="quiz-sentence-toolbar">
-                      <!-- Filled dynamically in quiz.js -->
+                      <!-- Filled dynamically in main.js -->
                     </div>
                   </div>
                 </div>
-                
-                <!-- Reveal Button -->
-                <button id="quiz-reveal-btn" class="btn btn-secondary btn-block">
-                  <i class="fa-solid fa-eye"></i> Show Answer
-                </button>
               </div>
             </div>
             
-            <!-- Grading Buttons (Hidden until answer shown) -->
-            <div id="quiz-grade-buttons" class="quiz-grade-row" style="display: none;">
-              <button id="quiz-incorrect-btn" class="btn btn-danger">
-                <i class="fa-solid fa-xmark"></i> Incorrect
-              </button>
-              <button id="quiz-correct-btn" class="btn btn-success">
-                <i class="fa-solid fa-check"></i> Correct
-              </button>
-            </div>
+            <!-- Next Button (Hidden until option is clicked) -->
+            <button id="quiz-next-btn" class="btn btn-primary btn-block btn-lg" style="display: none; margin-bottom: 1.5rem;">
+              Next Question <i class="fa-solid fa-arrow-right"></i>
+            </button>
             
             <button id="quiz-cancel-btn" class="btn btn-text">
               <i class="fa-solid fa-arrow-left"></i> Exit Practice
