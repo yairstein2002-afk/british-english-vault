@@ -272,8 +272,8 @@ export async function speakSlowSyllables(word, onStateChange = () => {}) {
     // Notify UI that we are playing slowly
     onStateChange({ status: 'speaking-slow', activeSyllable: 'Slowly...' });
 
-    // 1. Speak the full word slowly (rate = 0.5) to preserve natural stress and phonetics
-    await speakText(word, { rate: 0.5 });
+    // 1. Speak the full word very slowly (rate = 0.35) to preserve natural stress and phonetics
+    await speakText(word, { rate: 0.35 });
 
     // 2. Pause briefly
     onStateChange({ status: 'pause-before-full', activeSyllable: '' });
