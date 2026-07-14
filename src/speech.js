@@ -263,33 +263,19 @@ export function getSpeechFriendlySyllable(syl, idx, totalSyllables, fullWord) {
 }
 
 /**
- * Long-Press Syllable Pronunciation:
- * 1. Reads word slowly (rate = 0.5)
- * 2. Hyphenates into syllables and reads each syllable with a 400ms pause
- * 3. Plays word at normal speed (rate = 1.0)
+ * Long-Press Pronunciation:
+ * Speaks the entire word very slowly (rate = 0.5) so the user can hear all phonemes
+ * and transitions naturally with correct phonetic context, followed by the normal speed reading.
  */
 export async function speakSlowSyllables(word, onStateChange = () => {}) {
-  const syllables = splitIntoSyllables(word);
-  
   try {
-    onStateChange({ status: 'speaking-syllables', activeSyllable: '' });
+    // Notify UI that we are playing slowly
+    onStateChange({ status: 'speaking-slow', activeSyllable: 'Slowly...' });
 
-    // 1. Speak each syllable slowly with a short pause
-    for (let idx = 0; idx < syllables.length; idx++) {
-      const syl = syllables[idx];
-      onStateChange({ status: 'speaking-syllables', activeSyllable: syl, index: idx });
-      
-      // Adapt the syllable spelling phonetically for standalone TTS playback
-      const phoneticSyl = getSpeechFriendlySyllable(syl, idx, syllables.length, word);
-      
-      // Speak the adapted syllable slowly
-      await speakText(phoneticSyl, { rate: 0.5 });
-      
-      // Delay before next syllable
-      await new Promise(r => setTimeout(r, 450));
-    }
+    // 1. Speak the full word slowly (rate = 0.5) to preserve natural stress and phonetics
+    await speakText(word, { rate: 0.5 });
 
-    // 2. Final pause before full reading
+    // 2. Pause briefly
     onStateChange({ status: 'pause-before-full', activeSyllable: '' });
     await new Promise(r => setTimeout(r, 800));
 
@@ -299,7 +285,7 @@ export async function speakSlowSyllables(word, onStateChange = () => {}) {
 
     onStateChange({ status: 'done', activeSyllable: '' });
   } catch (error) {
-    console.error("Slow syllable speech failed", error);
+    console.error("Slow speech playback failed", error);
     onStateChange({ status: 'error', error });
   }
 }
