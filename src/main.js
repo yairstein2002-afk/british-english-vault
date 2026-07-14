@@ -872,8 +872,8 @@ function loadSettingsUI() {
     document.getElementById('github-filepath').value = config.path || 'data/vault.json';
   } else {
     document.getElementById('github-pat').value = '';
-    document.getElementById('github-owner').value = '';
-    document.getElementById('github-repo').value = '';
+    document.getElementById('github-owner').value = 'yairstein2002-afk';
+    document.getElementById('github-repo').value = 'british-english-vault';
     document.getElementById('github-branch').value = 'main';
     document.getElementById('github-filepath').value = 'data/vault.json';
   }
