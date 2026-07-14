@@ -123,3 +123,52 @@ export function getQuizSummary() {
     answers: quizSession.answersRecord
   };
 }
+
+/**
+ * Generate 4 multiple-choice options for the quiz card
+ * Includes 1 correct answer and 3 randomized distractors
+ */
+export function getQuizChoices(currentItem, allItems) {
+  const correctMeaning = currentItem.meaning;
+  
+  // 1. Gather all potential distractors (excluding current meaning)
+  let distractors = allItems
+    .filter(item => item.meaning.trim() !== correctMeaning.trim())
+    .map(item => item.meaning);
+
+  // De-duplicate distractors
+  distractors = [...new Set(distractors)];
+
+  // 2. Select 3 distractors
+  let chosenDistractors = [];
+  if (distractors.length >= 3) {
+    const shuffledDistractors = shuffleArray(distractors);
+    chosenDistractors = shuffledDistractors.slice(0, 3);
+  } else {
+    // Fallback static distractors if the user database is too small
+    const staticFillers = [
+      "עייף מאוד, מותש לחלוטין (Knackered)",
+      "שמח מאוד, מרוצה מעצמו (Chuffed)",
+      "בא לך כוס תה? (Fancy a cuppa?)",
+      "המום או מופתע לחלוטין (Gobsmacked)",
+      "מאוכזב מאוד, שבור (Gutted)",
+      "פאונד (סלנג בריטי למטבע)",
+      "תפרן, בלי פרוטה (Skint)"
+    ];
+    
+    // Filter out correct meaning if it overlaps
+    const filteredFillers = staticFillers.filter(f => f.trim() !== correctMeaning.trim());
+    const shuffledFillers = shuffleArray(filteredFillers);
+    
+    chosenDistractors = [...distractors, ...shuffledFillers].slice(0, 3);
+  }
+
+  // 3. Assemble and shuffle choices
+  const choices = [
+    { text: correctMeaning, isCorrect: true },
+    ...chosenDistractors.map(text => ({ text, isCorrect: false }))
+  ];
+
+  return shuffleArray(choices);
+}
+

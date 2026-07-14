@@ -21,7 +21,8 @@ import {
   getQuizProgress, 
   gradeQuestion, 
   nextQuestion, 
-  getQuizSummary 
+  getQuizSummary,
+  getQuizChoices
 } from './quiz.js';
 import { renderStatsUI } from './stats.js';
 
@@ -294,9 +295,17 @@ function renderCardsGrid() {
           <button class="action-icon-btn fav-btn ${item.favorite ? 'active' : ''}" title="Favorite">
             <i class="fa-${item.favorite ? 'solid' : 'regular'} fa-star"></i>
           </button>
-          <button class="speech-btn speak-word-btn" title="Listen (Long press for slow)">
-            <i class="fa-solid fa-volume-high"></i>
-          </button>
+          <div class="word-speech-controls">
+            <select class="word-rate" title="Pronunciation Speed">
+              <option value="1">1.0x</option>
+              <option value="0.75">0.75x</option>
+              <option value="0.5">0.5x</option>
+              <option value="0.35">0.35x</option>
+            </select>
+            <button class="speech-btn speak-word-btn" title="Listen (Long press for slow)">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
         </div>
       </div>
       
@@ -443,7 +452,10 @@ function bindLongPressSpeak(element, text) {
       // Regular click speech
       element.classList.add('speaking');
       try {
-        await speakText(text);
+        // Read speed selector if present in card header controls
+        const rateSelect = element.parentNode.querySelector('.word-rate, #quiz-word-rate');
+        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+        await speakText(text, { rate });
       } catch (err) {
         console.error(err);
       } finally {
@@ -612,10 +624,9 @@ function showQuizQuestion() {
   const item = getCurrentQuestion();
   const progress = getQuizProgress();
 
-  // Reset display states
+  // Reset display states and next question buttons
   document.getElementById('quiz-answer-block').style.display = 'none';
-  document.getElementById('quiz-grade-buttons').style.display = 'none';
-  document.getElementById('quiz-reveal-btn').style.display = 'block';
+  document.getElementById('quiz-next-btn').style.display = 'none';
 
   // Set card data
   document.getElementById('quiz-progress-text').innerText = `Question ${progress.current} of ${progress.total}`;
@@ -635,7 +646,6 @@ function showQuizQuestion() {
 
   // Bind Speak Word handlers in Quiz Card
   const speakBtn = document.getElementById('quiz-speak-btn');
-  // Rebind event listeners cleanly by replacing element or removing event listeners
   const newSpeakBtn = speakBtn.cloneNode(true);
   speakBtn.parentNode.replaceChild(newSpeakBtn, speakBtn);
   bindLongPressSpeak(newSpeakBtn, item.term);
@@ -674,26 +684,80 @@ function showQuizQuestion() {
       speakQuizSentenceBtn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
     }
   });
+
+  // Render Multiple Choice Option Buttons
+  const optionsContainer = document.getElementById('quiz-options');
+  optionsContainer.innerHTML = '';
+
+  const choices = getQuizChoices(item, vaultData.items || []);
+  
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option-btn';
+    
+    // Check direction (RTL for Hebrew, LTR for English)
+    const optionContainsHebrew = /[\u0590-\u05FF]/.test(choice.text);
+    if (optionContainsHebrew) {
+      btn.style.direction = 'rtl';
+      btn.style.textAlign = 'right';
+    } else {
+      btn.style.direction = 'ltr';
+      btn.style.textAlign = 'left';
+    }
+
+    btn.innerText = choice.text;
+
+    btn.addEventListener('click', () => {
+      handleQuizChoiceSelected(choice, btn, choices);
+    });
+
+    optionsContainer.appendChild(btn);
+  });
 }
 
-// Reveal Answer Quiz handler
-document.getElementById('quiz-reveal-btn').addEventListener('click', () => {
-  document.getElementById('quiz-reveal-btn').style.display = 'none';
-  document.getElementById('quiz-answer-block').style.display = 'block';
-  document.getElementById('quiz-grade-buttons').style.display = 'grid';
-});
+async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
+  // 1. Disable all option buttons to prevent multiple clicks
+  const optionButtons = document.querySelectorAll('.quiz-option-btn');
+  optionButtons.forEach(btn => {
+    btn.disabled = true;
+    btn.classList.add('disabled');
+  });
 
-// Grading Click Handlers
-document.getElementById('quiz-correct-btn').addEventListener('click', () => handleQuizGrading(true));
-document.getElementById('quiz-incorrect-btn').addEventListener('click', () => handleQuizGrading(false));
-
-async function handleQuizGrading(isCorrect) {
+  const isCorrect = choice.isCorrect;
   const currentItem = getCurrentQuestion();
-  
-  // Grade question internally
+
+  // 2. Add visual success/danger feedback
+  const feedbackBanner = document.getElementById('quiz-feedback-banner');
+  if (isCorrect) {
+    selectedBtn.classList.remove('disabled');
+    selectedBtn.classList.add('correct');
+    selectedBtn.innerHTML += ' <i class="fa-solid fa-circle-check"></i>';
+    
+    feedbackBanner.className = 'quiz-feedback-banner correct';
+    feedbackBanner.innerText = 'Splendid! Correct.';
+  } else {
+    selectedBtn.classList.remove('disabled');
+    selectedBtn.classList.add('incorrect');
+    selectedBtn.innerHTML += ' <i class="fa-solid fa-circle-xmark"></i>';
+
+    // Find and highlight correct answer
+    optionButtons.forEach(btn => {
+      const match = choices.find(c => c.text === btn.innerText && c.isCorrect);
+      if (match) {
+        btn.classList.remove('disabled');
+        btn.classList.add('correct');
+        btn.innerHTML += ' <i class="fa-solid fa-circle-check"></i>';
+      }
+    });
+
+    feedbackBanner.className = 'quiz-feedback-banner incorrect';
+    feedbackBanner.innerText = 'Incorrect. Let\'s review this word.';
+  }
+
+  // 3. Grade question internally
   gradeQuestion(isCorrect);
 
-  // If incorrect, update mistaker count inside main vault database
+  // 4. Update mistake count in database if incorrect
   if (!isCorrect) {
     const index = vaultData.items.findIndex(i => i.id === currentItem.id);
     if (index !== -1) {
@@ -701,13 +765,19 @@ async function handleQuizGrading(isCorrect) {
     }
   }
 
-  // Go to next question or complete
+  // 5. Reveal explanation and Next button
+  document.getElementById('quiz-answer-block').style.display = 'block';
+  document.getElementById('quiz-next-btn').style.display = 'block';
+}
+
+// Quiz Next Button Click handler
+document.getElementById('quiz-next-btn').addEventListener('click', async () => {
   if (nextQuestion()) {
     showQuizQuestion();
   } else {
     await completeQuiz();
   }
-}
+});
 
 async function completeQuiz() {
   const summary = getQuizSummary();
