@@ -13,7 +13,7 @@ import {
   speakSlowSyllables, 
   setSelectedVoice, 
   getSelectedVoice,
-  getEnglishVoices
+  getBritishVoices
 } from './speech.js';
 import { 
   startQuiz, 
@@ -882,11 +882,11 @@ function loadSettingsUI() {
 }
 
 function populateVoiceSelector() {
-  const voicesList = getEnglishVoices();
+  const voicesList = getBritishVoices();
   voiceSelect.innerHTML = '';
 
   if (voicesList.length === 0) {
-    voiceSelect.innerHTML = '<option value="">No English voice profiles found in browser.</option>';
+    voiceSelect.innerHTML = '<option value="">No British voice profiles found in browser.</option>';
     return;
   }
 

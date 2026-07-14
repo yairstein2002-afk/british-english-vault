@@ -17,21 +17,21 @@ export function initSpeech() {
     const loadVoices = () => {
       voices = window.speechSynthesis.getVoices();
       
-      // Filter for all English voices (en-US, en-GB, en-AU, en-CA, etc.)
-      const engVoices = voices.filter(v => v.lang.startsWith('en') || v.lang.includes('en-'));
+      // Filter for British English (en-GB) voices
+      const brVoices = voices.filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB'));
 
       // Try to load saved voice preference
       const savedVoiceURI = localStorage.getItem('bev_selected_voice');
       if (savedVoiceURI) {
-        selectedVoice = engVoices.find(v => v.voiceURI === savedVoiceURI) || null;
+        selectedVoice = brVoices.find(v => v.voiceURI === savedVoiceURI) || null;
       }
 
-      // Fallback: choose a British voice (en-GB) if possible, otherwise first English voice
-      if (!selectedVoice && engVoices.length > 0) {
-        selectedVoice = engVoices.find(v => v.lang.startsWith('en-GB')) || engVoices[0];
+      // Fallback: choose the first British voice (en-GB) if possible
+      if (!selectedVoice && brVoices.length > 0) {
+        selectedVoice = brVoices[0];
       }
 
-      resolve(engVoices);
+      resolve(brVoices);
     };
 
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -43,11 +43,11 @@ export function initSpeech() {
 }
 
 /**
- * Returns all available English voices
+ * Returns all available British voices
  */
-export function getEnglishVoices() {
+export function getBritishVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return [];
-  return window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('en') || v.lang.includes('en-'));
+  return window.speechSynthesis.getVoices().filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB'));
 }
 
 /**
@@ -222,21 +222,16 @@ export function getSpeechFriendlySyllable(syl, idx, totalSyllables, fullWord) {
   const isLast = idx === totalSyllables - 1;
   const isFirst = idx === 0;
 
-  const voiceLang = selectedVoice ? selectedVoice.lang : 'en-GB';
-  const isNonRhotic = voiceLang.startsWith('en-GB') || voiceLang.startsWith('en-AU');
-
-  // Rule 1: Trailing "er" in British/Australian English sounds like "uh" (Schwa)
-  if (isNonRhotic && phonetic.endsWith('er')) {
+  // Rule 1: Trailing "er" in British English sounds like "uh" (Schwa)
+  if (phonetic.endsWith('er')) {
     phonetic = phonetic.slice(0, -2) + 'uh';
   }
   
-  // Rule 2: Trailing "ered" (like knackered) or "erd" sounds like "uhd" in non-rhotic accents
-  if (isNonRhotic) {
-    if (phonetic.endsWith('ered')) {
-      phonetic = phonetic.slice(0, -4) + 'uhd';
-    } else if (phonetic.endsWith('erd')) {
-      phonetic = phonetic.slice(0, -3) + 'uhd';
-    }
+  // Rule 2: Trailing "ered" (like knackered) or "erd" sounds like "uhd"
+  if (phonetic.endsWith('ered')) {
+    phonetic = phonetic.slice(0, -4) + 'uhd';
+  } else if (phonetic.endsWith('erd')) {
+    phonetic = phonetic.slice(0, -3) + 'uhd';
   }
 
   // Rule 3: Single letter "a" at start (e.g. about) is a Schwa sound "uh"
