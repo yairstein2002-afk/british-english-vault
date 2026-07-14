@@ -13,9 +13,7 @@ import {
   speakSlowSyllables, 
   setSelectedVoice, 
   getSelectedVoice,
-  getActiveAccent,
-  setActiveAccent,
-  getVoicesForAccent
+  getEnglishVoices
 } from './speech.js';
 import { 
   startQuiz, 
@@ -862,7 +860,6 @@ document.getElementById('quiz-home-btn').addEventListener('click', () => navigat
 // ==========================================================================
 const gitForm = document.getElementById('settings-github-form');
 const voiceSelect = document.getElementById('voice-selector');
-const accentSelect = document.getElementById('accent-selector');
 
 function loadSettingsUI() {
   const config = getGitHubConfig();
@@ -881,20 +878,15 @@ function loadSettingsUI() {
     document.getElementById('github-filepath').value = 'data/vault.json';
   }
 
-  if (accentSelect) {
-    accentSelect.value = getActiveAccent();
-  }
-
   populateVoiceSelector();
 }
 
 function populateVoiceSelector() {
-  const currentAccent = getActiveAccent();
-  const voicesList = getVoicesForAccent(currentAccent);
+  const voicesList = getEnglishVoices();
   voiceSelect.innerHTML = '';
 
   if (voicesList.length === 0) {
-    voiceSelect.innerHTML = '<option value="">No voice profiles found in browser for this dialect.</option>';
+    voiceSelect.innerHTML = '<option value="">No English voice profiles found in browser.</option>';
     return;
   }
 
@@ -913,13 +905,6 @@ function populateVoiceSelector() {
 voiceSelect.addEventListener('change', () => {
   setSelectedVoice(voiceSelect.value);
 });
-
-if (accentSelect) {
-  accentSelect.addEventListener('change', () => {
-    setActiveAccent(accentSelect.value);
-    populateVoiceSelector();
-  });
-}
 
 // Test Connection Button click
 document.getElementById('btn-test-connection').addEventListener('click', async () => {
