@@ -1,0 +1,120 @@
+{
+  "items": [
+    {
+      "id": "word-1",
+      "category": "words",
+      "term": "Knackered",
+      "meaning": "עייף מאוד, מותש",
+      "example": "I was absolutely knackered after a long day at the office.",
+      "favorite": false,
+      "dateAdded": "2026-07-10T10:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "word-2",
+      "category": "words",
+      "term": "Gobsmacked",
+      "meaning": "המום, מופתע לחלוטין",
+      "example": "I was completely gobsmacked when she told me the news.",
+      "favorite": true,
+      "dateAdded": "2026-07-11T12:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "word-3",
+      "category": "words",
+      "term": "Quid",
+      "meaning": "פאונד (סלנג בריטי למטבע)",
+      "example": "Can you lend me ten quid until tomorrow?",
+      "favorite": false,
+      "dateAdded": "2026-07-12T09:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "slang-1",
+      "category": "slangs",
+      "term": "Chuffed",
+      "meaning": "שמח מאוד, מרוצה מעצמו",
+      "example": "He was chuffed to bits with his birthday present.",
+      "favorite": true,
+      "dateAdded": "2026-07-10T11:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "slang-2",
+      "category": "slangs",
+      "term": "Gutted",
+      "meaning": "מאוכזב מאוד, שבור",
+      "example": "She was absolutely gutted when her team lost the cup final.",
+      "favorite": false,
+      "dateAdded": "2026-07-11T14:30:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "slang-3",
+      "category": "slangs",
+      "term": "Skint",
+      "meaning": "תפרן, בלי פרוטה",
+      "example": "I would love to go to the pub, but I'm skint.",
+      "favorite": false,
+      "dateAdded": "2026-07-12T16:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "phrase-1",
+      "category": "phrases",
+      "term": "Bob's your uncle",
+      "meaning": "וזה הכל, פשוט מאוד (משמש לציון פעולה פשוטה שהסתיימה)",
+      "example": "Just add hot water, stir, and Bob's your uncle!",
+      "favorite": false,
+      "dateAdded": "2026-07-10T08:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "phrase-2",
+      "category": "phrases",
+      "term": "Fancy a cuppa?",
+      "meaning": "בא לך כוס תה?",
+      "example": "You look cold and tired. Fancy a cuppa?",
+      "favorite": true,
+      "dateAdded": "2026-07-11T10:15:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "idiom-1",
+      "category": "idioms",
+      "term": "A penny for your thoughts",
+      "meaning": "על מה אתה חושב? (הבעת עניין במחשבותיו של אדם שקט)",
+      "example": "You've been staring out the window for ages. A penny for your thoughts?",
+      "favorite": false,
+      "dateAdded": "2026-07-10T09:30:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "idiom-2",
+      "category": "idioms",
+      "term": "Cost an arm and a leg",
+      "meaning": "יקר מאוד, עלה הון תועפות",
+      "example": "Buying that designer winter coat cost me an arm and a leg.",
+      "favorite": false,
+      "dateAdded": "2026-07-12T11:00:00Z",
+      "mistakeCount": 0
+    },
+    {
+      "id": "words-1784052469858",
+      "category": "words",
+      "term": "try",
+      "meaning": "try",
+      "example": "try",
+      "favorite": false,
+      "dateAdded": "2026-07-14T18:07:49.858Z",
+      "mistakeCount": 0
+    }
+  ],
+  "stats": {
+    "quizzesCompleted": 0,
+    "correctAnswers": 0,
+    "incorrectAnswers": 0,
+    "history": []
+  }
+}
