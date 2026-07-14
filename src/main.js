@@ -866,8 +866,8 @@ function loadSettingsUI() {
   
   if (config) {
     document.getElementById('github-pat').value = config.pat || '';
-    document.getElementById('github-owner').value = config.owner || '';
-    document.getElementById('github-repo').value = config.repo || '';
+    document.getElementById('github-owner').value = config.owner || 'yairstein2002-afk';
+    document.getElementById('github-repo').value = config.repo || 'british-english-vault';
     document.getElementById('github-branch').value = config.branch || 'main';
     document.getElementById('github-filepath').value = config.path || 'data/vault.json';
   } else {
