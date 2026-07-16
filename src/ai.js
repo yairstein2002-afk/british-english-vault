@@ -114,7 +114,7 @@ Return a JSON object with this exact structure:
     modelsToTry.unshift(cachedModel);
   }
 
-  let lastError = null;
+  const errors = [];
 
   for (const model of modelsToTry) {
     try {
@@ -149,12 +149,12 @@ Return a JSON object with this exact structure:
       } else {
         const errData = await response.json().catch(() => ({}));
         const errMsg = errData.error?.message || response.statusText;
-        lastError = new Error(`Gemini API Error (${model}): ${errMsg}`);
+        errors.push(`- ${model}: ${errMsg}`);
       }
     } catch (err) {
-      lastError = err;
+      errors.push(`- ${model}: ${err.message}`);
     }
   }
 
-  throw lastError || new Error("Failed to communicate with any Gemini models.");
+  throw new Error(`Failed to connect to Gemini. Details:\n${errors.join('\n')}`);
 }
