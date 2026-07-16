@@ -110,6 +110,9 @@ export async function askGeminiTutor(mode, text) {
             contents: [{
               parts: [{ text: prompt }]
             }],
+            systemInstruction: {
+              parts: [{ text: "You are a British English language expert. You must ALWAYS respond with a raw JSON object matching the requested schema. Do NOT include any conversational text, introductions, or markdown code block formatting (like ```json). Respond with the raw JSON string only." }]
+            },
             generationConfig: {
               responseMimeType: "application/json",
               temperature: 0.1,
