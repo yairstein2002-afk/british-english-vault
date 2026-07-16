@@ -28,6 +28,12 @@ function extractJSON(text) {
   if (start !== -1 && end !== -1 && end > start) {
     cleaned = cleaned.substring(start, end + 1);
   }
+  
+  // Sanitize raw newlines inside double-quoted JSON string values to prevent JSON.parse syntax errors
+  cleaned = cleaned.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match, p1) => {
+    return '"' + p1.replace(/\n/g, '\\n').replace(/\r/g, '\\r') + '"';
+  });
+
   try {
     return JSON.parse(cleaned);
   } catch (err) {
@@ -60,7 +66,7 @@ export async function askGeminiTutor(mode, text) {
   }
 
   let prompt = '';
-  let maxTokens = 250;
+  let maxTokens = 1000;
   let responseSchema = null;
   
   if (mode === 'explore') {
@@ -87,7 +93,7 @@ export async function askGeminiTutor(mode, text) {
       required: ["status", "correction", "explanation", "meaning", "example"]
     };
   } else if (mode === 'tutor') {
-    maxTokens = 600;
+    maxTokens = 1500;
     prompt = `Friendly British English tutor. Answer: "${text}". Return JSON: {"response":"markdown text response","examples":[{"text":"example","context":"brief context"}]}`;
     responseSchema = {
       type: "OBJECT",
