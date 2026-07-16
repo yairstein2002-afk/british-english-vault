@@ -105,7 +105,7 @@ Return a JSON object with this exact structure:
   ];
 
   // If we already successfully found a working model in this session, try it first
-  const cachedModel = sessionStorage.getItem('bev_working_gemini_model');
+  const cachedModel = localStorage.getItem('bev_working_gemini_model');
   if (cachedModel) {
     const index = modelsToTry.indexOf(cachedModel);
     if (index > -1) {
@@ -142,8 +142,8 @@ Return a JSON object with this exact structure:
         const result = await response.json();
         const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
         if (rawText) {
-          // Success! Save the working model name to sessionStorage for speed on next requests
-          sessionStorage.setItem('bev_working_gemini_model', model);
+          // Success! Save the working model name to localStorage for speed on next requests
+          localStorage.setItem('bev_working_gemini_model', model);
           return JSON.parse(rawText.trim());
         }
       } else {
