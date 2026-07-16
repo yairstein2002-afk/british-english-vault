@@ -27,6 +27,21 @@ export async function askGeminiTutor(mode, text) {
     throw new Error("Gemini API Key is not configured. Please add it in Settings first.");
   }
 
+  // Next-Level Optimization: Local AI Response Caching (0ms response time for repeat queries)
+  const cacheKey = `${mode}:${text.toLowerCase().trim()}`;
+  try {
+    const cachedData = localStorage.getItem('bev_ai_cache');
+    if (cachedData) {
+      const cacheObj = JSON.parse(cachedData);
+      if (cacheObj[cacheKey]) {
+        console.log(`[AI Cache] Serving cached response for: ${cacheKey}`);
+        return cacheObj[cacheKey];
+      }
+    }
+  } catch (e) {
+    console.error("Cache read failed", e);
+  }
+
   let prompt = '';
   let maxTokens = 250;
   
@@ -93,7 +108,19 @@ export async function askGeminiTutor(mode, text) {
         if (rawText) {
           // Success! Save the working model name to localStorage for speed on next requests
           localStorage.setItem('bev_working_gemini_model', model);
-          return JSON.parse(rawText.trim());
+          const parsedResult = JSON.parse(rawText.trim());
+          
+          // Save to Local AI cache
+          try {
+            const cachedData = localStorage.getItem('bev_ai_cache') || '{}';
+            const cacheObj = JSON.parse(cachedData);
+            cacheObj[cacheKey] = parsedResult;
+            localStorage.setItem('bev_ai_cache', JSON.stringify(cacheObj));
+          } catch (e) {
+            console.error("Cache write failed", e);
+          }
+          
+          return parsedResult;
         }
       } else {
         const errData = await response.json().catch(() => ({}));
