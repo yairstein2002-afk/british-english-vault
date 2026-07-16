@@ -94,11 +94,11 @@ Return a JSON object with this exact structure:
 }`;
   }
 
-  // List of models to try. We put the most common and latest first.
+  // List of models to try. Prioritize gemini-3-flash-preview to prevent exceeding quota on unsupported models.
   const modelsToTry = [
+    'gemini-3-flash-preview',
     'gemini-1.5-flash',
     'gemini-2.0-flash',
-    'gemini-3-flash-preview',
     'gemini-3.0-flash',
     'gemini-3.5-flash',
     'gemini-1.5-flash-latest'
