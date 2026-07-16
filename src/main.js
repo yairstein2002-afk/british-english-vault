@@ -1171,6 +1171,7 @@ function initAIHandlers() {
           <div style="border: 2px solid var(--danger); padding: 1.5rem; border-radius: 12px; background-color: var(--danger-light); color: var(--danger);">
             <h4><i class="fa-solid fa-circle-exclamation"></i> AI Request Failed</h4>
             <p style="margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.5;">${userFriendlyMsg}</p>
+            <textarea style="width: 100%; margin-top: 1rem; height: 120px; font-family: monospace; font-size: 0.85rem; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 6px; background-color: var(--card-bg); color: var(--text-color);" readonly>${err.message}</textarea>
           </div>
         `;
         responsePanel.style.display = 'block';
