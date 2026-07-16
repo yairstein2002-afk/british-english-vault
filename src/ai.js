@@ -18,6 +18,19 @@ export function saveGeminiApiKey(key) {
   localStorage.setItem(GEMINI_API_KEY_STORAGE, key.trim());
 }
 
+function extractJSON(text) {
+  let cleaned = text.trim();
+  if (cleaned.startsWith('```')) {
+    cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
+  }
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.substring(start, end + 1);
+  }
+  return JSON.parse(cleaned);
+}
+
 /**
  * Call Gemini 1.5 Flash to process the AI Assistant prompts
  */
@@ -108,7 +121,7 @@ export async function askGeminiTutor(mode, text) {
         if (rawText) {
           // Success! Save the working model name to localStorage for speed on next requests
           localStorage.setItem('bev_working_gemini_model', model);
-          const parsedResult = JSON.parse(rawText.trim());
+          const parsedResult = extractJSON(rawText);
           
           // Save to Local AI cache
           try {
