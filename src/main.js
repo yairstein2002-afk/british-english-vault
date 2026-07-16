@@ -1160,10 +1160,17 @@ function initAIHandlers() {
         responsePanel.style.display = 'block';
       } catch (err) {
         console.error(err);
+        let userFriendlyMsg = err.message;
+        const lowerErr = err.message.toLowerCase();
+        if (lowerErr.includes("quota") || lowerErr.includes("exhausted") || lowerErr.includes("429") || lowerErr.includes("rate limit")) {
+          userFriendlyMsg = "⚠️ שרת ה-AI של גוגל עמוס זמנית בגלל מגבלת השימוש החינמית (Rate Limit). אנא המתן כ-30 שניות ברצף מבלי ללחוץ על כלום ונסה שוב.";
+        } else if (lowerErr.includes("key") || lowerErr.includes("invalid") || lowerErr.includes("400") || lowerErr.includes("credential")) {
+          userFriendlyMsg = "⚠️ מפתח ה-API שהזנת אינו תקין. אנא ודא שהעתקת אותו במלואו מ-Google AI Studio ללא רווחים מיותרים תחת הגדרות.";
+        }
         responsePanel.innerHTML = `
           <div style="border: 2px solid var(--danger); padding: 1.5rem; border-radius: 12px; background-color: var(--danger-light); color: var(--danger);">
             <h4><i class="fa-solid fa-circle-exclamation"></i> AI Request Failed</h4>
-            <p style="margin-top: 0.5rem; font-size: 0.95rem;">${err.message}</p>
+            <p style="margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.5;">${userFriendlyMsg}</p>
           </div>
         `;
         responsePanel.style.display = 'block';
