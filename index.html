@@ -97,6 +97,9 @@
         <a href="#stats" class="nav-item" data-view="stats">
           <i class="fa-solid fa-chart-line"></i> <span>Statistics</span>
         </a>
+        <a href="#ai" class="nav-item" data-view="ai">
+          <i class="fa-solid fa-robot"></i> <span>AI Assistant</span>
+        </a>
         <a href="#settings" class="nav-item" data-view="settings">
           <i class="fa-solid fa-gears"></i> <span>Settings</span>
         </a>
@@ -138,6 +141,10 @@
       <a href="#stats" class="mobile-nav-item" data-view="stats">
         <i class="fa-solid fa-chart-line"></i>
         <span>Stats</span>
+      </a>
+      <a href="#ai" class="mobile-nav-item" data-view="ai">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI</span>
       </a>
       <a href="#settings" class="mobile-nav-item" data-view="settings">
         <i class="fa-solid fa-gears"></i>
@@ -540,6 +547,24 @@
             </button>
           </div>
           
+          <!-- Gemini AI Settings Card -->
+          <div class="card form-card">
+            <h3><i class="fa-solid fa-robot"></i> Gemini AI Configuration</h3>
+            <p class="panel-desc">Add your Gemini API Key to enable the AI Assistant features. You can get a free API Key from <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.</p>
+            
+            <form id="settings-gemini-form" class="settings-form">
+              <div class="form-group">
+                <label for="gemini-key" class="form-label">Gemini API Key</label>
+                <input type="password" id="gemini-key" placeholder="AIzaSy..." class="form-control">
+              </div>
+              <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save API Key
+                </button>
+              </div>
+            </form>
+          </div>
+          
           <!-- Data Management Card -->
           <div class="card danger-zone-card">
             <h3><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone / Backup</h3>
@@ -553,6 +578,47 @@
                 <i class="fa-solid fa-trash-can"></i> Reset App Data
               </button>
             </div>
+          </div>
+        </section>
+        
+        <!-- AI ASSISTANT VIEW -->
+        <section id="view-ai" class="view-section" style="display: none;">
+          <div class="card form-card">
+            <h3><i class="fa-solid fa-robot"></i> AI Study Assistant</h3>
+            <p class="panel-desc">Ask questions, explore word context, check grammar, or translate Hebrew phrases using Google Gemini 1.5 Flash.</p>
+            
+            <div class="form-group">
+              <label for="ai-input" class="form-label">Type your text, word, sentence, or question:</label>
+              <textarea id="ai-input" class="form-control" rows="4" placeholder="Enter English text to check grammar/explore, or Hebrew text to translate..."></textarea>
+            </div>
+            
+            <!-- AI Action Buttons -->
+            <div class="ai-actions-grid">
+              <button id="btn-ai-explore" class="btn btn-secondary">
+                <i class="fa-solid fa-magnifying-glass"></i> Explore Word
+              </button>
+              <button id="btn-ai-grammar" class="btn btn-secondary">
+                <i class="fa-solid fa-spell-check"></i> Check Grammar
+              </button>
+              <button id="btn-ai-tutor" class="btn btn-secondary">
+                <i class="fa-solid fa-chalkboard-user"></i> Ask AI Tutor
+              </button>
+              <button id="btn-ai-translate" class="btn btn-secondary">
+                <i class="fa-solid fa-language"></i> Translate (HE -> EN)
+              </button>
+            </div>
+          </div>
+          
+          <!-- AI Loading Panel -->
+          <div id="ai-loading" class="card text-center" style="display: none; padding: 3rem 1.5rem;">
+            <div class="ai-loader-spinner"></div>
+            <h4 style="margin-top: 1.5rem; margin-bottom: 0.25rem;">Tuning in with British AI Tutor...</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Fetching structured definitions and audio examples.</p>
+          </div>
+
+          <!-- AI Response Panel -->
+          <div id="ai-response" class="card response-card" style="display: none;">
+            <!-- Generated dynamically based on mode -->
           </div>
         </section>
         

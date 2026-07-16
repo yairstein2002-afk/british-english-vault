@@ -25,6 +25,7 @@ import {
   getQuizChoices
 } from './quiz.js';
 import { renderStatsUI } from './stats.js';
+import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
@@ -39,7 +40,8 @@ const views = {
   cards: document.getElementById('view-cards-container'),
   quiz: document.getElementById('view-quiz'),
   stats: document.getElementById('view-stats'),
-  settings: document.getElementById('view-settings')
+  settings: document.getElementById('view-settings'),
+  ai: document.getElementById('view-ai')
 };
 
 // ==========================================================================
@@ -98,7 +100,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'quiz', 'stats', 'settings'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'quiz', 'stats', 'settings', 'ai'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -139,7 +141,8 @@ function updateView() {
     idioms: 'Idioms',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
-    settings: 'App Settings'
+    settings: 'App Settings',
+    ai: 'AI Assistant'
   };
   
   document.getElementById('current-view-title').innerText = titleMap[currentView] || 'Vault';
@@ -161,6 +164,9 @@ function updateView() {
     } else if (currentView === 'settings') {
       views.settings.classList.add('active');
       loadSettingsUI();
+    } else if (currentView === 'ai') {
+      views.ai.classList.add('active');
+      loadAIUI();
     }
   }
 }
@@ -878,6 +884,11 @@ function loadSettingsUI() {
     document.getElementById('github-filepath').value = 'data/vault.json';
   }
 
+  const geminiKeyInput = document.getElementById('gemini-key');
+  if (geminiKeyInput) {
+    geminiKeyInput.value = getGeminiApiKey();
+  }
+
   populateVoiceSelector();
 }
 
@@ -905,6 +916,17 @@ function populateVoiceSelector() {
 voiceSelect.addEventListener('change', () => {
   setSelectedVoice(voiceSelect.value);
 });
+
+// Gemini AI key settings form listener
+const geminiForm = document.getElementById('settings-gemini-form');
+if (geminiForm) {
+  geminiForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const key = document.getElementById('gemini-key').value.trim();
+    saveGeminiApiKey(key);
+    showBannerAlert("Gemini API Key saved successfully!", "success");
+  });
+}
 
 // Test Connection Button click
 document.getElementById('btn-test-connection').addEventListener('click', async () => {
@@ -1034,6 +1056,9 @@ function initEventListeners() {
     localStorage.setItem('bev_theme', newTheme);
     updateThemeButtonUI(newTheme);
   });
+
+  // Init AI Assistant controllers
+  initAIHandlers();
 }
 
 function updateThemeButtonUI(theme) {
@@ -1076,4 +1101,230 @@ function showLoader() {
 
 function hideLoader() {
   // Handled by rendering cards
+}
+
+// ==========================================================================
+// AI ASSISTANT VIEW CONTROLLER
+// ==========================================================================
+function loadAIUI() {
+  document.getElementById('ai-input').value = '';
+  document.getElementById('ai-loading').style.display = 'none';
+  document.getElementById('ai-response').style.display = 'none';
+  document.getElementById('ai-response').innerHTML = '';
+}
+
+function initAIHandlers() {
+  const actions = [
+    { btnId: 'btn-ai-explore', mode: 'explore' },
+    { btnId: 'btn-ai-grammar', mode: 'grammar' },
+    { btnId: 'btn-ai-tutor', mode: 'tutor' },
+    { btnId: 'btn-ai-translate', mode: 'translate' }
+  ];
+
+  actions.forEach(({ btnId, mode }) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+      const textInput = document.getElementById('ai-input').value.trim();
+      if (!textInput) {
+        showBannerAlert("Please type some text first.", "error");
+        return;
+      }
+
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        showBannerAlert("Please configure your Gemini API Key in Settings first.", "error");
+        navigateTo('settings');
+        return;
+      }
+
+      // Show loading panel, hide response
+      const loadingPanel = document.getElementById('ai-loading');
+      const responsePanel = document.getElementById('ai-response');
+      loadingPanel.style.display = 'block';
+      responsePanel.style.display = 'none';
+      responsePanel.innerHTML = '';
+
+      // Disable all action buttons during request
+      const actionButtons = document.querySelectorAll('.ai-actions-grid button');
+      actionButtons.forEach(b => b.disabled = true);
+
+      try {
+        const data = await askGeminiTutor(mode, textInput);
+        renderAIResponse(mode, data);
+        responsePanel.style.display = 'block';
+      } catch (err) {
+        console.error(err);
+        responsePanel.innerHTML = `
+          <div style="border: 2px solid var(--danger); padding: 1.5rem; border-radius: 12px; background-color: var(--danger-light); color: var(--danger);">
+            <h4><i class="fa-solid fa-circle-exclamation"></i> AI Request Failed</h4>
+            <p style="margin-top: 0.5rem; font-size: 0.95rem;">${err.message}</p>
+          </div>
+        `;
+        responsePanel.style.display = 'block';
+      } finally {
+        loadingPanel.style.display = 'none';
+        actionButtons.forEach(b => b.disabled = false);
+      }
+    });
+  });
+}
+
+function renderAIResponse(mode, data) {
+  const container = document.getElementById('ai-response');
+  container.innerHTML = '';
+
+  if (mode === 'explore') {
+    container.innerHTML = `
+      <div class="ai-section">
+        <h4>Meaning</h4>
+        <p>${data.meaning}</p>
+      </div>
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+      <div class="ai-section">
+        <h4>Example Sentence</h4>
+        <div class="ai-example-box">
+          <div class="example-text">"${data.example}"</div>
+          <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (mode === 'grammar') {
+    const isCorrect = data.status && data.status.toLowerCase().trim() === 'correct';
+    const badgeClass = isCorrect ? 'correct' : 'incorrect';
+    const badgeText = isCorrect ? 'Correct ✓' : 'Incorrect ✗';
+    const badgeIcon = isCorrect ? 'fa-circle-check' : 'fa-circle-xmark';
+
+    container.innerHTML = `
+      <div class="ai-badge ${badgeClass}">
+        <i class="fa-solid ${badgeIcon}"></i> ${badgeText}
+      </div>
+
+      <div class="ai-section">
+        <h4>Corrected Sentence</h4>
+        <div class="ai-correction-text">"${data.correction}"</div>
+        <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+          <button class="mini-speak-btn ai-speak-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="Speak sentence">
+            <i class="fa-solid fa-circle-play"></i>
+          </button>
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+      <div class="ai-section">
+        <h4>Grammar Explanation</h4>
+        <p>${data.explanation}</p>
+      </div>
+
+      <div class="ai-section">
+        <h4>Sentence Meaning</h4>
+        <p>${data.meaning}</p>
+      </div>
+
+      <div class="ai-section">
+        <h4>Another Example</h4>
+        <div class="ai-example-box">
+          <div class="example-text">"${data.example}"</div>
+          <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (mode === 'tutor') {
+    // Format response simple markdown rules
+    let formattedResponse = data.response
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+
+    let examplesHTML = '';
+    if (data.examples && data.examples.length > 0) {
+      examplesHTML = `
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+        <div class="ai-section">
+          <h4>Usage Examples</h4>
+          ${data.examples.map(ex => `
+            <div class="ai-example-box" style="margin-bottom: 1rem;">
+              <div class="example-text">"${ex.text}"</div>
+              <div class="example-context">${ex.context}</div>
+              <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+                <button class="mini-speak-btn ai-speak-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="Speak sentence">
+                  <i class="fa-solid fa-circle-play"></i>
+                </button>
+                <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    container.innerHTML = `
+      <div class="ai-section">
+        <h4>AI Tutor Response</h4>
+        <div class="ai-tutor-response">${formattedResponse}</div>
+      </div>
+      ${examplesHTML}
+    `;
+  } else if (mode === 'translate') {
+    container.innerHTML = `
+      <div class="ai-section">
+        <h4>British English Translation</h4>
+        <div class="ai-correction-text">"${data.translation}"</div>
+        <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+          <button class="mini-speak-btn ai-speak-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="Speak sentence">
+            <i class="fa-solid fa-circle-play"></i>
+          </button>
+          <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+      <div class="ai-section">
+        <h4>Meaning / Context</h4>
+        <p>${data.meaning}</p>
+      </div>
+
+      <div class="ai-section">
+        <h4>Example Usage</h4>
+        <div class="ai-example-box">
+          <div class="example-text">"${data.example}"</div>
+          <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Bind speak click event listeners to speech buttons
+  const speakButtons = container.querySelectorAll('.ai-speak-btn');
+  speakButtons.forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const textToSpeak = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+      try {
+        await speakText(textToSpeak);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
+      }
+    });
+  });
 }

@@ -1683,3 +1683,135 @@ button, input, select, textarea {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+/* ==========================================================================
+   AI STUDY ASSISTANT STYLES
+   ========================================================================== */
+.ai-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.ai-loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--border-color);
+  border-top: 4px solid var(--uk-blue);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: spin 1s linear infinite;
+}
+
+[data-theme="dark"] .ai-loader-spinner {
+  border-top-color: var(--gold);
+}
+
+.response-card {
+  animation: slide-up-reveal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 2rem;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 1.25rem;
+}
+
+.ai-badge.correct {
+  background-color: var(--success-light);
+  color: var(--success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.ai-badge.incorrect {
+  background-color: var(--danger-light);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.ai-section {
+  margin-bottom: 1.5rem;
+}
+
+.ai-section:last-child {
+  margin-bottom: 0;
+}
+
+.ai-section h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 0.35rem;
+}
+
+.ai-section p {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text-main);
+}
+
+.ai-correction-text {
+  font-size: 1.35rem !important;
+  font-weight: 700;
+  color: var(--uk-blue) !important;
+  font-family: 'Playfair Display', serif;
+  background-color: var(--input-bg);
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  border-left: 4px solid var(--uk-blue);
+  margin-top: 0.25rem;
+}
+
+[data-theme="dark"] .ai-correction-text {
+  color: var(--gold) !important;
+  border-left-color: var(--gold);
+}
+
+.ai-tutor-response {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+/* Bullet list inside AI responses */
+.ai-tutor-response ul {
+  padding-left: 1.25rem;
+  margin: 0.75rem 0;
+}
+
+.ai-tutor-response li {
+  margin-bottom: 0.5rem;
+}
+
+.ai-example-box {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-top: 0.75rem;
+}
+
+.ai-example-box .example-text {
+  font-weight: 600;
+  font-size: 1.05rem;
+  font-style: italic;
+  margin-bottom: 0.5rem;
+}
+
+.ai-example-box .example-context {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+
