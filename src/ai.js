@@ -92,35 +92,67 @@ Return a JSON object with this exact structure:
 }`;
   }
 
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: prompt }]
-        }],
-        generationConfig: {
-          responseMimeType: "application/json"
-        }
-      })
+  // List of models to try. We put the most common and latest first.
+  const modelsToTry = [
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-3-flash-preview',
+    'gemini-3.0-flash',
+    'gemini-3.5-flash',
+    'gemini-1.5-flash-latest'
+  ];
+
+  // If we already successfully found a working model in this session, try it first
+  const cachedModel = sessionStorage.getItem('bev_working_gemini_model');
+  if (cachedModel) {
+    const index = modelsToTry.indexOf(cachedModel);
+    if (index > -1) {
+      modelsToTry.splice(index, 1);
     }
-  );
-
-  if (!response.ok) {
-    const errData = await response.json().catch(() => ({}));
-    const errMsg = errData.error?.message || response.statusText;
-    throw new Error(`Gemini API Error: ${errMsg}`);
+    modelsToTry.unshift(cachedModel);
   }
 
-  const result = await response.json();
-  const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!rawText) {
-    throw new Error("No response received from Gemini.");
+  let lastError = null;
+
+  for (const model of modelsToTry) {
+    try {
+      console.log(`Attempting Gemini API request with model: ${model}`);
+      
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }]
+            }],
+            generationConfig: {
+              responseMimeType: "application/json"
+            }
+          })
+        }
+      );
+
+      if (response.ok) {
+        const result = await response.json();
+        const rawText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (rawText) {
+          // Success! Save the working model name to sessionStorage for speed on next requests
+          sessionStorage.setItem('bev_working_gemini_model', model);
+          return JSON.parse(rawText.trim());
+        }
+      } else {
+        const errData = await response.json().catch(() => ({}));
+        const errMsg = errData.error?.message || response.statusText;
+        lastError = new Error(`Gemini API Error (${model}): ${errMsg}`);
+      }
+    } catch (err) {
+      lastError = err;
+    }
   }
 
-  return JSON.parse(rawText.trim());
+  throw lastError || new Error("Failed to communicate with any Gemini models.");
 }
