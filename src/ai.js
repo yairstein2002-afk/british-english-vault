@@ -61,16 +61,63 @@ export async function askGeminiTutor(mode, text) {
 
   let prompt = '';
   let maxTokens = 250;
+  let responseSchema = null;
   
   if (mode === 'explore') {
     prompt = `Return JSON for British English "${text}": {"meaning":"simple definition","example":"natural British English sentence"}`;
+    responseSchema = {
+      type: "OBJECT",
+      properties: {
+        meaning: { type: "STRING" },
+        example: { type: "STRING" }
+      },
+      required: ["meaning", "example"]
+    };
   } else if (mode === 'grammar') {
     prompt = `Grammar check "${text}". Ignore minor capitalization/punctuation differences. Return JSON: {"status":"Correct" or "Incorrect","correction":"corrected sentence","explanation":"simple grammar rule explanation","meaning":"sentence meaning","example":"similar correct sentence"}`;
+    responseSchema = {
+      type: "OBJECT",
+      properties: {
+        status: { type: "STRING" },
+        correction: { type: "STRING" },
+        explanation: { type: "STRING" },
+        meaning: { type: "STRING" },
+        example: { type: "STRING" }
+      },
+      required: ["status", "correction", "explanation", "meaning", "example"]
+    };
   } else if (mode === 'tutor') {
     maxTokens = 600;
     prompt = `Friendly British English tutor. Answer: "${text}". Return JSON: {"response":"markdown text response","examples":[{"text":"example","context":"brief context"}]}`;
+    responseSchema = {
+      type: "OBJECT",
+      properties: {
+        response: { type: "STRING" },
+        examples: {
+          type: "ARRAY",
+          items: {
+            type: "OBJECT",
+            properties: {
+              text: { type: "STRING" },
+              context: { type: "STRING" }
+            },
+            required: ["text", "context"]
+          }
+        }
+      },
+      required: ["response", "examples"]
+    };
   } else if (mode === 'translate') {
     prompt = `Translate Hebrew "${text}" to natural British English. Return JSON: {"translation":"British English translation","meaning":"translation context","example":"example sentence using translation"}`;
+    responseSchema = {
+      type: "OBJECT",
+      properties: {
+        translation: { type: "STRING" },
+        meaning: { type: "STRING" },
+        example: { type: "STRING" }
+      },
+      required: ["translation", "meaning", "example"]
+    };
   }
 
   // List of models to try. Prioritize gemini-3-flash-preview to prevent exceeding quota on unsupported models.
@@ -115,6 +162,7 @@ export async function askGeminiTutor(mode, text) {
             },
             generationConfig: {
               responseMimeType: "application/json",
+              responseSchema: responseSchema,
               temperature: 0.1,
               maxOutputTokens: maxTokens
             }
