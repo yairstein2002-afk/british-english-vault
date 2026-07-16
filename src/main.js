@@ -1146,6 +1146,10 @@ function initAIHandlers() {
       responsePanel.style.display = 'none';
       responsePanel.innerHTML = '';
 
+      // Cache original button content and add spinner
+      const originalBtnHTML = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Loading...';
+
       // Disable all action buttons during request
       const actionButtons = document.querySelectorAll('.ai-actions-grid button');
       actionButtons.forEach(b => b.disabled = true);
@@ -1166,6 +1170,7 @@ function initAIHandlers() {
       } finally {
         loadingPanel.style.display = 'none';
         actionButtons.forEach(b => b.disabled = false);
+        btn.innerHTML = originalBtnHTML;
       }
     });
   });

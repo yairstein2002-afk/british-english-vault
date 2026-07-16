@@ -44,6 +44,8 @@ Return a JSON object with this exact structure:
   } else if (mode === 'grammar') {
     prompt = `You are a British English grammar checker.
 Analyze this sentence: "${text}".
+Important: Ignore minor punctuation (periods, commas, quotation marks) and capitalization differences when determining correctness. If the sentence is grammatically correct and the only issues are capitalization or missing basic punctuation, you MUST mark it as "Correct".
+
 Provide:
 1. Status ("Correct" or "Incorrect").
 2. Correction: the corrected sentence.
