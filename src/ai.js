@@ -28,70 +28,17 @@ export async function askGeminiTutor(mode, text) {
   }
 
   let prompt = '';
+  let maxTokens = 250;
   
   if (mode === 'explore') {
-    prompt = `You are a British English language expert.
-Analyze the word or phrase: "${text}".
-Provide:
-1. A brief and simple definition in English.
-2. A natural example sentence using this word in a British English style/context.
-
-Return a JSON object with this exact structure:
-{
-  "meaning": "...",
-  "example": "..."
-}`;
+    prompt = `Return JSON for British English "${text}": {"meaning":"simple definition","example":"natural British English sentence"}`;
   } else if (mode === 'grammar') {
-    prompt = `You are a British English grammar checker.
-Analyze this sentence: "${text}".
-Important: Ignore minor punctuation (periods, commas, quotation marks) and capitalization differences when determining correctness. If the sentence is grammatically correct and the only issues are capitalization or missing basic punctuation, you MUST mark it as "Correct".
-
-Provide:
-1. Status ("Correct" or "Incorrect").
-2. Correction: the corrected sentence.
-3. Explanation: a simple explanation of the grammar rule/mistake.
-4. Meaning: simple explanation of what the sentence means.
-5. Example: another example sentence demonstrating the corrected grammar rule.
-
-Return a JSON object with this exact structure:
-{
-  "status": "Correct" or "Incorrect",
-  "correction": "...",
-  "explanation": "...",
-  "meaning": "...",
-  "example": "..."
-}`;
+    prompt = `Grammar check "${text}". Ignore minor capitalization/punctuation differences. Return JSON: {"status":"Correct" or "Incorrect","correction":"corrected sentence","explanation":"simple grammar rule explanation","meaning":"sentence meaning","example":"similar correct sentence"}`;
   } else if (mode === 'tutor') {
-    prompt = `You are a friendly British English tutor.
-Answer this question: "${text}".
-Provide:
-1. A structured response (markdown supported).
-2. Up to 3 natural example sentences demonstrating the response, along with brief context descriptions.
-
-Return a JSON object with this exact structure:
-{
-  "response": "...",
-  "examples": [
-    {
-      "text": "...",
-      "context": "..."
-    }
-  ]
-}`;
+    maxTokens = 600;
+    prompt = `Friendly British English tutor. Answer: "${text}". Return JSON: {"response":"markdown text response","examples":[{"text":"example","context":"brief context"}]}`;
   } else if (mode === 'translate') {
-    prompt = `You are a translator converting Hebrew text to natural, idiomatic British English.
-Translate this Hebrew text: "${text}".
-Provide:
-1. Translation: the best British English translation.
-2. Meaning: explain why this translation was chosen and what it means (in English).
-3. Example: a natural example sentence using the translated phrase.
-
-Return a JSON object with this exact structure:
-{
-  "translation": "...",
-  "meaning": "...",
-  "example": "..."
-}`;
+    prompt = `Translate Hebrew "${text}" to natural British English. Return JSON: {"translation":"British English translation","meaning":"translation context","example":"example sentence using translation"}`;
   }
 
   // List of models to try. Prioritize gemini-3-flash-preview to prevent exceeding quota on unsupported models.
@@ -132,7 +79,9 @@ Return a JSON object with this exact structure:
               parts: [{ text: prompt }]
             }],
             generationConfig: {
-              responseMimeType: "application/json"
+              responseMimeType: "application/json",
+              temperature: 0.1,
+              maxOutputTokens: maxTokens
             }
           })
         }
