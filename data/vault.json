@@ -99,6 +99,16 @@
       "favorite": false,
       "dateAdded": "2026-07-12T11:00:00Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1784052469858",
+      "category": "words",
+      "term": "try",
+      "meaning": "try",
+      "example": "try",
+      "favorite": false,
+      "dateAdded": "2026-07-14T18:07:49.858Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
