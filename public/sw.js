@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bev-cache-v3';
+const CACHE_NAME = 'bev-cache-v4';
 const ASSETS = [
   '/',
   '/index.html',
@@ -15,6 +15,7 @@ const ASSETS = [
 
 // Install Event
 self.addEventListener('install', (e) => {
+  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS);
@@ -33,6 +34,8 @@ self.addEventListener('activate', (e) => {
           }
         })
       );
+    }).then(() => {
+      return self.clients.claim();
     })
   );
 });
