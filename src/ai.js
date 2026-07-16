@@ -28,7 +28,11 @@ function extractJSON(text) {
   if (start !== -1 && end !== -1 && end > start) {
     cleaned = cleaned.substring(start, end + 1);
   }
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (err) {
+    throw new Error(`JSON Parse failed. Raw response: "${text.substring(0, 120)}...". Error: ${err.message}`);
+  }
 }
 
 /**
