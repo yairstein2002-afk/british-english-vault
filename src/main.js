@@ -387,11 +387,11 @@ function renderCardsGrid() {
 
     // 2. Favorite toggle handler
     const favBtn = card.querySelector('.fav-btn');
-    favBtn.addEventListener('click', async (e) => {
+    favBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       item.favorite = !item.favorite;
-      await saveDatabase();
       renderCardsGrid();
+      saveDatabase();
     });
 
     // 3. Edit Handler
@@ -400,11 +400,11 @@ function renderCardsGrid() {
     });
 
     // 4. Delete Handler
-    card.querySelector('.delete-item-btn').addEventListener('click', async () => {
+    card.querySelector('.delete-item-btn').addEventListener('click', () => {
       if (confirm(`Are you sure you want to delete "${item.term}"?`)) {
         vaultData.items = vaultData.items.filter(i => i.id !== item.id);
-        await saveDatabase();
         renderCardsGrid();
+        saveDatabase();
       }
     });
 
@@ -569,12 +569,8 @@ itemForm.addEventListener('submit', async (e) => {
   }
 
   closeItemModal();
-  showLoader();
-  
-  const saved = await saveDatabase();
-  hideLoader();
 
-  // If saved successfully and we are in a cards view, reload lists
+  // Reload lists immediately
   if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
     // Automatically switch categories if added to a different view
     if (category !== currentView) {
@@ -583,6 +579,9 @@ itemForm.addEventListener('submit', async (e) => {
       renderCardsGrid();
     }
   }
+
+  // Save database in background
+  saveDatabase();
 });
 
 document.getElementById('modal-close-btn').addEventListener('click', closeItemModal);
