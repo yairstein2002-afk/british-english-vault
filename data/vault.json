@@ -26,7 +26,7 @@
       "term": "Quid",
       "meaning": "פאונד (סלנג בריטי למטבע)",
       "example": "Can you lend me ten quid until tomorrow?",
-      "favorite": false,
+      "favorite": true,
       "dateAdded": "2026-07-12T09:00:00Z",
       "mistakeCount": 0
     },
