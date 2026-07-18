@@ -186,7 +186,7 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
   const targetBranch = branch || 'main';
   const targetPath = path || 'data/vault.json';
   
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${Date.now()}`;
   
   try {
     const response = await fetch(url, {
@@ -288,7 +288,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
     let sha = sessionStorage.getItem('bev_github_file_sha');
     
     // Always fetch latest SHA to prevent conflict errors
-    const checkUrl = `${url}?ref=${targetBranch}`;
+    const checkUrl = `${url}?ref=${targetBranch}&t=${Date.now()}`;
     const checkResponse = await fetch(checkUrl, {
       method: 'GET',
       headers: {
