@@ -885,6 +885,7 @@ const voiceSelect = document.getElementById('voice-selector');
 function loadSettingsUI() {
   const config = getGitHubConfig();
   const disconnectBtn = document.getElementById('btn-disconnect-github');
+  const testConnBtn = document.getElementById('btn-test-connection');
   
   if (config) {
     document.getElementById('github-pat').value = config.pat || '';
@@ -893,6 +894,7 @@ function loadSettingsUI() {
     document.getElementById('github-branch').value = config.branch || 'main';
     document.getElementById('github-filepath').value = config.path || 'data/vault.json';
     if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
+    if (testConnBtn) testConnBtn.style.display = 'none';
   } else {
     document.getElementById('github-pat').value = '';
     document.getElementById('github-owner').value = 'yairstein2002-afk';
@@ -900,6 +902,7 @@ function loadSettingsUI() {
     document.getElementById('github-branch').value = 'main';
     document.getElementById('github-filepath').value = 'data/vault.json';
     if (disconnectBtn) disconnectBtn.style.display = 'none';
+    if (testConnBtn) testConnBtn.style.display = 'inline-flex';
   }
 
   const geminiKeyInput = document.getElementById('gemini-key');
