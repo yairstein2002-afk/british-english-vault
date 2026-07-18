@@ -106,7 +106,7 @@
       "term": "try",
       "meaning": "try",
       "example": "try",
-      "favorite": true,
+      "favorite": false,
       "dateAdded": "2026-07-14T18:07:49.858Z",
       "mistakeCount": 0
     }
