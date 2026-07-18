@@ -881,6 +881,7 @@ const voiceSelect = document.getElementById('voice-selector');
 
 function loadSettingsUI() {
   const config = getGitHubConfig();
+  const disconnectBtn = document.getElementById('btn-disconnect-github');
   
   if (config) {
     document.getElementById('github-pat').value = config.pat || '';
@@ -888,12 +889,14 @@ function loadSettingsUI() {
     document.getElementById('github-repo').value = config.repo || 'british-english-vault';
     document.getElementById('github-branch').value = config.branch || 'main';
     document.getElementById('github-filepath').value = config.path || 'data/vault.json';
+    if (disconnectBtn) disconnectBtn.style.display = 'inline-flex';
   } else {
     document.getElementById('github-pat').value = '';
     document.getElementById('github-owner').value = 'yairstein2002-afk';
     document.getElementById('github-repo').value = 'british-english-vault';
     document.getElementById('github-branch').value = 'main';
     document.getElementById('github-filepath').value = 'data/vault.json';
+    if (disconnectBtn) disconnectBtn.style.display = 'none';
   }
 
   const geminiKeyInput = document.getElementById('gemini-key');
@@ -968,6 +971,29 @@ document.getElementById('btn-test-connection').addEventListener('click', async (
     showBannerAlert(`Connection failed: ${res.error}`, "error");
   }
 });
+
+// Disconnect GitHub Sync Button click
+const disconnectBtn = document.getElementById('btn-disconnect-github');
+if (disconnectBtn) {
+  disconnectBtn.addEventListener('click', () => {
+    if (confirm("Are you sure you want to disconnect GitHub Sync? Your data will remain stored locally in the browser, but it will no longer sync to GitHub.")) {
+      localStorage.removeItem('bev_github_config');
+      sessionStorage.removeItem('bev_github_file_sha');
+      
+      // Update UI state
+      updateGitHubStatusBadge();
+      loadSettingsUI();
+      
+      // Hide the Sync Failed error badge in the header immediately
+      const syncIndicator = document.getElementById('github-sync-indicator');
+      if (syncIndicator) {
+        syncIndicator.style.display = 'none';
+      }
+      
+      showBannerAlert("GitHub Sync disconnected successfully. Switched to Local Mode.", "success");
+    }
+  });
+}
 
 // Save settings form handler
 gitForm.addEventListener('submit', async (e) => {
