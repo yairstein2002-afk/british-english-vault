@@ -991,13 +991,14 @@ gitForm.addEventListener('submit', async (e) => {
   saveGitHubConfig(newConfig);
   updateGitHubStatusBadge();
 
-  showBannerAlert("Settings saved successfully. Syncing database...", "info");
+  showBannerAlert("Settings saved successfully! Syncing database in background...", "success");
   
-  showLoader();
-  await loadDatabase();
-  hideLoader();
-
-  showBannerAlert("Vault database synced successfully with GitHub!", "success");
+  // Run sync in the background without showing full-screen loader
+  loadDatabase().then(() => {
+    showBannerAlert("Vault database synced successfully with GitHub!", "success");
+  }).catch((err) => {
+    console.error(err);
+  });
 });
 
 // Test speech audio button
