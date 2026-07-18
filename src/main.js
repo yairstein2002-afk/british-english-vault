@@ -31,6 +31,7 @@ import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
 let vaultData = { items: [], stats: {} };
 let currentView = 'words'; // words, slangs, phrases, idioms, quiz, stats, settings
 let isSyncing = false;
+let syncQueue = false;
 
 // Voice Selection Cache
 let brVoices = [];
@@ -183,11 +184,22 @@ async function loadDatabase() {
 }
 
 async function saveDatabase() {
+  if (isSyncing) {
+    syncQueue = true;
+    return false;
+  }
   isSyncing = true;
   updateSyncStateUI('syncing');
-  const success = await saveVaultData(vaultData, updateSyncStateUI);
-  isSyncing = false;
-  return success;
+  try {
+    const success = await saveVaultData(vaultData, updateSyncStateUI);
+    return success;
+  } finally {
+    isSyncing = false;
+    if (syncQueue) {
+      syncQueue = false;
+      setTimeout(saveDatabase, 150);
+    }
+  }
 }
 
 function updateSyncStateUI(state) {
