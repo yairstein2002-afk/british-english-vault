@@ -128,9 +128,9 @@ export async function askGeminiTutor(mode, text) {
 
   // List of models to try. Prioritize gemini-3-flash-preview to prevent exceeding quota on unsupported models.
   const modelsToTry = [
-    'gemini-1.5-flash',
-    'gemini-1.5-flash-latest',
-    'gemini-1.5-pro'
+    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-3-flash-preview'
   ];
 
   // If we already successfully found a working model in this session, try it first
@@ -150,7 +150,7 @@ export async function askGeminiTutor(mode, text) {
       console.log(`Attempting Gemini API request with model: ${model}`);
       
       const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: 'POST',
           headers: {
