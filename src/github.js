@@ -258,7 +258,7 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
     }
   } catch (error) {
     console.error("GitHub fetch failed, loading local cache", error);
-    onSyncStateChange('sync-failed');
+    onSyncStateChange('sync-failed', error.message);
     return getLocalFallbackData();
   }
 }
@@ -340,7 +340,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
     }
   } catch (error) {
     console.error("GitHub sync failed", error);
-    onSyncStateChange('sync-failed');
+    onSyncStateChange('sync-failed', error.message);
     return false;
   }
 }

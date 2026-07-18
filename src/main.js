@@ -202,7 +202,7 @@ async function saveDatabase() {
   }
 }
 
-function updateSyncStateUI(state) {
+function updateSyncStateUI(state, errMsg = '') {
   const badge = document.getElementById('github-status-badge');
   const syncIndicator = document.getElementById('github-sync-indicator');
   const badgeDot = badge.querySelector('.dot');
@@ -226,6 +226,9 @@ function updateSyncStateUI(state) {
   } else if (state === 'sync-failed') {
     syncIndicator.style.display = 'inline-flex';
     syncIndicator.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Sync Failed';
+    if (errMsg) {
+      showBannerAlert(`Sync failed details: ${errMsg}`, "error");
+    }
   } else if (state === 'local-out-of-sync') {
     badge.className = 'status-indicator local-mode';
     badgeText.innerText = 'Not Synced';
