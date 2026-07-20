@@ -102,9 +102,16 @@
     }
   ],
   "stats": {
-    "quizzesCompleted": 0,
-    "correctAnswers": 0,
+    "quizzesCompleted": 1,
+    "correctAnswers": 3,
     "incorrectAnswers": 0,
-    "history": []
+    "history": [
+      {
+        "date": "2026-07-20",
+        "correct": 3,
+        "total": 3,
+        "percentage": 100
+      }
+    ]
   }
 }
