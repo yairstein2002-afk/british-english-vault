@@ -109,6 +109,16 @@
       "favorite": false,
       "dateAdded": "2026-07-21T03:44:26.595Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1784605875375",
+      "category": "words",
+      "term": "Bin",
+      "meaning": "trash can / garbage can",
+      "example": "Put the rubbish in the bin.\nThe bin is full.",
+      "favorite": false,
+      "dateAdded": "2026-07-21T03:51:15.375Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
