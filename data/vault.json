@@ -99,6 +99,16 @@
       "favorite": false,
       "dateAdded": "2026-07-12T11:00:00Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "slangs-1784605466595",
+      "category": "slangs",
+      "term": "Pukka",
+      "meaning": "Excellent, first-class, really good.",
+      "example": "You've done a pukka job.",
+      "favorite": false,
+      "dateAdded": "2026-07-21T03:44:26.595Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
