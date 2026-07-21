@@ -119,6 +119,16 @@
       "favorite": false,
       "dateAdded": "2026-07-21T03:51:15.375Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "idioms-1784605974856",
+      "category": "idioms",
+      "term": "Barking up the wrong tree",
+      "meaning": "To be mistaken about something or looking in the wrong place for an answer.",
+      "example": "I thought John broke the computer, but I was barking up the wrong tree.",
+      "favorite": false,
+      "dateAdded": "2026-07-21T03:52:54.856Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
