@@ -129,6 +129,16 @@
       "favorite": false,
       "dateAdded": "2026-07-21T03:52:54.856Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "phrases-1784606144752",
+      "category": "phrases",
+      "term": "I’m just off",
+      "meaning": "I’m leaving now / I’m going.",
+      "example": "Right, I’m just off. See you later! → I’m leaving now.",
+      "favorite": false,
+      "dateAdded": "2026-07-21T03:55:44.752Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
