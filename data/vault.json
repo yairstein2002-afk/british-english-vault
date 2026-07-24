@@ -179,6 +179,16 @@
       "favorite": false,
       "dateAdded": "2026-07-24T15:51:58.479Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1784908395608",
+      "category": "words",
+      "term": "Zebra crossing",
+      "meaning": "a pedestrian crossing marked with black and white stripes",
+      "example": "Always stop at a zebra crossing when someone is waiting to cross",
+      "favorite": false,
+      "dateAdded": "2026-07-24T15:53:15.608Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
