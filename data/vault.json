@@ -159,6 +159,16 @@
       "favorite": false,
       "dateAdded": "2026-07-24T15:49:23.992Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "phrases-1784908238776",
+      "category": "phrases",
+      "term": "“I’d better be off.”",
+      "meaning": "I should leave now.",
+      "example": "It’s getting late. I’d better be off.",
+      "favorite": false,
+      "dateAdded": "2026-07-24T15:50:38.776Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
