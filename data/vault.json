@@ -169,6 +169,16 @@
       "favorite": false,
       "dateAdded": "2026-07-24T15:50:38.776Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "idioms-1784908318479",
+      "category": "idioms",
+      "term": "Go the extra mile",
+      "meaning": "To make more effort than is expected",
+      "example": "“She always goes the extra mile to help her customers.”",
+      "favorite": false,
+      "dateAdded": "2026-07-24T15:51:58.479Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
