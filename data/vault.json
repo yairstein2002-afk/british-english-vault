@@ -199,6 +199,16 @@
       "favorite": false,
       "dateAdded": "2026-07-26T18:30:07.360Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "phrases-1785090654042",
+      "category": "phrases",
+      "term": "“I’ll leave you to it.”",
+      "meaning": "I'll let you get on with what you're doing.",
+      "example": "You look busy, so I'll leave you to it.",
+      "favorite": false,
+      "dateAdded": "2026-07-26T18:30:54.042Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
