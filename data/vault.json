@@ -249,6 +249,16 @@
       "favorite": false,
       "dateAdded": "2026-07-27T16:55:21.689Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1785171372753",
+      "category": "words",
+      "term": "Solicitor",
+      "meaning": "a lawyer who gives legal advice and prepares legal documents.",
+      "example": "You should speak to a solicitor before signing the contract.",
+      "favorite": false,
+      "dateAdded": "2026-07-27T16:56:12.753Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
