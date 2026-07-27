@@ -219,6 +219,16 @@
       "favorite": false,
       "dateAdded": "2026-07-26T18:31:34.903Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "idioms-1785171218516",
+      "category": "idioms",
+      "term": "Miss the boat",
+      "meaning": "To miss an opportunity because you were too late.",
+      "example": "“I wanted to buy those concert tickets, but I missed the boat.”",
+      "favorite": false,
+      "dateAdded": "2026-07-27T16:53:38.516Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
