@@ -289,6 +289,16 @@
       "favorite": false,
       "dateAdded": "2026-07-28T03:37:18.393Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "idioms-1785209890371",
+      "category": "idioms",
+      "term": "“Once in a blue moon”",
+      "meaning": "Very rarely.",
+      "example": "“We see each other once in a blue moon these days.”",
+      "favorite": false,
+      "dateAdded": "2026-07-28T03:38:10.371Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
