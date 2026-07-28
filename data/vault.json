@@ -259,6 +259,16 @@
       "favorite": false,
       "dateAdded": "2026-07-27T16:56:12.753Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1785209723717",
+      "category": "words",
+      "term": "Timetable",
+      "meaning": "schedule (especially for trains, buses, schools, or events).",
+      "example": "Have you checked the train timetable?",
+      "favorite": false,
+      "dateAdded": "2026-07-28T03:35:23.717Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
