@@ -269,6 +269,16 @@
       "favorite": false,
       "dateAdded": "2026-07-28T03:35:23.717Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "slangs-1785209781159",
+      "category": "slangs",
+      "term": "“Chinwag",
+      "meaning": "A friendly chat or conversation.",
+      "example": "“I bumped into my neighbour and ended up having a half-hour chinwag.” → We ended up chatting for half an hour.",
+      "favorite": false,
+      "dateAdded": "2026-07-28T03:36:21.159Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
