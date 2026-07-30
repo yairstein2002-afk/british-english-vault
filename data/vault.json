@@ -309,6 +309,16 @@
       "favorite": false,
       "dateAdded": "2026-07-30T06:00:18.338Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "phrases-1785391289356",
+      "category": "phrases",
+      "term": "“I wouldn’t bother.”",
+      "meaning": "I don't think it's worth doing.",
+      "example": "“Should I queue up for that café?” — “I wouldn’t bother. It’s not that good.”",
+      "favorite": false,
+      "dateAdded": "2026-07-30T06:01:29.356Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
