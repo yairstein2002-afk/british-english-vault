@@ -329,6 +329,16 @@
       "favorite": false,
       "dateAdded": "2026-07-30T06:02:44.081Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "words-1785391414371",
+      "category": "words",
+      "term": "Revision",
+      "meaning": "studying or reviewing school material before an exam.",
+      "example": "I'm doing some revision for my maths exam",
+      "favorite": false,
+      "dateAdded": "2026-07-30T06:03:34.371Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
