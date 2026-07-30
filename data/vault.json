@@ -319,6 +319,16 @@
       "favorite": false,
       "dateAdded": "2026-07-30T06:01:29.356Z",
       "mistakeCount": 0
+    },
+    {
+      "id": "slangs-1785391364081",
+      "category": "slangs",
+      "term": "“Nicked”",
+      "meaning": "Stolen",
+      "example": "“Someone's nicked my bike!” → Someone has stolen my bike.",
+      "favorite": false,
+      "dateAdded": "2026-07-30T06:02:44.081Z",
+      "mistakeCount": 0
     }
   ],
   "stats": {
