@@ -20,7 +20,7 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-lwrO9GrQ.js"></script>
+  <script type="module" crossorigin src="/assets/index-Dep34Xkk.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DcTQI5mi.css">
 </head>
 <body>
@@ -494,7 +494,12 @@
             <form id="settings-github-form" class="settings-form">
               <div class="form-group">
                 <label for="github-pat" class="form-label">Personal Access Token (PAT)</label>
-                <input type="password" id="github-pat" placeholder="ghp_xxxxxxxxxxxx" class="form-control">
+                <div class="password-input-wrapper" style="position: relative; display: flex; align-items: center;">
+                  <input type="password" id="github-pat" placeholder="ghp_xxxxxxxxxxxx" class="form-control" style="padding-right: 2.75rem;">
+                  <button type="button" class="toggle-password-btn" data-target="github-pat" title="Show/Hide Token" style="position: absolute; right: 0.75rem; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem 0.5rem; font-size: 1rem; z-index: 2;">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
                 <span class="form-help">Requires <code>repo</code> access scope. This token is stored locally in your browser.</span>
               </div>
               
@@ -557,7 +562,12 @@
             <form id="settings-gemini-form" class="settings-form">
               <div class="form-group">
                 <label for="gemini-key" class="form-label">Gemini API Key</label>
-                <input type="password" id="gemini-key" placeholder="AIzaSy..." class="form-control">
+                <div class="password-input-wrapper" style="position: relative; display: flex; align-items: center;">
+                  <input type="password" id="gemini-key" placeholder="AIzaSy..." class="form-control" style="padding-right: 2.75rem;">
+                  <button type="button" class="toggle-password-btn" data-target="gemini-key" title="Show/Hide API Key" style="position: absolute; right: 0.75rem; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem 0.5rem; font-size: 1rem; z-index: 2;">
+                    <i class="fa-solid fa-eye"></i>
+                  </button>
+                </div>
               </div>
               <div class="settings-actions">
                 <button type="submit" class="btn btn-primary">

@@ -975,6 +975,18 @@ if (geminiForm) {
   });
 }
 
+// Password visibility toggle buttons (PAT & Gemini API key)
+document.querySelectorAll('.toggle-password-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetId = btn.getAttribute('data-target');
+    const input = document.getElementById(targetId);
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    btn.innerHTML = isPassword ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+  });
+});
+
 // Test Connection Button click
 document.getElementById('btn-test-connection').addEventListener('click', async () => {
   const pat = document.getElementById('github-pat').value.trim();
