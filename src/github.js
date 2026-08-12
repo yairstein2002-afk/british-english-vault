@@ -297,12 +297,19 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
     return getLocalFallbackData();
   }
 
+  // If localStorage was cleared, clear session cache to force fresh pull from Cloud DB
+  const isLocalEmpty = !localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (isLocalEmpty) {
+    sessionStorage.removeItem('bev_last_github_fetch_time');
+    sessionStorage.removeItem('bev_github_cached_remote');
+  }
+
   // 5-Minute Session Cache check to prevent GitHub 403 Rate Limits
   const now = Date.now();
   const lastFetch = sessionStorage.getItem('bev_last_github_fetch_time');
   const cachedRemoteJson = sessionStorage.getItem('bev_github_cached_remote');
 
-  if (!forceRefresh && lastFetch && cachedRemoteJson && (now - parseInt(lastFetch, 10) < 300000)) {
+  if (!forceRefresh && !isLocalEmpty && lastFetch && cachedRemoteJson && (now - parseInt(lastFetch, 10) < 300000)) {
     try {
       const parsedData = JSON.parse(cachedRemoteJson);
       return mergeRemoteWithLocal(parsedData, onSyncStateChange);
