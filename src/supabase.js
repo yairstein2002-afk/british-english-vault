@@ -13,14 +13,18 @@ export function getSupabaseConfig() {
     } catch (e) {}
   }
   return {
-    url: 'https://british-english-vault.supabase.co',
-    key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyaXRpc2gtZW5nbGlzaC12YXVsdCIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzgzOTE5ODAwLCJleHAiOjIwOTk0OTU4MDB9.vault_supabase_public_anon_key'
+    url: 'https://iqngleyyuwyaomufdmlm.supabase.co',
+    key: ''
   };
 }
 
 export function saveSupabaseConfig(url, key) {
   if (url && key) {
-    localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({ url: url.trim(), key: key.trim() }));
+    let cleanUrl = url.trim().replace(/\/+$/, '');
+    if (cleanUrl.endsWith('/rest/v1')) {
+      cleanUrl = cleanUrl.replace(/\/rest\/v1$/, '');
+    }
+    localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({ url: cleanUrl, key: key.trim() }));
     return true;
   }
   return false;
