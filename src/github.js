@@ -136,7 +136,7 @@ export function saveGitHubConfig(config) {
   return false;
 }
 
-/**
+// Auth & Encoding Helpers
 function getAuthHeader(pat) {
   const cleanPat = (pat || '').trim();
   if (cleanPat.startsWith('github_pat_') || cleanPat.startsWith('ghp_')) {
