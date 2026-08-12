@@ -147,13 +147,13 @@ export function getQuizChoices(currentItem, allItems) {
   } else {
     // Fallback static distractors if the user database is too small
     const staticFillers = [
-      "עייף מאוד, מותש לחלוטין (Knackered)",
-      "שמח מאוד, מרוצה מעצמו (Chuffed)",
-      "בא לך כוס תה? (Fancy a cuppa?)",
-      "המום או מופתע לחלוטין (Gobsmacked)",
-      "מאוכזב מאוד, שבור (Gutted)",
-      "פאונד (סלנג בריטי למטבע)",
-      "תפרן, בלי פרוטה (Skint)"
+      "Very tired, completely exhausted (Knackered)",
+      "Extremely happy, delighted (Chuffed)",
+      "Would you like a cup of tea? (Fancy a cuppa?)",
+      "Completely shocked or astonished (Gobsmacked)",
+      "Extremely disappointed, devastated (Gutted)",
+      "A pound sterling (British currency slang)",
+      "Broke, having no money (Skint)"
     ];
     
     // Filter out correct meaning if it overlaps

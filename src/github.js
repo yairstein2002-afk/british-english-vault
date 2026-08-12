@@ -284,25 +284,25 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}`;
   
   try {
-    // 1. Get the current file SHA from session cache first
+    // 1. Get the current file SHA (always check latest before upload to prevent 409 conflicts)
     let sha = sessionStorage.getItem('bev_github_file_sha');
     
-    // If we don't have a cached SHA, fetch it from GitHub
-    if (!sha) {
-      const checkUrl = `${url}?ref=${targetBranch}&t=${Date.now()}`;
-      const checkResponse = await fetch(checkUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `token ${pat}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-
-      if (checkResponse.status === 200) {
-        const fileMeta = await checkResponse.json();
-        sha = fileMeta.sha;
-        sessionStorage.setItem('bev_github_file_sha', sha);
+    const checkUrl = `${url}?ref=${targetBranch}&t=${Date.now()}`;
+    const checkResponse = await fetch(checkUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `token ${pat}`,
+        'Accept': 'application/vnd.github.v3+json'
       }
+    });
+
+    if (checkResponse.status === 200) {
+      const fileMeta = await checkResponse.json();
+      sha = fileMeta.sha;
+      sessionStorage.setItem('bev_github_file_sha', sha);
+    } else if (checkResponse.status === 404) {
+      sha = null;
+      sessionStorage.removeItem('bev_github_file_sha');
     }
 
     // 2. Prepare payload
@@ -319,7 +319,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
       body.sha = sha;
     }
 
-    // 3. Commit to GitHub (Attempt 1 with cached or freshly fetched SHA)
+    // 3. Commit to GitHub (Attempt 1)
     let putResponse = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -331,10 +331,9 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
     });
 
     // 4. If we get a 409 conflict, the cached SHA was stale. Refetch the SHA and retry once!
-    if (putResponse.status === 409) {
-      console.warn("Cached SHA was stale (409). Refetching fresh SHA and retrying...");
-      const checkUrl = `${url}?ref=${targetBranch}&t=${Date.now()}`;
-      const checkResponse = await fetch(checkUrl, {
+    if (putResponse.status === 409 || putResponse.status === 422) {
+      console.warn(`SHA conflict (${putResponse.status}). Refetching fresh SHA and retrying...`);
+      const retryCheck = await fetch(checkUrl, {
         method: 'GET',
         headers: {
           'Authorization': `token ${pat}`,
@@ -342,8 +341,8 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
         }
       });
 
-      if (checkResponse.status === 200) {
-        const fileMeta = await checkResponse.json();
+      if (retryCheck.status === 200) {
+        const fileMeta = await retryCheck.json();
         sha = fileMeta.sha;
         sessionStorage.setItem('bev_github_file_sha', sha);
         
@@ -362,7 +361,9 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
 
     if (putResponse.status === 200 || putResponse.status === 201) {
       const responseData = await putResponse.json();
-      sessionStorage.setItem('bev_github_file_sha', responseData.content.sha);
+      if (responseData.content && responseData.content.sha) {
+        sessionStorage.setItem('bev_github_file_sha', responseData.content.sha);
+      }
       onSyncStateChange('synced');
       return true;
     } else {

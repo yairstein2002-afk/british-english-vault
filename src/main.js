@@ -226,9 +226,6 @@ function updateSyncStateUI(state, errMsg = '') {
   } else if (state === 'sync-failed') {
     syncIndicator.style.display = 'inline-flex';
     syncIndicator.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Sync Failed';
-    if (errMsg) {
-      showBannerAlert(`Sync failed details: ${errMsg}`, "error");
-    }
   } else if (state === 'local-out-of-sync') {
     badge.className = 'status-indicator local-mode';
     badgeText.innerText = 'Not Synced';
@@ -271,12 +268,23 @@ function renderCardsGrid() {
     return true;
   });
 
+function cleanForSorting(str) {
+  if (!str) return '';
+  return str.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toLowerCase();
+}
+
   // Sort items
   filteredItems.sort((a, b) => {
     if (sortBy === 'az') {
-      return a.term.localeCompare(b.term);
+      const cleanA = cleanForSorting(a.term);
+      const cleanB = cleanForSorting(b.term);
+      const cmp = cleanA.localeCompare(cleanB, undefined, { sensitivity: 'base' });
+      return cmp !== 0 ? cmp : a.term.localeCompare(b.term);
     } else if (sortBy === 'za') {
-      return b.term.localeCompare(a.term);
+      const cleanA = cleanForSorting(a.term);
+      const cleanB = cleanForSorting(b.term);
+      const cmp = cleanB.localeCompare(cleanA, undefined, { sensitivity: 'base' });
+      return cmp !== 0 ? cmp : b.term.localeCompare(a.term);
     } else if (sortBy === 'newest') {
       return new Date(b.dateAdded || 0) - new Date(a.dateAdded || 0);
     } else if (sortBy === 'oldest') {
@@ -366,24 +374,49 @@ function renderCardsGrid() {
           </div>
           
           <div class="card-footer-controls">
-            <button class="action-icon-btn edit-item-btn" title="Edit">
-              <i class="fa-solid fa-pen-to-square"></i>
+            <button class="btn btn-text hide-answer-btn" style="font-size: 0.85rem; padding: 0.25rem 0.5rem; color: var(--text-muted);" title="Hide Answer">
+              <i class="fa-solid fa-chevron-up"></i> Hide Answer
             </button>
-            <button class="action-icon-btn delete-item-btn" style="color: var(--danger);" title="Delete">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
+            <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+              <button class="action-icon-btn edit-item-btn" title="Edit">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button class="action-icon-btn delete-item-btn" style="color: var(--danger);" title="Delete">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     `;
 
-    // 1. Reveal Answer Button Handler
+    // 1. Reveal / Hide Answer Button Handler
     const revealBtn = card.querySelector('.reveal-answer-btn');
     const answerPanel = card.querySelector('.answer-panel');
+    const hideBtn = card.querySelector('.hide-answer-btn');
+
+    const toggleAnswer = (show) => {
+      if (show) {
+        answerPanel.style.display = 'block';
+        revealBtn.innerHTML = '<i class="fa-solid fa-eye-slash"></i> Hide Answer';
+        revealBtn.classList.add('active-revealed');
+      } else {
+        answerPanel.style.display = 'none';
+        revealBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Show Answer';
+        revealBtn.classList.remove('active-revealed');
+      }
+    };
+
     revealBtn.addEventListener('click', () => {
-      revealBtn.style.display = 'none';
-      answerPanel.style.display = 'block';
+      const isCurrentlyHidden = answerPanel.style.display === 'none' || !answerPanel.style.display;
+      toggleAnswer(isCurrentlyHidden);
     });
+
+    if (hideBtn) {
+      hideBtn.addEventListener('click', () => {
+        toggleAnswer(false);
+      });
+    }
 
     // 2. Favorite toggle handler
     const favBtn = card.querySelector('.fav-btn');
@@ -1178,9 +1211,9 @@ function initAIHandlers() {
         let userFriendlyMsg = err.message;
         const lowerErr = err.message.toLowerCase();
         if (lowerErr.includes("quota") || lowerErr.includes("exhausted") || lowerErr.includes("429") || lowerErr.includes("rate limit")) {
-          userFriendlyMsg = "⚠️ שרת ה-AI של גוגל עמוס זמנית בגלל מגבלת השימוש החינמית (Rate Limit). אנא המתן כ-30 שניות ברצף מבלי ללחוץ על כלום ונסה שוב.";
+          userFriendlyMsg = "⚠️ Google AI service is temporarily busy (Rate Limit). Please wait about 30 seconds and try again.";
         } else if (lowerErr.includes("key") || lowerErr.includes("invalid") || lowerErr.includes("400") || lowerErr.includes("credential")) {
-          userFriendlyMsg = "⚠️ מפתח ה-API שהזנת אינו תקין. אנא ודא שהעתקת אותו במלואו מ-Google AI Studio ללא רווחים מיותרים תחת הגדרות.";
+          userFriendlyMsg = "⚠️ Invalid API Key. Please verify you copied your full Gemini API key from Google AI Studio under Settings.";
         }
         responsePanel.innerHTML = `
           <div style="border: 2px solid var(--danger); padding: 1.5rem; border-radius: 12px; background-color: var(--danger-light); color: var(--danger);">
