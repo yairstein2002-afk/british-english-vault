@@ -110,3 +110,16 @@ export async function deleteItemFromSupabase(itemId) {
     return false;
   }
 }
+
+/**
+ * Sync entire Vault database items to Supabase
+ */
+export async function syncAllVaultToSupabase(vaultData) {
+  if (!vaultData || !Array.isArray(vaultData.items)) return false;
+  let successCount = 0;
+  for (const item of vaultData.items) {
+    const ok = await upsertItemInSupabase(item);
+    if (ok) successCount++;
+  }
+  return successCount > 0;
+}

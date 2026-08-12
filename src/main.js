@@ -26,7 +26,14 @@ import {
 } from './quiz.js';
 import { renderStatsUI } from './stats.js';
 import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
-import { getSupabaseConfig, saveSupabaseConfig } from './supabase.js';
+import { 
+  getSupabaseConfig, 
+  saveSupabaseConfig, 
+  fetchVaultFromSupabase, 
+  upsertItemInSupabase, 
+  deleteItemFromSupabase, 
+  syncAllVaultToSupabase 
+} from './supabase.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
@@ -177,7 +184,12 @@ function updateView() {
 // DATABASE / SYNC OPERATIONS
 // ==========================================================================
 async function loadDatabase() {
-  vaultData = await fetchVaultData(updateSyncStateUI);
+  const sbRes = await fetchVaultFromSupabase();
+  if (sbRes && sbRes.success && Array.isArray(sbRes.items) && sbRes.items.length > 0) {
+    vaultData.items = sbRes.items;
+  } else {
+    vaultData = await fetchVaultData(updateSyncStateUI);
+  }
   renderStatsUI(vaultData);
   if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
     renderCardsGrid();
@@ -192,6 +204,10 @@ async function saveDatabase() {
   isSyncing = true;
   updateSyncStateUI('syncing');
   try {
+    // 1. Sync to Supabase PostgreSQL Database
+    syncAllVaultToSupabase(vaultData);
+    
+    // 2. Sync to local storage & Cloud DB
     const success = await saveVaultData(vaultData, updateSyncStateUI);
     return success;
   } finally {
@@ -435,6 +451,7 @@ function cleanForSorting(str) {
           vaultData.deletedIds.push(item.id);
         }
         vaultData.items = vaultData.items.filter(i => i.id !== item.id);
+        deleteItemFromSupabase(item.id);
         renderCardsGrid();
         saveDatabase();
       }
