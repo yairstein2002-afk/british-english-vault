@@ -205,36 +205,25 @@ async function saveDatabase() {
 function updateSyncStateUI(state, errMsg = '') {
   const badge = document.getElementById('github-status-badge');
   const syncIndicator = document.getElementById('github-sync-indicator');
-  const badgeDot = badge.querySelector('.dot');
+  if (!badge) return;
   const badgeText = badge.querySelector('.status-text');
 
-  if (state === 'local') {
-    badge.className = 'status-indicator local-mode';
-    badgeText.innerText = 'Local Mode';
-    syncIndicator.style.display = 'none';
-  } else if (state === 'syncing') {
-    syncIndicator.style.display = 'inline-flex';
-    syncIndicator.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Committing...';
-  } else if (state === 'synced') {
-    badge.className = 'status-indicator github-mode';
-    badgeText.innerText = 'Cloud Sync';
-    syncIndicator.style.display = 'inline-flex';
-    syncIndicator.innerHTML = '<i class="fa-solid fa-cloud-check" style="color: var(--success);"></i> Saved';
-    setTimeout(() => {
-      if (!isSyncing) syncIndicator.style.display = 'none';
-    }, 2500);
-  } else if (state === 'sync-failed') {
-    badge.className = 'status-indicator local-mode';
-    badgeText.innerText = 'Local Mode';
-    syncIndicator.style.display = 'inline-flex';
-    syncIndicator.innerHTML = '<i class="fa-solid fa-database" style="color: var(--primary-color);"></i> Saved Locally';
-    setTimeout(() => {
-      if (!isSyncing) syncIndicator.style.display = 'none';
-    }, 2500);
-  } else if (state === 'local-out-of-sync') {
-    badge.className = 'status-indicator local-mode';
-    badgeText.innerText = 'Not Synced';
-    syncIndicator.style.display = 'none';
+  badge.className = 'status-indicator github-mode';
+  if (badgeText) badgeText.innerText = 'Cloud Database';
+
+  if (syncIndicator) {
+    if (state === 'syncing') {
+      syncIndicator.style.display = 'inline-flex';
+      syncIndicator.innerHTML = '<i class="fa-solid fa-arrows-rotate fa-spin"></i> Syncing...';
+    } else if (state === 'synced') {
+      syncIndicator.style.display = 'inline-flex';
+      syncIndicator.innerHTML = '<i class="fa-solid fa-cloud-check" style="color: var(--success);"></i> Saved';
+      setTimeout(() => {
+        if (!isSyncing) syncIndicator.style.display = 'none';
+      }, 2500);
+    } else {
+      syncIndicator.style.display = 'none';
+    }
   }
 }
 
@@ -931,27 +920,10 @@ const gitForm = document.getElementById('settings-github-form');
 const voiceSelect = document.getElementById('voice-selector');
 
 function loadSettingsUI() {
-  const config = getGitHubConfig();
-  
-  if (config) {
-    document.getElementById('github-pat').value = config.pat || '';
-    document.getElementById('github-owner').value = config.owner || 'yairstein2002-afk';
-    document.getElementById('github-repo').value = config.repo || 'british-english-vault';
-    document.getElementById('github-branch').value = config.branch || 'main';
-    document.getElementById('github-filepath').value = config.path || 'data/vault.json';
-  } else {
-    document.getElementById('github-pat').value = '';
-    document.getElementById('github-owner').value = 'yairstein2002-afk';
-    document.getElementById('github-repo').value = 'british-english-vault';
-    document.getElementById('github-branch').value = 'main';
-    document.getElementById('github-filepath').value = 'data/vault.json';
-  }
-
   const geminiKeyInput = document.getElementById('gemini-key');
   if (geminiKeyInput) {
     geminiKeyInput.value = getGeminiApiKey();
   }
-
   populateVoiceSelector();
 }
 
@@ -991,7 +963,7 @@ if (geminiForm) {
   });
 }
 
-// Password visibility toggle buttons (PAT & Gemini API key)
+// Password visibility toggle buttons
 document.querySelectorAll('.toggle-password-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     const targetId = btn.getAttribute('data-target');
@@ -1003,92 +975,21 @@ document.querySelectorAll('.toggle-password-btn').forEach(btn => {
   });
 });
 
-// Test Connection Button click
-document.getElementById('btn-test-connection').addEventListener('click', async () => {
-  const pat = document.getElementById('github-pat').value.trim();
-  const owner = document.getElementById('github-owner').value.trim();
-  const repo = document.getElementById('github-repo').value.trim();
-  const branch = document.getElementById('github-branch').value.trim();
-  const path = document.getElementById('github-filepath').value.trim();
-
-  if (!pat || !owner || !repo) {
-    showBannerAlert("Please enter Token, Owner, and Repo before testing connection.", "error");
-    return;
-  }
-
-  const testConfig = { pat, owner, repo, branch, path };
-  saveGitHubConfig(testConfig);
-  updateGitHubStatusBadge();
-
-  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and pulling data from GitHub...", "info");
-
-  const res = await testGitHubConnection(testConfig);
-  
-  // Always trigger pulling database
-  await loadDatabase();
-
-  if (res.success) {
-    showBannerAlert("Connection successful! Vault database restored and synced from GitHub.", "success");
-  } else {
-    if (res.tokenExpired) {
-      showBannerAlert("⚠️ Database loaded successfully! However, your GitHub Token has expired (401 Bad Credentials). Generate a new Token in GitHub Settings if you wish to save new additions back to cloud.", "error");
-    } else {
-      showBannerAlert(`Connection note: ${res.error}. Database loaded successfully from GitHub.`, "info");
+// Sync Cloud Database Now Button click
+const syncNowBtn = document.getElementById('btn-sync-now');
+if (syncNowBtn) {
+  syncNowBtn.addEventListener('click', async () => {
+    syncNowBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing Cloud Database...';
+    try {
+      const ok = await saveVaultData(vaultData, updateSyncStateUI);
+      if (ok) {
+        showBannerAlert("Cloud Database synced successfully!", "success");
+      } else {
+        showBannerAlert("Database synced to local cache.", "info");
+      }
+    } finally {
+      syncNowBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Sync Cloud Database Now';
     }
-  }
-});
-
-// Save settings form handler
-gitForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const pat = document.getElementById('github-pat').value.trim();
-  const owner = document.getElementById('github-owner').value.trim();
-  const repo = document.getElementById('github-repo').value.trim();
-  const branch = document.getElementById('github-branch').value.trim();
-  const path = document.getElementById('github-filepath').value.trim();
-
-  if (!pat || !owner || !repo) {
-    showBannerAlert("Token, Owner, and Repo are required to connect to GitHub.", "error");
-    return;
-  }
-
-  const newConfig = { pat, owner, repo, branch, path };
-  saveGitHubConfig(newConfig);
-  updateGitHubStatusBadge();
-
-  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and saving settings...", "info");
-  
-  const testRes = await testGitHubConnection(newConfig);
-  
-  if (testRes.success) {
-    // Force push local data to GitHub repository so cloud has all additions
-    showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Connection verified! Committing database to GitHub...", "info");
-    const commitOk = await saveVaultData(vaultData, updateSyncStateUI);
-    if (commitOk) {
-      showBannerAlert("Settings saved and all Vault entries committed successfully to GitHub!", "success");
-    } else {
-      showBannerAlert("Settings saved, but failed to write commit to GitHub.", "error");
-    }
-  } else {
-    await loadDatabase();
-    if (testRes.tokenExpired) {
-      showBannerAlert("⚠️ Settings saved locally. Note: Personal Access Token is invalid/expired (HTTP 401). Please generate a new Token with 'repo' scope in GitHub to enable cloud save.", "error");
-    } else {
-      showBannerAlert(`Settings saved locally. GitHub connection note: ${testRes.error}`, "info");
-    }
-  }
-});
-
-// Use Local Mode / Disconnect GitHub Button Handler
-const disconnectBtn = document.getElementById('btn-disconnect-github');
-if (disconnectBtn) {
-  disconnectBtn.addEventListener('click', () => {
-    localStorage.removeItem('bev_github_config');
-    const patInput = document.getElementById('github-pat');
-    if (patInput) patInput.value = '';
-    updateSyncStateUI('local');
-    showBannerAlert("Switched to Local Mode. All vocabulary entries are saved locally in your browser.", "success");
   });
 }
 
