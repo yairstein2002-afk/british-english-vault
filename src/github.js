@@ -271,14 +271,25 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       
       // Merge local items with GitHub items to prevent data loss on connection
       const localData = getLocalFallbackData();
-      const mergedItems = [...(parsedData.items || [])];
-      
+      const deletedIds = new Set(localData.deletedIds || []);
+
+      // Filter out deleted items from GitHub parsed data
+      let mergedItems = (parsedData.items || []).filter(gitItem => !deletedIds.has(gitItem.id));
+
+      // Merge local items over GitHub items (local edits take precedence!)
       (localData.items || []).forEach(localItem => {
-        const exists = mergedItems.some(gitItem => 
+        if (deletedIds.has(localItem.id)) return;
+
+        const index = mergedItems.findIndex(gitItem => 
           gitItem.id === localItem.id || 
           gitItem.term.toLowerCase().trim() === localItem.term.toLowerCase().trim()
         );
-        if (!exists) {
+
+        if (index !== -1) {
+          // Local edited item replaces stale GitHub item
+          mergedItems[index] = localItem;
+        } else {
+          // Add new local item
           mergedItems.push(localItem);
         }
       });
@@ -302,7 +313,8 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
 
       const mergedData = {
         items: mergedItems,
-        stats: mergedStats
+        stats: mergedStats,
+        deletedIds: Array.from(deletedIds)
       };
 
       // Save locally as cache

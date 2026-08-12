@@ -435,6 +435,10 @@ function cleanForSorting(str) {
     // 4. Delete Handler
     card.querySelector('.delete-item-btn').addEventListener('click', () => {
       if (confirm(`Are you sure you want to delete "${item.term}"?`)) {
+        vaultData.deletedIds = vaultData.deletedIds || [];
+        if (!vaultData.deletedIds.includes(item.id)) {
+          vaultData.deletedIds.push(item.id);
+        }
         vaultData.items = vaultData.items.filter(i => i.id !== item.id);
         renderCardsGrid();
         saveDatabase();
