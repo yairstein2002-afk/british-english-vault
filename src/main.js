@@ -184,12 +184,21 @@ function updateView() {
 // DATABASE / SYNC OPERATIONS
 // ==========================================================================
 async function loadDatabase() {
+  // 1. Always load complete 33-item vaultData first
+  vaultData = await fetchVaultData(updateSyncStateUI);
+
+  // 2. Fetch Supabase items if available
   const sbRes = await fetchVaultFromSupabase();
   if (sbRes && sbRes.success && Array.isArray(sbRes.items) && sbRes.items.length > 0) {
-    vaultData.items = sbRes.items;
+    const itemMap = new Map();
+    (vaultData.items || []).forEach(item => itemMap.set(item.id, item));
+    (sbRes.items || []).forEach(item => itemMap.set(item.id, item));
+    vaultData.items = Array.from(itemMap.values());
   } else {
-    vaultData = await fetchVaultData(updateSyncStateUI);
+    // Automatically seed all 33 items into Supabase
+    syncAllVaultToSupabase(vaultData);
   }
+
   renderStatsUI(vaultData);
   if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
     renderCardsGrid();
