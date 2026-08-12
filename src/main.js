@@ -26,6 +26,14 @@ import {
 } from './quiz.js';
 import { renderStatsUI } from './stats.js';
 import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
+import { 
+  getCurrentUser, 
+  signUpUser, 
+  signInUser, 
+  signOutUser, 
+  getUserPersonalVault, 
+  saveUserPersonalVault 
+} from './auth.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
@@ -990,6 +998,125 @@ if (syncNowBtn) {
     } finally {
       syncNowBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Sync Cloud Database Now';
     }
+  });
+}
+
+// ==========================================================================
+// USER AUTHENTICATION & PERSONAL CLOUD VAULT LOGIC
+// ==========================================================================
+let isAuthRegisterMode = false;
+
+function updateAuthUI() {
+  const user = getCurrentUser();
+  const userBtnText = document.getElementById('user-btn-text');
+  const authFormContainer = document.getElementById('auth-form-container');
+  const loggedInProfileView = document.getElementById('logged-in-profile-view');
+  const profileEmailDisplay = document.getElementById('profile-email-display');
+
+  if (user) {
+    if (userBtnText) userBtnText.innerText = user.email.split('@')[0];
+    if (authFormContainer) authFormContainer.style.display = 'none';
+    if (loggedInProfileView) loggedInProfileView.style.display = 'block';
+    if (profileEmailDisplay) profileEmailDisplay.innerText = user.email;
+  } else {
+    if (userBtnText) userBtnText.innerText = 'Account';
+    if (authFormContainer) authFormContainer.style.display = 'block';
+    if (loggedInProfileView) loggedInProfileView.style.display = 'none';
+  }
+}
+
+function openAuthModal() {
+  updateAuthUI();
+  document.getElementById('auth-modal').classList.add('active');
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal').classList.remove('active');
+  const errorBanner = document.getElementById('auth-banner-error');
+  if (errorBanner) errorBanner.style.display = 'none';
+}
+
+document.getElementById('user-profile-btn').addEventListener('click', openAuthModal);
+document.getElementById('auth-modal-close-btn').addEventListener('click', closeAuthModal);
+
+// Toggle between Login & Register forms
+const authSwitchBtn = document.getElementById('auth-switch-mode-btn');
+const authSubmitBtn = document.getElementById('auth-submit-btn');
+const authModalTitle = document.getElementById('auth-modal-title');
+
+if (authSwitchBtn) {
+  authSwitchBtn.addEventListener('click', () => {
+    isAuthRegisterMode = !isAuthRegisterMode;
+    const errorBanner = document.getElementById('auth-banner-error');
+    if (errorBanner) errorBanner.style.display = 'none';
+
+    if (isAuthRegisterMode) {
+      authModalTitle.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Personal Vault Account';
+      authSubmitBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register';
+      authSwitchBtn.innerText = 'Already have an account? Sign In';
+    } else {
+      authModalTitle.innerHTML = '<i class="fa-solid fa-user-lock"></i> User Account & Cloud Vault';
+      authSubmitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+      authSwitchBtn.innerText = 'Need an account? Register';
+    }
+  });
+}
+
+// Handle Login / Register Form Submission
+const authForm = document.getElementById('auth-form');
+if (authForm) {
+  authForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value;
+    const password = document.getElementById('auth-password').value;
+    const errorBanner = document.getElementById('auth-banner-error');
+
+    errorBanner.style.display = 'none';
+    authSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+
+    try {
+      let session;
+      if (isAuthRegisterMode) {
+        session = await signUpUser(email, password);
+        // Copy current vault items into user's new personal vault
+        saveUserPersonalVault(session.id, vaultData);
+        showBannerAlert(`Account created successfully! Welcome ${session.email}.`, "success");
+      } else {
+        session = await signInUser(email, password);
+        // Load user's personal cloud vault
+        const personalVault = getUserPersonalVault(session.id);
+        if (personalVault && personalVault.items) {
+          vaultData = personalVault;
+          saveDatabase();
+          if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+            renderCardsGrid();
+          }
+          renderStatsUI(vaultData);
+        }
+        showBannerAlert(`Welcome back, ${session.email}! Personal Vault connected.`, "success");
+      }
+
+      closeAuthModal();
+      updateAuthUI();
+    } catch (err) {
+      errorBanner.innerText = err.message;
+      errorBanner.style.display = 'block';
+    } finally {
+      authSubmitBtn.innerHTML = isAuthRegisterMode 
+        ? '<i class="fa-solid fa-user-plus"></i> Register' 
+        : '<i class="fa-solid fa-right-to-bracket"></i> Sign In';
+    }
+  });
+}
+
+// Logout Button Handler
+const logoutBtn = document.getElementById('auth-logout-btn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    signOutUser();
+    updateAuthUI();
+    closeAuthModal();
+    showBannerAlert("Signed out successfully.", "info");
   });
 }
 
