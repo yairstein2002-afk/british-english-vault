@@ -20,7 +20,7 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-_qTycWtz.js"></script>
+  <script type="module" crossorigin src="/assets/index-rbfe3BjR.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DcTQI5mi.css">
 </head>
 <body>
@@ -579,14 +579,18 @@
           
           <!-- Data Management Card -->
           <div class="card danger-zone-card">
-            <h3><i class="fa-solid fa-triangle-exclamation"></i> Danger Zone / Backup</h3>
-            <p class="panel-desc">Manage local storage cache. These actions do not affect GitHub directly unless explicitly synced.</p>
+            <h3><i class="fa-solid fa-box-archive"></i> Backup & Data Management</h3>
+            <p class="panel-desc">Export or import JSON backup files to transfer your database between devices or restore entries anytime.</p>
             
-            <div class="btn-group-row">
+            <input type="file" id="file-import-input" accept=".json" style="display: none;">
+            <div class="btn-group-row" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
               <button id="btn-export-data" class="btn btn-secondary">
-                <i class="fa-solid fa-download"></i> Export Data Backup
+                <i class="fa-solid fa-download"></i> Export JSON Backup
               </button>
-              <button id="btn-reset-data" class="btn btn-danger-outline">
+              <button id="btn-import-data" class="btn btn-secondary">
+                <i class="fa-solid fa-file-import"></i> Import Backup File
+              </button>
+              <button id="btn-reset-data" class="btn btn-danger-outline" style="margin-left: auto;">
                 <i class="fa-solid fa-trash-can"></i> Reset App Data
               </button>
             </div>
