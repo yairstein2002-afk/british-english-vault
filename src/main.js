@@ -443,6 +443,7 @@ function cleanForSorting(str) {
     favBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       item.favorite = !item.favorite;
+      upsertItemInSupabase(item);
       renderCardsGrid();
       saveDatabase();
     });
@@ -599,6 +600,7 @@ itemForm.addEventListener('submit', async (e) => {
 
   if (!term || !meaning || !example) return;
 
+  let savedItem;
   if (id) {
     // Edit existing entry
     const index = vaultData.items.findIndex(i => i.id === id);
@@ -610,6 +612,7 @@ itemForm.addEventListener('submit', async (e) => {
         meaning,
         example
       };
+      savedItem = vaultData.items[index];
     }
   } else {
     // Add new entry
@@ -624,6 +627,11 @@ itemForm.addEventListener('submit', async (e) => {
       mistakeCount: 0
     };
     vaultData.items.push(newEntry);
+    savedItem = newEntry;
+  }
+
+  if (savedItem) {
+    upsertItemInSupabase(savedItem);
   }
 
   closeItemModal();
