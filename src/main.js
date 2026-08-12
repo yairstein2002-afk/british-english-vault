@@ -612,14 +612,21 @@ itemForm.addEventListener('submit', async (e) => {
 
   closeItemModal();
 
+  // Reset search input and favorite filter so the newly added card is guaranteed to show in UI
+  const searchInput = document.getElementById('search-input');
+  const favFilter = document.getElementById('filter-fav-btn');
+  if (searchInput) searchInput.value = '';
+  if (favFilter) favFilter.classList.remove('active');
+
   // Reload lists immediately
   if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
-    // Automatically switch categories if added to a different view
     if (category !== currentView) {
       navigateTo(category);
     } else {
       renderCardsGrid();
     }
+  } else {
+    navigateTo(category);
   }
 
   // Save database in background

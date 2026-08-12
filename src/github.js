@@ -464,6 +464,8 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
       if (responseData.content && responseData.content.sha) {
         sessionStorage.setItem('bev_github_file_sha', responseData.content.sha);
       }
+      sessionStorage.setItem('bev_last_github_fetch_time', Date.now().toString());
+      sessionStorage.setItem('bev_github_cached_remote', JSON.stringify(data));
       onSyncStateChange('synced');
       return true;
     } else {
