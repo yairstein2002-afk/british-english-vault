@@ -1002,7 +1002,11 @@ document.getElementById('btn-test-connection').addEventListener('click', async (
   if (res.success) {
     showBannerAlert("Connection successful! Vault database restored and synced from GitHub.", "success");
   } else {
-    showBannerAlert(`Connection check warning: ${res.error}. Database loaded from public GitHub file.`, "error");
+    if (res.tokenExpired) {
+      showBannerAlert("⚠️ Database loaded successfully! However, your GitHub Token has expired (401 Bad Credentials). Generate a new Token in GitHub Settings if you wish to save new additions back to cloud.", "error");
+    } else {
+      showBannerAlert(`Connection note: ${res.error}. Database loaded successfully from GitHub.`, "info");
+    }
   }
 });
 
@@ -1034,7 +1038,11 @@ gitForm.addEventListener('submit', async (e) => {
   if (testRes.success) {
     showBannerAlert("Settings saved and Vault database synced successfully with GitHub!", "success");
   } else {
-    showBannerAlert(`Settings saved. GitHub connection note: ${testRes.error}`, "error");
+    if (testRes.tokenExpired) {
+      showBannerAlert("⚠️ Settings saved and database loaded! Note: Your Personal Access Token has expired (401). Create a new PAT in GitHub to enable cloud saving.", "error");
+    } else {
+      showBannerAlert(`Settings saved. Database loaded from GitHub with notice: ${testRes.error}`, "info");
+    }
   }
 });
 
