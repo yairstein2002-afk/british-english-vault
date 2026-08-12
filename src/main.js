@@ -1049,15 +1049,21 @@ gitForm.addEventListener('submit', async (e) => {
   
   const testRes = await testGitHubConnection(newConfig);
   
-  await loadDatabase();
-
   if (testRes.success) {
-    showBannerAlert("Settings saved and Vault database synced successfully with GitHub!", "success");
-  } else {
-    if (testRes.tokenExpired) {
-      showBannerAlert("⚠️ Settings saved and database loaded! Note: Your Personal Access Token has expired (401). Create a new PAT in GitHub to enable cloud saving.", "error");
+    // Force push local data to GitHub repository so cloud has all additions
+    showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Connection verified! Committing database to GitHub...", "info");
+    const commitOk = await saveVaultData(vaultData, updateSyncStateUI);
+    if (commitOk) {
+      showBannerAlert("Settings saved and all Vault entries committed successfully to GitHub!", "success");
     } else {
-      showBannerAlert(`Settings saved. Database loaded from GitHub with notice: ${testRes.error}`, "info");
+      showBannerAlert("Settings saved, but failed to write commit to GitHub.", "error");
+    }
+  } else {
+    await loadDatabase();
+    if (testRes.tokenExpired) {
+      showBannerAlert("⚠️ Settings saved locally. Note: Personal Access Token is invalid/expired (HTTP 401). Please generate a new Token with 'repo' scope in GitHub to enable cloud save.", "error");
+    } else {
+      showBannerAlert(`Settings saved locally. GitHub connection note: ${testRes.error}`, "info");
     }
   }
 });
@@ -1084,9 +1090,73 @@ document.getElementById('btn-export-data').addEventListener('click', () => {
   downloadAnchor.remove();
 });
 
+// Import database backup
+const importBtn = document.getElementById('btn-import-data');
+const importFileInput = document.getElementById('file-import-input');
+
+if (importBtn && importFileInput) {
+  importBtn.addEventListener('click', () => {
+    importFileInput.click();
+  });
+
+  importFileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const importedData = JSON.parse(event.target.result);
+        if (!importedData || !Array.isArray(importedData.items)) {
+          showBannerAlert("Invalid backup file structure. File must contain an 'items' array.", "error");
+          return;
+        }
+
+        // Merge imported items into local vaultData
+        const existingIds = new Set(vaultData.items.map(i => i.id));
+        let addedCount = 0;
+
+        importedData.items.forEach(item => {
+          if (item && item.term && item.meaning) {
+            const index = vaultData.items.findIndex(i => i.id === item.id || i.term.toLowerCase().trim() === item.term.toLowerCase().trim());
+            if (index !== -1) {
+              vaultData.items[index] = item;
+            } else {
+              if (!item.id) item.id = `imported-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
+              vaultData.items.push(item);
+              addedCount++;
+            }
+          }
+        });
+
+        if (importedData.stats) {
+          vaultData.stats = {
+            quizzesCompleted: Math.max(vaultData.stats.quizzesCompleted || 0, importedData.stats.quizzesCompleted || 0),
+            correctAnswers: Math.max(vaultData.stats.correctAnswers || 0, importedData.stats.correctAnswers || 0),
+            incorrectAnswers: Math.max(vaultData.stats.incorrectAnswers || 0, importedData.stats.incorrectAnswers || 0),
+            history: [...(vaultData.stats.history || [])]
+          };
+        }
+
+        saveDatabase();
+        renderStatsUI(vaultData);
+        if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+          renderCardsGrid();
+        }
+
+        showBannerAlert(`Backup imported successfully! Database updated (${vaultData.items.length} total entries).`, "success");
+      } catch (err) {
+        showBannerAlert(`Failed to read backup file: ${err.message}`, "error");
+      }
+    };
+    reader.readAsText(file);
+    importFileInput.value = '';
+  });
+}
+
 // Reset application data cached
 document.getElementById('btn-reset-data').addEventListener('click', () => {
-  if (confirm("WARNING: This will delete local settings and clear your browser cache. GitHub files will remain untouched unless you write to them. Proceed?")) {
+  if (confirm("WARNING: This will clear local browser cache on this device. Proceed?")) {
     clearAllLocalData();
     window.location.reload();
   }
