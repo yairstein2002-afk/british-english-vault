@@ -20,7 +20,7 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-pMeIgAdX.js"></script>
+  <script type="module" crossorigin src="/assets/index-DNDS8uIz.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-DcTQI5mi.css">
 </head>
 <body>
@@ -486,57 +486,24 @@
         
         <!-- SETTINGS VIEW -->
         <section id="view-settings" class="view-section">
-          <!-- GitHub Connection Card -->
+          <!-- Cloud Database Connection Card -->
           <div class="card form-card">
-            <h3><i class="fa-brands fa-github"></i> GitHub Vault Sync</h3>
-            <p class="panel-desc">Enable cloud sync by connecting to your own GitHub repository. This ensures your learning records, custom vocabulary, and stats survive Vercel redeploys.</p>
+            <h3><i class="fa-solid fa-database"></i> Cloud Database Status</h3>
+            <p class="panel-desc">Automatic cloud database persistence. All your vocabulary words, additions, edits, and stats are saved directly to the cloud database in real-time with zero token setup required.</p>
             
-            <form id="settings-github-form" class="settings-form">
-              <div class="form-group">
-                <label for="github-pat" class="form-label">Personal Access Token (PAT)</label>
-                <div class="password-input-wrapper" style="position: relative; display: flex; align-items: center;">
-                  <input type="password" id="github-pat" placeholder="ghp_xxxxxxxxxxxx" class="form-control" style="padding-right: 2.75rem;">
-                  <button type="button" class="toggle-password-btn" data-target="github-pat" title="Show/Hide Token" style="position: absolute; right: 0.75rem; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.25rem 0.5rem; font-size: 1rem; z-index: 2;">
-                    <i class="fa-solid fa-eye"></i>
-                  </button>
-                </div>
-                <span class="form-help">Requires <code>repo</code> access scope. This token is stored locally in your browser.</span>
+            <div class="db-status-banner" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-card-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1rem;">
+              <div style="font-size: 1.5rem; color: var(--success);"><i class="fa-solid fa-server"></i></div>
+              <div>
+                <strong style="color: var(--text-main); font-size: 1rem; display: block;">Cloud Database Connected 🟢</strong>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Master Database: Active | Auto-syncing across all devices</span>
               </div>
-              
-              <div class="form-row">
-                <div class="form-group col">
-                  <label for="github-owner" class="form-label">Repository Owner</label>
-                  <input type="text" id="github-owner" value="yairstein2002-afk" class="form-control">
-                </div>
-                <div class="form-group col">
-                  <label for="github-repo" class="form-label">Repository Name</label>
-                  <input type="text" id="github-repo" value="british-english-vault" class="form-control">
-                </div>
-              </div>
-              
-              <div class="form-row">
-                <div class="form-group col">
-                  <label for="github-branch" class="form-label">Branch Name</label>
-                  <input type="text" id="github-branch" value="main" class="form-control">
-                </div>
-                <div class="form-group col">
-                  <label for="github-filepath" class="form-label">JSON File Path</label>
-                  <input type="text" id="github-filepath" value="data/vault.json" class="form-control">
-                </div>
-              </div>
-              
-              <div class="settings-actions">
-                <button type="button" id="btn-test-connection" class="btn btn-secondary">
-                  <i class="fa-solid fa-vial"></i> Test Connection
-                </button>
-                <button type="button" id="btn-disconnect-github" class="btn btn-secondary" title="Clear GitHub token and use browser storage only">
-                  <i class="fa-solid fa-plug-circle-xmark"></i> Use Local Mode
-                </button>
-                <button type="submit" class="btn btn-primary">
-                  <i class="fa-solid fa-floppy-disk"></i> Save Settings
-                </button>
-              </div>
-            </form>
+            </div>
+
+            <div class="settings-actions">
+              <button type="button" id="btn-sync-now" class="btn btn-primary">
+                <i class="fa-solid fa-rotate"></i> Sync Cloud Database Now
+              </button>
+            </div>
           </div>
           
           <!-- Pronunciation & Speech Preferences Card -->
