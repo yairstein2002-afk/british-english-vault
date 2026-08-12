@@ -224,8 +224,13 @@ function updateSyncStateUI(state, errMsg = '') {
       if (!isSyncing) syncIndicator.style.display = 'none';
     }, 2500);
   } else if (state === 'sync-failed') {
+    badge.className = 'status-indicator local-mode';
+    badgeText.innerText = 'Local Mode';
     syncIndicator.style.display = 'inline-flex';
-    syncIndicator.innerHTML = '<i class="fa-solid fa-circle-exclamation" style="color: var(--danger);"></i> Sync Failed';
+    syncIndicator.innerHTML = '<i class="fa-solid fa-database" style="color: var(--primary-color);"></i> Saved Locally';
+    setTimeout(() => {
+      if (!isSyncing) syncIndicator.style.display = 'none';
+    }, 2500);
   } else if (state === 'local-out-of-sync') {
     badge.className = 'status-indicator local-mode';
     badgeText.innerText = 'Not Synced';
@@ -1067,6 +1072,18 @@ gitForm.addEventListener('submit', async (e) => {
     }
   }
 });
+
+// Use Local Mode / Disconnect GitHub Button Handler
+const disconnectBtn = document.getElementById('btn-disconnect-github');
+if (disconnectBtn) {
+  disconnectBtn.addEventListener('click', () => {
+    localStorage.removeItem('bev_github_config');
+    const patInput = document.getElementById('github-pat');
+    if (patInput) patInput.value = '';
+    updateSyncStateUI('local');
+    showBannerAlert("Switched to Local Mode. All vocabulary entries are saved locally in your browser.", "success");
+  });
+}
 
 // Test speech audio button
 document.getElementById('btn-test-speech').addEventListener('click', async () => {
