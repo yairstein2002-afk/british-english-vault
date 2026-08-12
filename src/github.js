@@ -227,24 +227,31 @@ export async function testGitHubConnection(config) {
  * If not, or if it fails, falls back to browser localStorage.
  */
 function mergeRemoteWithLocal(parsedData, onSyncStateChange = () => {}) {
+  const isLocalStorageEmpty = !localStorage.getItem(LOCAL_STORAGE_KEY);
+  
+  // If localStorage was cleared, Cloud DB is 100% ground truth!
+  if (isLocalStorageEmpty && parsedData && Array.isArray(parsedData.items) && parsedData.items.length > 0) {
+    saveLocalData(parsedData);
+    onSyncStateChange('synced');
+    return parsedData;
+  }
+
   const localData = getLocalFallbackData();
   const deletedIds = new Set(localData.deletedIds || []);
 
   const itemMap = new Map();
 
-  // 1. Ground Truth: Local items take priority (preserves additions, edits, favorites)
-  (localData.items || []).forEach(item => {
-    if (item && item.id && !deletedIds.has(item.id)) {
-      itemMap.set(item.id, item);
+  // 1. Load remote Cloud DB items first into map
+  (parsedData.items || []).forEach(gitItem => {
+    if (gitItem && gitItem.id && !deletedIds.has(gitItem.id)) {
+      itemMap.set(gitItem.id, gitItem);
     }
   });
 
-  // 2. Add remote items from GitHub if not deleted and not already in map
-  (parsedData.items || []).forEach(gitItem => {
-    if (gitItem && gitItem.id && !deletedIds.has(gitItem.id)) {
-      if (!itemMap.has(gitItem.id)) {
-        itemMap.set(gitItem.id, gitItem);
-      }
+  // 2. Overlay local items (offline local additions/edits take priority)
+  (localData.items || []).forEach(item => {
+    if (item && item.id && !deletedIds.has(item.id)) {
+      itemMap.set(item.id, item);
     }
   });
 
