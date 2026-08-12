@@ -487,22 +487,29 @@
         <section id="view-settings" class="view-section">
           <!-- Supabase PostgreSQL Database Status Card -->
           <div class="card form-card">
-            <h3><i class="fa-solid fa-bolt"></i> Supabase PostgreSQL Database</h3>
-            <p class="panel-desc">Enterprise-grade PostgreSQL database backend powered by Supabase. High-performance, zero-latency cloud persistence for all your vocabulary, slangs, idioms, and quiz stats.</p>
+            <h3><i class="fa-solid fa-bolt"></i> Supabase PostgreSQL Database Settings</h3>
+            <p class="panel-desc">Enterprise-grade PostgreSQL database backend powered by Supabase. Connect your own free Supabase project for permanent cloud storage across all your devices.</p>
             
-            <div class="db-status-banner" style="display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: var(--bg-card-subtle); border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 1rem;">
-              <div style="font-size: 1.5rem; color: var(--success);"><i class="fa-solid fa-database"></i></div>
-              <div>
-                <strong style="color: var(--text-main); font-size: 1rem; display: block;">Supabase PostgreSQL Active 🟢</strong>
-                <span style="font-size: 0.85rem; color: var(--text-muted);">Database: Active & Auto-syncing across all devices</span>
+            <form id="settings-supabase-form" class="settings-form">
+              <div class="form-group">
+                <label for="supabase-url" class="form-label">Supabase Project URL</label>
+                <input type="text" id="supabase-url" placeholder="https://xyzxyzxyz.supabase.co" class="form-control">
               </div>
-            </div>
+              
+              <div class="form-group">
+                <label for="supabase-key" class="form-label">Supabase Anon / Public Key</label>
+                <input type="password" id="supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." class="form-control">
+              </div>
 
-            <div class="settings-actions">
-              <button type="button" id="btn-sync-now" class="btn btn-primary">
-                <i class="fa-solid fa-rotate"></i> Sync Supabase Database Now
-              </button>
-            </div>
+              <div class="settings-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Save Supabase Settings
+                </button>
+                <button type="button" id="btn-sync-now" class="btn btn-secondary">
+                  <i class="fa-solid fa-rotate"></i> Sync Database Now
+                </button>
+              </div>
+            </form>
           </div>
           
           <!-- Pronunciation & Speech Preferences Card -->

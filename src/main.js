@@ -26,6 +26,7 @@ import {
 } from './quiz.js';
 import { renderStatsUI } from './stats.js';
 import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
+import { getSupabaseConfig, saveSupabaseConfig } from './supabase.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
@@ -920,11 +921,33 @@ const gitForm = document.getElementById('settings-github-form');
 const voiceSelect = document.getElementById('voice-selector');
 
 function loadSettingsUI() {
+  const sbConfig = getSupabaseConfig();
+  const sbUrlInput = document.getElementById('supabase-url');
+  const sbKeyInput = document.getElementById('supabase-key');
+  if (sbUrlInput) sbUrlInput.value = sbConfig.url;
+  if (sbKeyInput) sbKeyInput.value = sbConfig.key;
+
   const geminiKeyInput = document.getElementById('gemini-key');
   if (geminiKeyInput) {
     geminiKeyInput.value = getGeminiApiKey();
   }
   populateVoiceSelector();
+}
+
+// Supabase Form Submit Listener
+const sbForm = document.getElementById('settings-supabase-form');
+if (sbForm) {
+  sbForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const url = document.getElementById('supabase-url').value;
+    const key = document.getElementById('supabase-key').value;
+    if (saveSupabaseConfig(url, key)) {
+      showBannerAlert("Supabase PostgreSQL Settings saved successfully!", "success");
+      loadDatabase();
+    } else {
+      showBannerAlert("Please enter both Supabase URL and Anon Key.", "error");
+    }
+  });
 }
 
 function populateVoiceSelector() {
