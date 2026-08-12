@@ -269,45 +269,44 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       const contentString = decodeBase64UTF8(data.content);
       const parsedData = JSON.parse(contentString);
       
-      // Merge local items with GitHub items to prevent data loss on connection
+      // Ground-Truth Merge: Local items always take priority for this device
       const localData = getLocalFallbackData();
       const deletedIds = new Set(localData.deletedIds || []);
 
-      // Filter out deleted items from GitHub parsed data
-      let mergedItems = (parsedData.items || []).filter(gitItem => !deletedIds.has(gitItem.id));
+      const itemMap = new Map();
 
-      // Merge local items over GitHub items (local edits take precedence!)
-      (localData.items || []).forEach(localItem => {
-        if (deletedIds.has(localItem.id)) return;
-
-        const index = mergedItems.findIndex(gitItem => 
-          gitItem.id === localItem.id || 
-          gitItem.term.toLowerCase().trim() === localItem.term.toLowerCase().trim()
-        );
-
-        if (index !== -1) {
-          // Local edited item replaces stale GitHub item
-          mergedItems[index] = localItem;
-        } else {
-          // Add new local item
-          mergedItems.push(localItem);
+      // 1. Load local items into map first (preserves local additions, edits, and favorites)
+      (localData.items || []).forEach(item => {
+        if (item && item.id && !deletedIds.has(item.id)) {
+          itemMap.set(item.id, item);
         }
       });
+
+      // 2. Add remote items from GitHub if not deleted and not already present
+      (parsedData.items || []).forEach(gitItem => {
+        if (gitItem && gitItem.id && !deletedIds.has(gitItem.id)) {
+          if (!itemMap.has(gitItem.id)) {
+            itemMap.set(gitItem.id, gitItem);
+          }
+        }
+      });
+
+      const mergedItems = Array.from(itemMap.values());
       
       const mergedStats = {
         quizzesCompleted: Math.max(parsedData.stats?.quizzesCompleted || 0, localData.stats?.quizzesCompleted || 0),
         correctAnswers: Math.max(parsedData.stats?.correctAnswers || 0, localData.stats?.correctAnswers || 0),
         incorrectAnswers: Math.max(parsedData.stats?.incorrectAnswers || 0, localData.stats?.incorrectAnswers || 0),
-        history: [...(parsedData.stats?.history || [])]
+        history: [...(localData.stats?.history || [])]
       };
       
-      (localData.stats?.history || []).forEach(localHist => {
-        const histExists = mergedStats.history.some(gitHist => 
-          gitHist.date === localHist.date && 
-          gitHist.percentage === localHist.percentage
+      (parsedData.stats?.history || []).forEach(gitHist => {
+        const histExists = mergedStats.history.some(localHist => 
+          localHist.date === gitHist.date && 
+          localHist.percentage === gitHist.percentage
         );
         if (!histExists) {
-          mergedStats.history.push(localHist);
+          mergedStats.history.push(gitHist);
         }
       });
 
