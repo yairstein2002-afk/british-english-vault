@@ -137,6 +137,42 @@ export function saveGitHubConfig(config) {
 }
 
 /**
+function getAuthHeader(pat) {
+  const cleanPat = (pat || '').trim();
+  if (cleanPat.startsWith('github_pat_') || cleanPat.startsWith('ghp_')) {
+    return `Bearer ${cleanPat}`;
+  }
+  return `token ${cleanPat}`;
+}
+
+function decodeBase64UTF8(base64Str) {
+  const cleanBase64 = (base64Str || '').replace(/\s/g, '');
+  try {
+    const binaryString = atob(cleanBase64);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+    return new TextDecoder('utf-8').decode(bytes);
+  } catch (e) {
+    return decodeURIComponent(escape(atob(cleanBase64)));
+  }
+}
+
+function encodeBase64UTF8(str) {
+  try {
+    const bytes = new TextEncoder().encode(str);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+  } catch (e) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+}
+
+/**
  * Test Connection with GitHub Repo
  */
 export async function testGitHubConnection(config) {
@@ -144,13 +180,13 @@ export async function testGitHubConnection(config) {
   const targetBranch = branch || 'main';
   const targetPath = path || 'data/vault.json';
   
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${Date.now()}`;
   
   try {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `token ${pat}`,
+        'Authorization': getAuthHeader(pat),
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -158,11 +194,29 @@ export async function testGitHubConnection(config) {
     if (response.status === 200) {
       return { success: true, exists: true };
     } else if (response.status === 404) {
-      // File doesn't exist, but repo and token are valid
-      return { success: true, exists: false };
+      // Check if the repository itself exists
+      const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
+      const repoRes = await fetch(repoUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': getAuthHeader(pat),
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (repoRes.status === 200) {
+        return { success: true, exists: false };
+      } else {
+        return { success: false, error: `Repository "${owner}/${repo}" not found or token lacks access (HTTP ${repoRes.status})` };
+      }
+    } else if (response.status === 401) {
+      return { success: false, error: `Bad credentials (HTTP 401). Please check your Personal Access Token.` };
     } else {
-      const errorMsg = await response.text();
-      return { success: false, error: `GitHub API error: ${response.statusText} (${response.status})` };
+      let errorMsg = `HTTP ${response.status}`;
+      try {
+        const errJson = await response.json();
+        if (errJson.message) errorMsg = errJson.message;
+      } catch (e) {}
+      return { success: false, error: `${errorMsg} (${response.status})` };
     }
   } catch (error) {
     return { success: false, error: error.message };
@@ -192,15 +246,15 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `token ${pat}`,
+        'Authorization': getAuthHeader(pat),
         'Accept': 'application/vnd.github.v3+json'
       }
     });
 
     if (response.status === 200) {
       const data = await response.json();
-      const contentString = atob(data.content.replace(/\s/g, ''));
-      const parsedData = JSON.parse(decodeURIComponent(escape(contentString)));
+      const contentString = decodeBase64UTF8(data.content);
+      const parsedData = JSON.parse(contentString);
       
       // Merge local items with GitHub items to prevent data loss on connection
       const localData = getLocalFallbackData();
@@ -244,9 +298,7 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       // Cache the file SHA in sessionStorage for subsequent commits
       sessionStorage.setItem('bev_github_file_sha', data.sha);
       
-      // Auto-upload merged data to GitHub in background to ensure sync
-      saveVaultData(mergedData, onSyncStateChange);
-      
+      onSyncStateChange('synced');
       return mergedData;
     } else if (response.status === 404) {
       // File not found in GitHub. Create it immediately using local data.
@@ -254,7 +306,12 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       saveVaultData(localData, onSyncStateChange);
       return localData;
     } else {
-      throw new Error(`Status ${response.status}`);
+      let errDetail = `HTTP ${response.status}`;
+      try {
+        const errJson = await response.json();
+        if (errJson.message) errDetail = errJson.message;
+      } catch (e) {}
+      throw new Error(errDetail);
     }
   } catch (error) {
     console.error("GitHub fetch failed, loading local cache", error);
@@ -291,7 +348,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
     const checkResponse = await fetch(checkUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `token ${pat}`,
+        'Authorization': getAuthHeader(pat),
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -307,7 +364,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
 
     // 2. Prepare payload
     const jsonStr = JSON.stringify(data, null, 2);
-    const base64Content = btoa(unescape(encodeURIComponent(jsonStr)));
+    const base64Content = encodeBase64UTF8(jsonStr);
     
     const body = {
       message: `Sync learning data: ${new Date().toISOString()}`,
@@ -323,7 +380,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
     let putResponse = await fetch(url, {
       method: 'PUT',
       headers: {
-        'Authorization': `token ${pat}`,
+        'Authorization': getAuthHeader(pat),
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
@@ -336,7 +393,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
       const retryCheck = await fetch(checkUrl, {
         method: 'GET',
         headers: {
-          'Authorization': `token ${pat}`,
+          'Authorization': getAuthHeader(pat),
           'Accept': 'application/vnd.github.v3+json'
         }
       });
@@ -350,7 +407,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
         putResponse = await fetch(url, {
           method: 'PUT',
           headers: {
-            'Authorization': `token ${pat}`,
+            'Authorization': getAuthHeader(pat),
             'Accept': 'application/vnd.github.v3+json',
             'Content-Type': 'application/json'
           },
@@ -367,8 +424,14 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
       onSyncStateChange('synced');
       return true;
     } else {
-      const errText = await putResponse.text();
-      throw new Error(`Write failed with status ${putResponse.status}: ${errText}`);
+      let errText = `Status ${putResponse.status}`;
+      try {
+        const errJson = await putResponse.json();
+        if (errJson.message) errText = errJson.message;
+      } catch (e) {
+        errText = await putResponse.text();
+      }
+      throw new Error(`Write failed: ${errText}`);
     }
   } catch (error) {
     console.error("GitHub sync failed", error);

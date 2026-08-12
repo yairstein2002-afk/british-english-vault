@@ -1004,6 +1004,45 @@ document.getElementById('btn-test-connection').addEventListener('click', async (
   }
 });
 
+// Restore / Pull Data from GitHub button handler
+const restoreBtn = document.getElementById('btn-restore-github');
+if (restoreBtn) {
+  restoreBtn.addEventListener('click', async () => {
+    const pat = document.getElementById('github-pat').value.trim();
+    const owner = document.getElementById('github-owner').value.trim();
+    const repo = document.getElementById('github-repo').value.trim();
+    const branch = document.getElementById('github-branch').value.trim();
+    const path = document.getElementById('github-filepath').value.trim();
+
+    if (!pat || !owner || !repo) {
+      showBannerAlert("Please enter Personal Access Token, Owner, and Repo first.", "error");
+      return;
+    }
+
+    const newConfig = { pat, owner, repo, branch, path };
+    saveGitHubConfig(newConfig);
+    updateGitHubStatusBadge();
+
+    showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and pulling latest data from GitHub...", "info");
+
+    const testRes = await testGitHubConnection(newConfig);
+    if (!testRes.success) {
+      showBannerAlert(`Restore failed: ${testRes.error}`, "error");
+      return;
+    }
+
+    showLoader();
+    try {
+      await loadDatabase();
+      hideLoader();
+      showBannerAlert("Vault database successfully restored and synced from GitHub!", "success");
+    } catch (err) {
+      hideLoader();
+      showBannerAlert(`Failed to restore data from GitHub: ${err.message}`, "error");
+    }
+  });
+}
+
 // Save settings form handler
 gitForm.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -1023,13 +1062,20 @@ gitForm.addEventListener('submit', async (e) => {
   saveGitHubConfig(newConfig);
   updateGitHubStatusBadge();
 
-  showBannerAlert("Settings saved successfully! Syncing database in background...", "success");
+  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and saving settings...", "info");
   
-  // Run sync in the background without showing full-screen loader
+  const testRes = await testGitHubConnection(newConfig);
+  if (!testRes.success) {
+    showBannerAlert(`Settings saved, but GitHub connection failed: ${testRes.error}`, "error");
+    return;
+  }
+
+  showBannerAlert("Settings saved successfully! Syncing database from GitHub...", "info");
   loadDatabase().then(() => {
     showBannerAlert("Vault database synced successfully with GitHub!", "success");
   }).catch((err) => {
     console.error(err);
+    showBannerAlert(`Sync completed with warnings: ${err.message}`, "error");
   });
 });
 
