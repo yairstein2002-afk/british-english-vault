@@ -227,7 +227,63 @@ export async function testGitHubConnection(config) {
  * Fetch Data: Checks GitHub first. If configured, pulls the data file.
  * If not, or if it fails, falls back to browser localStorage.
  */
-export async function fetchVaultData(onSyncStateChange = () => {}) {
+function mergeRemoteWithLocal(parsedData, onSyncStateChange = () => {}) {
+  const localData = getLocalFallbackData();
+  const deletedIds = new Set(localData.deletedIds || []);
+
+  const itemMap = new Map();
+
+  // 1. Ground Truth: Local items take priority (preserves additions, edits, favorites)
+  (localData.items || []).forEach(item => {
+    if (item && item.id && !deletedIds.has(item.id)) {
+      itemMap.set(item.id, item);
+    }
+  });
+
+  // 2. Add remote items from GitHub if not deleted and not already in map
+  (parsedData.items || []).forEach(gitItem => {
+    if (gitItem && gitItem.id && !deletedIds.has(gitItem.id)) {
+      if (!itemMap.has(gitItem.id)) {
+        itemMap.set(gitItem.id, gitItem);
+      }
+    }
+  });
+
+  const mergedItems = Array.from(itemMap.values());
+  
+  const mergedStats = {
+    quizzesCompleted: Math.max(parsedData.stats?.quizzesCompleted || 0, localData.stats?.quizzesCompleted || 0),
+    correctAnswers: Math.max(parsedData.stats?.correctAnswers || 0, localData.stats?.correctAnswers || 0),
+    incorrectAnswers: Math.max(parsedData.stats?.incorrectAnswers || 0, localData.stats?.incorrectAnswers || 0),
+    history: [...(localData.stats?.history || [])]
+  };
+  
+  (parsedData.stats?.history || []).forEach(gitHist => {
+    const histExists = mergedStats.history.some(localHist => 
+      localHist.date === gitHist.date && 
+      localHist.percentage === gitHist.percentage
+    );
+    if (!histExists) {
+      mergedStats.history.push(gitHist);
+    }
+  });
+
+  const mergedData = {
+    items: mergedItems,
+    stats: mergedStats,
+    deletedIds: Array.from(deletedIds)
+  };
+
+  saveLocalData(mergedData);
+  onSyncStateChange('synced');
+  return mergedData;
+}
+
+/**
+ * Fetch Data: Checks GitHub first. If configured, pulls the data file.
+ * If not, or if it fails, falls back to browser localStorage.
+ */
+export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh = false) {
   const config = getGitHubConfig();
   
   if (!config) {
@@ -235,12 +291,24 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
     return getLocalFallbackData();
   }
 
+  // 5-Minute Session Cache check to prevent GitHub 403 Rate Limits
+  const now = Date.now();
+  const lastFetch = sessionStorage.getItem('bev_last_github_fetch_time');
+  const cachedRemoteJson = sessionStorage.getItem('bev_github_cached_remote');
+
+  if (!forceRefresh && lastFetch && cachedRemoteJson && (now - parseInt(lastFetch, 10) < 300000)) {
+    try {
+      const parsedData = JSON.parse(cachedRemoteJson);
+      return mergeRemoteWithLocal(parsedData, onSyncStateChange);
+    } catch (e) {}
+  }
+
   onSyncStateChange('syncing');
   const { pat, owner, repo, branch, path } = config;
   const targetBranch = branch || 'main';
   const targetPath = path || 'data/vault.json';
   
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${Date.now()}`;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${now}`;
   
   try {
     let response;
@@ -269,61 +337,12 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
       const contentString = decodeBase64UTF8(data.content);
       const parsedData = JSON.parse(contentString);
       
-      // Ground-Truth Merge: Local items always take priority for this device
-      const localData = getLocalFallbackData();
-      const deletedIds = new Set(localData.deletedIds || []);
-
-      const itemMap = new Map();
-
-      // 1. Load local items into map first (preserves local additions, edits, and favorites)
-      (localData.items || []).forEach(item => {
-        if (item && item.id && !deletedIds.has(item.id)) {
-          itemMap.set(item.id, item);
-        }
-      });
-
-      // 2. Add remote items from GitHub if not deleted and not already present
-      (parsedData.items || []).forEach(gitItem => {
-        if (gitItem && gitItem.id && !deletedIds.has(gitItem.id)) {
-          if (!itemMap.has(gitItem.id)) {
-            itemMap.set(gitItem.id, gitItem);
-          }
-        }
-      });
-
-      const mergedItems = Array.from(itemMap.values());
-      
-      const mergedStats = {
-        quizzesCompleted: Math.max(parsedData.stats?.quizzesCompleted || 0, localData.stats?.quizzesCompleted || 0),
-        correctAnswers: Math.max(parsedData.stats?.correctAnswers || 0, localData.stats?.correctAnswers || 0),
-        incorrectAnswers: Math.max(parsedData.stats?.incorrectAnswers || 0, localData.stats?.incorrectAnswers || 0),
-        history: [...(localData.stats?.history || [])]
-      };
-      
-      (parsedData.stats?.history || []).forEach(gitHist => {
-        const histExists = mergedStats.history.some(localHist => 
-          localHist.date === gitHist.date && 
-          localHist.percentage === gitHist.percentage
-        );
-        if (!histExists) {
-          mergedStats.history.push(gitHist);
-        }
-      });
-
-      const mergedData = {
-        items: mergedItems,
-        stats: mergedStats,
-        deletedIds: Array.from(deletedIds)
-      };
-
-      // Save locally as cache
-      saveLocalData(mergedData);
-      
-      // Cache the file SHA in sessionStorage for subsequent commits
+      // Store in session cache
+      sessionStorage.setItem('bev_last_github_fetch_time', now.toString());
+      sessionStorage.setItem('bev_github_cached_remote', JSON.stringify(parsedData));
       sessionStorage.setItem('bev_github_file_sha', data.sha);
-      
-      onSyncStateChange('synced');
-      return mergedData;
+
+      return mergeRemoteWithLocal(parsedData, onSyncStateChange);
     } else if (response.status === 404) {
       // File not found in GitHub. Create it immediately using local data.
       const localData = getLocalFallbackData();
