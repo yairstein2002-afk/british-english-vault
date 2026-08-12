@@ -988,60 +988,23 @@ document.getElementById('btn-test-connection').addEventListener('click', async (
     return;
   }
 
-  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection to GitHub...", "info");
-
   const testConfig = { pat, owner, repo, branch, path };
+  saveGitHubConfig(testConfig);
+  updateGitHubStatusBadge();
+
+  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and pulling data from GitHub...", "info");
+
   const res = await testGitHubConnection(testConfig);
+  
+  // Always trigger pulling database
+  await loadDatabase();
 
   if (res.success) {
-    if (res.exists) {
-      showBannerAlert("Connection successful! Vault data exists in repository and is ready to load.", "success");
-    } else {
-      showBannerAlert("Connection successful! Repo validated (Vault data file does not exist yet and will be created on first sync).", "success");
-    }
+    showBannerAlert("Connection successful! Vault database restored and synced from GitHub.", "success");
   } else {
-    showBannerAlert(`Connection failed: ${res.error}`, "error");
+    showBannerAlert(`Connection check warning: ${res.error}. Database loaded from public GitHub file.`, "error");
   }
 });
-
-// Restore / Pull Data from GitHub button handler
-const restoreBtn = document.getElementById('btn-restore-github');
-if (restoreBtn) {
-  restoreBtn.addEventListener('click', async () => {
-    const pat = document.getElementById('github-pat').value.trim();
-    const owner = document.getElementById('github-owner').value.trim();
-    const repo = document.getElementById('github-repo').value.trim();
-    const branch = document.getElementById('github-branch').value.trim();
-    const path = document.getElementById('github-filepath').value.trim();
-
-    if (!pat || !owner || !repo) {
-      showBannerAlert("Please enter Personal Access Token, Owner, and Repo first.", "error");
-      return;
-    }
-
-    const newConfig = { pat, owner, repo, branch, path };
-    saveGitHubConfig(newConfig);
-    updateGitHubStatusBadge();
-
-    showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and pulling latest data from GitHub...", "info");
-
-    const testRes = await testGitHubConnection(newConfig);
-    if (!testRes.success) {
-      showBannerAlert(`Restore failed: ${testRes.error}`, "error");
-      return;
-    }
-
-    showLoader();
-    try {
-      await loadDatabase();
-      hideLoader();
-      showBannerAlert("Vault database successfully restored and synced from GitHub!", "success");
-    } catch (err) {
-      hideLoader();
-      showBannerAlert(`Failed to restore data from GitHub: ${err.message}`, "error");
-    }
-  });
-}
 
 // Save settings form handler
 gitForm.addEventListener('submit', async (e) => {
@@ -1065,18 +1028,14 @@ gitForm.addEventListener('submit', async (e) => {
   showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Testing connection and saving settings...", "info");
   
   const testRes = await testGitHubConnection(newConfig);
-  if (!testRes.success) {
-    showBannerAlert(`Settings saved, but GitHub connection failed: ${testRes.error}`, "error");
-    return;
-  }
+  
+  await loadDatabase();
 
-  showBannerAlert("Settings saved successfully! Syncing database from GitHub...", "info");
-  loadDatabase().then(() => {
-    showBannerAlert("Vault database synced successfully with GitHub!", "success");
-  }).catch((err) => {
-    console.error(err);
-    showBannerAlert(`Sync completed with warnings: ${err.message}`, "error");
-  });
+  if (testRes.success) {
+    showBannerAlert("Settings saved and Vault database synced successfully with GitHub!", "success");
+  } else {
+    showBannerAlert(`Settings saved. GitHub connection note: ${testRes.error}`, "error");
+  }
 });
 
 // Test speech audio button

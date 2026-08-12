@@ -243,13 +243,26 @@ export async function fetchVaultData(onSyncStateChange = () => {}) {
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${Date.now()}`;
   
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': getAuthHeader(pat),
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
+    let response;
+    if (pat) {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Authorization': getAuthHeader(pat),
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+    }
+
+    // If no PAT, or if PAT returns 401/403, fallback to unauthenticated public GET
+    if (!response || response.status === 401 || response.status === 403) {
+      response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+    }
 
     if (response.status === 200) {
       const data = await response.json();
