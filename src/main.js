@@ -183,6 +183,14 @@ function updateView() {
 // ==========================================================================
 // DATABASE / SYNC OPERATIONS
 // ==========================================================================
+function normalizeTerm(term) {
+  if (!term) return '';
+  return term.toString()
+    .replace(/^["'“`]+|["'”`]+$/g, '')
+    .trim()
+    .toLowerCase();
+}
+
 async function loadDatabase() {
   // 1. Always load complete 33-item vaultData first
   vaultData = await fetchVaultData(updateSyncStateUI);
@@ -198,6 +206,15 @@ async function loadDatabase() {
     // Automatically seed all 33 items into Supabase
     syncAllVaultToSupabase(vaultData);
   }
+
+  // Deduplicate items by normalized term across all categories
+  const termSet = new Set();
+  vaultData.items = (vaultData.items || []).filter(item => {
+    const norm = normalizeTerm(item.term);
+    if (!norm || termSet.has(norm)) return false;
+    termSet.add(norm);
+    return true;
+  });
 
   renderStatsUI(vaultData);
   if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
@@ -599,6 +616,24 @@ itemForm.addEventListener('submit', async (e) => {
   const example = document.getElementById('item-example').value.trim();
 
   if (!term || !meaning || !example) return;
+
+  // Strict Duplicate Check across ALL categories (Words, Slangs, Phrases, Idioms)
+  const normTerm = normalizeTerm(term);
+  const existingDuplicate = (vaultData.items || []).find(i => 
+    i.id !== id && normalizeTerm(i.term) === normTerm
+  );
+
+  if (existingDuplicate) {
+    const categoryLabels = { words: 'Words', slangs: 'Slangs', phrases: 'Phrases', idioms: 'Idioms' };
+    const catLabel = categoryLabels[existingDuplicate.category] || existingDuplicate.category;
+    showBannerAlert(`⚠️ Duplicate blocked! "${term}" already exists in your vault under ${catLabel}.`, "warning");
+    const termInput = document.getElementById('item-term');
+    if (termInput) {
+      termInput.focus();
+      termInput.select();
+    }
+    return;
+  }
 
   let savedItem;
   if (id) {
