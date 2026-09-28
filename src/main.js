@@ -1573,7 +1573,8 @@ function renderGoalsUI() {
 
   filteredGoals.forEach(goal => {
     const isCompleted = completedSet.has(goal.id) || goal.completed;
-    const catInfo = GOAL_CATEGORIES[goal.category] || { emoji: '🎯', labelHeb: goal.category };
+    const catInfo = GOAL_CATEGORIES[goal.category] || { emoji: '🎯', labelEng: goal.category, name: goal.category };
+    const domainLabel = catInfo.labelEng || catInfo.name || goal.category;
 
     if (activeGoalsTab === 'goals') {
       const card = document.createElement('div');
@@ -1583,7 +1584,7 @@ function renderGoalsUI() {
         <div class="goal-info">
           <div class="goal-title">${goal.title}</div>
           <div class="goal-meta">
-            <span class="goal-badge">${catInfo.emoji} ${catInfo.labelHeb}</span>
+            <span class="goal-badge">${catInfo.emoji} ${domainLabel}</span>
             ${goal.isCustom ? `<span class="goal-badge" style="background: var(--gold); color: #111;">Custom Goal</span>` : ''}
             ${goal.targetDate ? `<span>📅 ${goal.targetDate}</span>` : ''}
           </div>
@@ -1608,7 +1609,7 @@ function renderGoalsUI() {
         </div>
         <div style="flex: 1;">
           <h4 style="font-size: 1rem; margin-bottom: 0.25rem; color: var(--text-main);">${goal.achievementTitle || goal.title}</h4>
-          <span class="goal-badge">${catInfo.emoji} ${catInfo.labelHeb}</span>
+          <span class="goal-badge">${catInfo.emoji} ${domainLabel}</span>
           <span style="font-size: 0.75rem; color: ${isCompleted ? 'var(--success)' : 'var(--text-muted)'}; margin-left: 0.5rem; font-weight: 600;">
             ${isCompleted ? '✓ Unlocked' : '🔒 Locked'}
           </span>
@@ -1626,19 +1627,13 @@ function renderGoalsUI() {
     }
   });
 
-  // Bind checkbox events
+  // Bind checkbox events (toggles completion directly without popups)
   grid.querySelectorAll('.goal-checkbox').forEach(chk => {
     chk.addEventListener('change', (e) => {
       const goalId = e.target.getAttribute('data-id');
-      const isNowCompleted = toggleGoalCompletion(goalId, vaultData);
+      toggleGoalCompletion(goalId, vaultData);
       saveDatabase();
       renderGoalsUI();
-
-      if (isNowCompleted) {
-        const goalObj = allGoals.find(g => g.id === goalId);
-        const title = goalObj ? (goalObj.achievementTitle || goalObj.title) : 'Goal Completed!';
-        triggerCelebrationModal(title);
-      }
     });
   });
 
@@ -1671,13 +1666,6 @@ function renderGoalsUI() {
       }
     });
   });
-}
-
-function triggerCelebrationModal(title) {
-  const modal = document.getElementById('celebration-modal');
-  const titleEl = document.getElementById('celebration-title');
-  if (titleEl) titleEl.innerText = title;
-  if (modal) modal.classList.add('active');
 }
 
 function setupGoalsEventListeners() {
@@ -1755,10 +1743,4 @@ function setupGoalsEventListeners() {
       renderGoalsUI();
     });
   }
-
-  // Celebration Modal Close
-  const celClose = document.getElementById('celebration-close-btn');
-  if (celClose) celClose.addEventListener('click', () => {
-    document.getElementById('celebration-modal').classList.remove('active');
-  });
 }

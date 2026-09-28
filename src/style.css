@@ -1393,20 +1393,26 @@ button, input, select, textarea {
 /* ==========================================================================
    MODAL WINDOW DIALOG
    ========================================================================== */
-.modal-overlay {
+.modal-overlay,
+.modal-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(11, 17, 30, 0.5);
+  background-color: rgba(11, 17, 30, 0.6);
   backdrop-filter: blur(4px);
   z-index: 1000;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
   animation: fade-in-overlay 0.25s ease;
+}
+
+.modal-overlay.active,
+.modal-backdrop.active {
+  display: flex !important;
 }
 
 @keyframes fade-in-overlay {
