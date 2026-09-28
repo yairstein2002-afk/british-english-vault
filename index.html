@@ -101,6 +101,9 @@
         <a href="#ai" class="nav-item" data-view="ai">
           <i class="fa-solid fa-robot"></i> <span>AI Assistant</span>
         </a>
+        <a href="#goals" class="nav-item" data-view="goals">
+          <i class="fa-solid fa-trophy"></i> <span>Goals & Achievements</span>
+        </a>
         <a href="#settings" class="nav-item" data-view="settings">
           <i class="fa-solid fa-gears"></i> <span>Settings</span>
         </a>
@@ -146,6 +149,10 @@
       <a href="#ai" class="mobile-nav-item" data-view="ai">
         <i class="fa-solid fa-robot"></i>
         <span>AI</span>
+      </a>
+      <a href="#goals" class="mobile-nav-item" data-view="goals">
+        <i class="fa-solid fa-trophy"></i>
+        <span>Goals</span>
       </a>
       <a href="#settings" class="mobile-nav-item" data-view="settings">
         <i class="fa-solid fa-gears"></i>
@@ -614,6 +621,64 @@
           </div>
         </section>
         
+        <!-- GOALS & ACHIEVEMENTS VIEW -->
+        <section id="view-goals" class="view-section">
+          <!-- Goals Dashboard Summary Banner -->
+          <div class="card goals-summary-card">
+            <div class="goals-summary-main">
+              <div class="summary-trophy-badge">
+                <i class="fa-solid fa-trophy"></i>
+                <span id="goals-unlocked-count">0</span>
+              </div>
+              <div class="summary-info">
+                <h3>Goals & Achievements Progress</h3>
+                <p>Track your language learning milestones, unlock trophies, and set custom goals.</p>
+                <div class="goals-progress-bar-bg">
+                  <div id="goals-progress-bar-fill" class="goals-progress-bar-fill" style="width: 0%;"></div>
+                </div>
+                <div class="goals-progress-stats">
+                  <span id="goals-progress-text">0% Completed</span>
+                  <span id="goals-count-text">0 / 0 Unlocked</span>
+                </div>
+              </div>
+            </div>
+            <div class="goals-summary-actions">
+              <button id="btn-create-custom-goal" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> <span>➕ Create Custom Goal</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- View Mode Switcher (Goals vs Achievements) -->
+          <div class="goals-view-toggle-bar">
+            <button class="goals-tab-btn active" data-tab="goals">
+              🎯 Goals (מטרות)
+            </button>
+            <button class="goals-tab-btn" data-tab="achievements">
+              🏆 Achievements (הישגים)
+            </button>
+          </div>
+
+          <!-- Domain Filter Chips -->
+          <div class="domain-filter-chips" id="domain-chips-container">
+            <button class="chip active" data-domain="all">🌟 All Domains</button>
+            <button class="chip" data-domain="speaking">🗣️ Speaking</button>
+            <button class="chip" data-domain="listening">🎧 Listening</button>
+            <button class="chip" data-domain="reading">📖 Reading</button>
+            <button class="chip" data-domain="writing">✍️ Writing</button>
+            <button class="chip" data-domain="vocabulary">🧠 Vocabulary</button>
+            <button class="chip" data-domain="british">🇬🇧 British</button>
+            <button class="chip" data-domain="entertainment">📺 Entertainment</button>
+            <button class="chip" data-domain="consistency">🔥 Consistency</button>
+            <button class="chip" data-domain="special">🌟 Special</button>
+          </div>
+
+          <!-- Goals & Achievements Grid Container -->
+          <div id="goals-grid-container" class="goals-grid">
+            <!-- Loaded dynamically from src/goals.js -->
+          </div>
+        </section>
+        
       </div>
     </main>
   </div>
@@ -661,6 +726,67 @@
     </div>
   </div>
   
+  <!-- CUSTOM GOAL MODAL -->
+  <div id="custom-goal-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-bullseye"></i> Create Custom Goal (מטרה אישית)</h3>
+        <button id="custom-goal-close-btn" class="icon-btn" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <form id="custom-goal-form">
+        <div class="form-group">
+          <label for="custom-goal-title" class="form-label">Goal Title (שם המטרה)</label>
+          <input type="text" id="custom-goal-title" class="form-control" placeholder="e.g. Speak with a tourist in English" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="custom-goal-category" class="form-label">Domain (תחום)</label>
+          <select id="custom-goal-category" class="form-control">
+            <option value="speaking">🗣️ Speaking & Conversation</option>
+            <option value="listening">🎧 Listening</option>
+            <option value="reading">📖 Reading</option>
+            <option value="writing">✍️ Writing</option>
+            <option value="vocabulary">🧠 Vocabulary</option>
+            <option value="british">🇬🇧 British English</option>
+            <option value="entertainment">📺 Content & Entertainment</option>
+            <option value="consistency">🔥 Consistency & Streaks</option>
+            <option value="special">🌟 Special Achievements</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="custom-goal-target" class="form-label">Target Count (יעד)</label>
+            <input type="number" id="custom-goal-target" class="form-control" value="1" min="1">
+          </div>
+          <div>
+            <label for="custom-goal-date" class="form-label">Target Date (תאריך יעד)</label>
+            <input type="date" id="custom-goal-date" class="form-control">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="custom-goal-cancel-btn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">➕ Create Goal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- CELEBRATION UNLOCK MODAL -->
+  <div id="celebration-modal" class="modal-backdrop">
+    <div class="modal-card celebration-card">
+      <div class="celebration-icon">🏆</div>
+      <h2 style="color: #FFD700; margin-bottom: 0.5rem;">🎉 New Achievement Unlocked!</h2>
+      <h3 id="celebration-title" style="color: var(--text-main); margin-bottom: 1.5rem;">🏆 Achievement Title</h3>
+      <button id="celebration-close-btn" class="btn btn-primary" style="width: 100%;">
+        Awesome! Keep Going 🚀
+      </button>
+    </div>
+  </div>
+
   <!-- APP JAVASCRIPT MODULES -->
   <script type="module" src="/src/main.js"></script>
 </body>

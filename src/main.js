@@ -34,6 +34,15 @@ import {
   deleteItemFromSupabase, 
   syncAllVaultToSupabase 
 } from './supabase.js';
+import { 
+  DEFAULT_GOALS, 
+  GOAL_CATEGORIES, 
+  getGoalsState, 
+  toggleGoalCompletion, 
+  addCustomGoal, 
+  deleteCustomGoal, 
+  calculateGoalsStats 
+} from './goals.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
@@ -50,7 +59,8 @@ const views = {
   quiz: document.getElementById('view-quiz'),
   stats: document.getElementById('view-stats'),
   settings: document.getElementById('view-settings'),
-  ai: document.getElementById('view-ai')
+  ai: document.getElementById('view-ai'),
+  goals: document.getElementById('view-goals')
 };
 
 // ==========================================================================
@@ -109,7 +119,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'quiz', 'stats', 'settings', 'ai'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -151,7 +161,8 @@ function updateView() {
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
     settings: 'App Settings',
-    ai: 'AI Assistant'
+    ai: 'AI Assistant',
+    goals: 'Goals & Achievements'
   };
   
   document.getElementById('current-view-title').innerText = titleMap[currentView] || 'Vault';
@@ -176,6 +187,9 @@ function updateView() {
     } else if (currentView === 'ai') {
       views.ai.classList.add('active');
       loadAIUI();
+    } else if (currentView === 'goals') {
+      views.goals.classList.add('active');
+      renderGoalsUI();
     }
   }
 }
@@ -1223,6 +1237,9 @@ function initEventListeners() {
 
   // Init AI Assistant controllers
   initAIHandlers();
+
+  // Init Goals & Achievements handlers
+  setupGoalsEventListeners();
 }
 
 function updateThemeButtonUI(theme) {
@@ -1503,5 +1520,184 @@ function renderAIResponse(mode, data) {
         btn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
       }
     });
+  });
+}
+
+// ==========================================================================
+// GOALS & ACHIEVEMENTS CONTROLLER
+// ==========================================================================
+let activeGoalsTab = 'goals';
+let activeGoalsDomain = 'all';
+
+function renderGoalsUI() {
+  const stats = calculateGoalsStats(vaultData);
+  
+  // Update Header Summary
+  const unlockedCount = document.getElementById('goals-unlocked-count');
+  const progressFill = document.getElementById('goals-progress-bar-fill');
+  const progressText = document.getElementById('goals-progress-text');
+  const countText = document.getElementById('goals-count-text');
+
+  if (unlockedCount) unlockedCount.innerText = stats.unlockedTrophies;
+  if (progressFill) progressFill.style.width = `${stats.percentage}%`;
+  if (progressText) progressText.innerText = `${stats.percentage}% Completed`;
+  if (countText) countText.innerText = `${stats.completedCount} / ${stats.totalGoalsCount} Unlocked`;
+
+  // Render Grid Cards
+  const grid = document.getElementById('goals-grid-container');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  const goalsState = getGoalsState(vaultData);
+  const completedSet = new Set(goalsState.completedIds || []);
+
+  const allGoals = [...DEFAULT_GOALS, ...(goalsState.customGoals || [])];
+
+  const filteredGoals = allGoals.filter(goal => {
+    if (activeGoalsDomain !== 'all' && goal.category !== activeGoalsDomain) return false;
+    return true;
+  });
+
+  if (filteredGoals.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1.5rem; color: var(--text-muted);">
+        <i class="fa-solid fa-bullseye" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--gold);"></i>
+        <h4>No goals found in this domain.</h4>
+        <p style="font-size: 0.9rem;">Click "+ Create Custom Goal" to add your own personal milestone!</p>
+      </div>
+    `;
+    return;
+  }
+
+  filteredGoals.forEach(goal => {
+    const isCompleted = completedSet.has(goal.id) || goal.completed;
+    const catInfo = GOAL_CATEGORIES[goal.category] || { emoji: '🎯', labelHeb: goal.category };
+
+    if (activeGoalsTab === 'goals') {
+      const card = document.createElement('div');
+      card.className = `goal-card ${isCompleted ? 'completed' : ''}`;
+      card.innerHTML = `
+        <input type="checkbox" class="goal-checkbox" data-id="${goal.id}" ${isCompleted ? 'checked' : ''}>
+        <div class="goal-info">
+          <div class="goal-title">${goal.title}</div>
+          <div class="goal-meta">
+            <span class="goal-badge">${catInfo.emoji} ${catInfo.labelHeb}</span>
+            ${goal.isCustom ? `<span class="goal-badge" style="background: var(--gold); color: #111;">Custom Goal</span>` : ''}
+            ${goal.targetDate ? `<span>📅 ${goal.targetDate}</span>` : ''}
+          </div>
+        </div>
+        ${goal.isCustom ? `<button class="icon-btn delete-custom-goal-btn" data-id="${goal.id}" title="Delete Custom Goal" style="color: var(--danger);"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+      `;
+      grid.appendChild(card);
+    } else {
+      // Achievements Tab
+      const card = document.createElement('div');
+      card.className = `achievement-card ${isCompleted ? 'unlocked' : ''}`;
+      card.innerHTML = `
+        <div class="achievement-icon">
+          ${isCompleted ? '🏆' : '🔒'}
+        </div>
+        <div>
+          <h4 style="font-size: 1rem; margin-bottom: 0.25rem; color: var(--text-main);">${goal.achievementTitle || goal.title}</h4>
+          <span class="goal-badge">${catInfo.emoji} ${catInfo.labelHeb}</span>
+          <span style="font-size: 0.75rem; color: ${isCompleted ? 'var(--success)' : 'var(--text-muted)'}; margin-left: 0.5rem; font-weight: 600;">
+            ${isCompleted ? '✓ Unlocked' : '🔒 Locked'}
+          </span>
+        </div>
+      `;
+      grid.appendChild(card);
+    }
+  });
+
+  // Bind checkbox events
+  grid.querySelectorAll('.goal-checkbox').forEach(chk => {
+    chk.addEventListener('change', (e) => {
+      const goalId = e.target.getAttribute('data-id');
+      const isNowCompleted = toggleGoalCompletion(goalId, vaultData);
+      saveDatabase();
+      renderGoalsUI();
+
+      if (isNowCompleted) {
+        const goalObj = allGoals.find(g => g.id === goalId);
+        const title = goalObj ? (goalObj.achievementTitle || goalObj.title) : 'Goal Completed!';
+        triggerCelebrationModal(title);
+      }
+    });
+  });
+
+  // Bind delete custom goal events
+  grid.querySelectorAll('.delete-custom-goal-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const goalId = e.currentTarget.getAttribute('data-id');
+      if (confirm("Delete this custom goal?")) {
+        deleteCustomGoal(goalId, vaultData);
+        saveDatabase();
+        renderGoalsUI();
+      }
+    });
+  });
+}
+
+function triggerCelebrationModal(title) {
+  const modal = document.getElementById('celebration-modal');
+  const titleEl = document.getElementById('celebration-title');
+  if (titleEl) titleEl.innerText = title;
+  if (modal) modal.classList.add('active');
+}
+
+function setupGoalsEventListeners() {
+  // Tab Switcher (Goals vs Achievements)
+  document.querySelectorAll('.goals-tab-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      document.querySelectorAll('.goals-tab-btn').forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      activeGoalsTab = e.currentTarget.getAttribute('data-tab');
+      renderGoalsUI();
+    });
+  });
+
+  // Domain Filter Chips
+  document.querySelectorAll('#domain-chips-container .chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      document.querySelectorAll('#domain-chips-container .chip').forEach(c => c.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      activeGoalsDomain = e.currentTarget.getAttribute('data-domain');
+      renderGoalsUI();
+    });
+  });
+
+  // Custom Goal Modal Trigger
+  const createBtn = document.getElementById('btn-create-custom-goal');
+  const customModal = document.getElementById('custom-goal-modal');
+  const closeBtn = document.getElementById('custom-goal-close-btn');
+  const cancelBtn = document.getElementById('custom-goal-cancel-btn');
+
+  if (createBtn) createBtn.addEventListener('click', () => customModal.classList.add('active'));
+  if (closeBtn) closeBtn.addEventListener('click', () => customModal.classList.remove('active'));
+  if (cancelBtn) cancelBtn.addEventListener('click', () => customModal.classList.remove('active'));
+
+  // Custom Goal Form Submit
+  const customForm = document.getElementById('custom-goal-form');
+  if (customForm) {
+    customForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('custom-goal-title').value;
+      const category = document.getElementById('custom-goal-category').value;
+      const targetCount = document.getElementById('custom-goal-target').value;
+      const targetDate = document.getElementById('custom-goal-date').value;
+
+      addCustomGoal({ title, category, targetCount, targetDate }, vaultData);
+      saveDatabase();
+      customModal.classList.remove('active');
+      customForm.reset();
+      showBannerAlert("➕ Custom Goal created successfully!", "success");
+      renderGoalsUI();
+    });
+  }
+
+  // Celebration Modal Close
+  const celClose = document.getElementById('celebration-close-btn');
+  if (celClose) celClose.addEventListener('click', () => {
+    document.getElementById('celebration-modal').classList.remove('active');
   });
 }
