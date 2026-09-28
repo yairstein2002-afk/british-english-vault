@@ -22,11 +22,11 @@ function renderCategoryChips() {
 
   container.innerHTML = `
     <button class="chip ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
-      🌟 All Topics (כל הנושאים)
+      🌟 All Topics
     </button>
     ${LEARN_CATEGORIES.map(cat => `
       <button class="chip ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">
-        ${cat.emoji} ${cat.titleEng} (${cat.titleHeb})
+        ${cat.emoji} ${cat.titleEng}
       </button>
     `).join('')}
   `;
@@ -95,7 +95,7 @@ export function renderTopicsList() {
   container.innerHTML = '';
 
   Object.keys(categoryGroups).forEach(catId => {
-    const catData = LEARN_CATEGORIES.find(c => c.id === catId) || { emoji: '📚', titleEng: catId, titleHeb: '' };
+    const catData = LEARN_CATEGORIES.find(c => c.id === catId) || { emoji: '📚', titleEng: catId };
     const topicsInCat = categoryGroups[catId];
 
     const groupCard = document.createElement('div');
@@ -106,7 +106,7 @@ export function renderTopicsList() {
           <span class="cat-emoji">${catData.emoji}</span>
           <div>
             <h3>${catData.titleEng}</h3>
-            <span class="cat-subtitle-he">${catData.titleHeb}</span>
+            <span class="cat-subtitle-he">${catData.desc || ''}</span>
           </div>
         </div>
         <span class="badge-count">${topicsInCat.length} Topics</span>

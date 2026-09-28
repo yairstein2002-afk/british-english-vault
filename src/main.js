@@ -164,7 +164,7 @@ function updateView() {
     slangs: 'Slangs',
     phrases: 'Phrases',
     idioms: 'Idioms',
-    learn: 'Learn & Practice (לימוד ותרגול)',
+    learn: 'Learn & Practice',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
     settings: 'App Settings',
@@ -1624,7 +1624,7 @@ function renderGoalsUI() {
       `;
       grid.appendChild(card);
     } else {
-      // Achievements Tab
+      // Achievements Tab (Pure trophy cards without edit/delete action buttons)
       const card = document.createElement('div');
       card.className = `achievement-card ${isCompleted ? 'unlocked' : ''}`;
       card.innerHTML = `
@@ -1637,14 +1637,6 @@ function renderGoalsUI() {
           <span style="font-size: 0.75rem; color: ${isCompleted ? 'var(--success)' : 'var(--text-muted)'}; margin-left: 0.5rem; font-weight: 600;">
             ${isCompleted ? '✓ Unlocked' : '🔒 Locked'}
           </span>
-        </div>
-        <div class="goal-card-actions">
-          <button class="goal-action-btn edit-goal-btn" data-id="${goal.id}" title="Edit Goal">
-            <i class="fa-solid fa-pen"></i>
-          </button>
-          <button class="goal-action-btn delete-goal-btn" data-id="${goal.id}" title="Delete Goal">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
         </div>
       `;
       grid.appendChild(card);
