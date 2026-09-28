@@ -912,7 +912,7 @@ function showQuizQuestion() {
 }
 
 async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
-  // 1. Disable all option buttons to prevent multiple clicks
+  // 1. Disable option buttons from submitting duplicate answers
   const optionButtons = document.querySelectorAll('.quiz-option-btn');
   optionButtons.forEach(btn => {
     btn.disabled = true;
@@ -922,27 +922,36 @@ async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
   const isCorrect = choice.isCorrect;
   const currentItem = getCurrentQuestion();
 
+  const appendStatusBadge = (buttonEl, isCheck) => {
+    const icon = document.createElement('i');
+    icon.className = isCheck ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
+    icon.style.marginLeft = '0.5rem';
+    buttonEl.appendChild(icon);
+  };
+
   // 2. Add visual success/danger feedback
   const feedbackBanner = document.getElementById('quiz-feedback-banner');
   if (isCorrect) {
     selectedBtn.classList.remove('disabled');
     selectedBtn.classList.add('correct');
-    selectedBtn.innerHTML += ' <i class="fa-solid fa-circle-check"></i>';
+    appendStatusBadge(selectedBtn, true);
     
     feedbackBanner.className = 'quiz-feedback-banner correct';
     feedbackBanner.innerText = 'Splendid! Correct.';
   } else {
     selectedBtn.classList.remove('disabled');
     selectedBtn.classList.add('incorrect');
-    selectedBtn.innerHTML += ' <i class="fa-solid fa-circle-xmark"></i>';
+    appendStatusBadge(selectedBtn, false);
 
     // Find and highlight correct answer
     optionButtons.forEach(btn => {
-      const match = choices.find(c => c.text === btn.innerText && c.isCorrect);
+      const optTextEl = btn.querySelector('.quiz-opt-text');
+      const textToMatch = optTextEl ? optTextEl.innerText.trim() : btn.innerText.trim();
+      const match = choices.find(c => c.text.trim() === textToMatch && c.isCorrect);
       if (match) {
         btn.classList.remove('disabled');
         btn.classList.add('correct');
-        btn.innerHTML += ' <i class="fa-solid fa-circle-check"></i>';
+        appendStatusBadge(btn, true);
       }
     });
 

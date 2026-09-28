@@ -165,6 +165,24 @@ export function splitIntoSyllables(word) {
 }
 
 /**
+ * Clean text to avoid speech engine pronouncing 'blank', 'space blank', 'underscore', '____', etc.
+ * Replaces gaps/placeholders with a short pause (comma space) so speech flows naturally.
+ */
+export function sanitizeTextForTTS(text) {
+  if (!text) return '';
+  return text
+    // Replace sequences of 2 or more underscores, hyphens or dots used as fill-in-the-blank gaps with a pause
+    .replace(/[_.\-]{2,}/g, ', ')
+    // Replace explicit placeholder terms like [blank], (blank), "space blank", "blank", "underscore", "underscores"
+    .replace(/\[\s*blank\s*\]|\(\s*blank\s*\)/gi, ', ')
+    .replace(/\b(space\s+blank|blank|underscore|underscores)\b/gi, ', ')
+    // Consolidate multiple consecutive commas/spaces
+    .replace(/,\s*,+/g, ',')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
  * Standard Speech Playback
  */
 export function speakText(text, options = {}) {
@@ -174,10 +192,12 @@ export function speakText(text, options = {}) {
       return;
     }
 
+    const cleanText = sanitizeTextForTTS(text);
+
     // Cancel ongoing speech
     window.speechSynthesis.cancel();
 
-    const utterance = new SpeechSynthesisUtterance(text);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     
     if (selectedVoice) {
       utterance.voice = selectedVoice;

@@ -1685,6 +1685,13 @@ button, input, select, textarea {
   border-color: var(--gold);
 }
 
+.quiz-option-btn:disabled .quiz-opt-speak-btn,
+.practice-opt-btn:disabled .practice-opt-speak-btn {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+  cursor: pointer !important;
+}
+
 .quiz-option-btn:hover:not(:disabled) {
   border-color: var(--uk-blue);
   background-color: rgba(0, 36, 125, 0.02);
