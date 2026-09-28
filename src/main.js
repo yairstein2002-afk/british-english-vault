@@ -876,32 +876,7 @@ function showQuizQuestion() {
       btn.style.textAlign = 'left';
     }
 
-    const textSpan = document.createElement('span');
-    textSpan.className = 'quiz-opt-text';
-    textSpan.innerText = choice.text;
-
-    const speakOptBtn = document.createElement('button');
-    speakOptBtn.className = 'quiz-opt-speak-btn';
-    speakOptBtn.type = 'button';
-    speakOptBtn.title = 'Listen option (UK Accent)';
-    speakOptBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-
-    speakOptBtn.addEventListener('click', async (e) => {
-      e.stopPropagation(); // Prevent answer selection when listening
-      speakOptBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-      try {
-        const rateSelect = document.getElementById('quiz-word-rate');
-        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
-        await speakText(choice.text, { rate });
-      } catch (err) {
-        console.error(err);
-      } finally {
-        speakOptBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      }
-    });
-
-    btn.appendChild(textSpan);
-    btn.appendChild(speakOptBtn);
+    btn.innerText = choice.text;
 
     btn.addEventListener('click', () => {
       handleQuizChoiceSelected(choice, btn, choices);
@@ -945,8 +920,7 @@ async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
 
     // Find and highlight correct answer
     optionButtons.forEach(btn => {
-      const optTextEl = btn.querySelector('.quiz-opt-text');
-      const textToMatch = optTextEl ? optTextEl.innerText.trim() : btn.innerText.trim();
+      const textToMatch = btn.innerText.trim();
       const match = choices.find(c => c.text.trim() === textToMatch && c.isCorrect);
       if (match) {
         btn.classList.remove('disabled');

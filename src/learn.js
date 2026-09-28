@@ -302,20 +302,6 @@ function renderTopicDetailContent(topic) {
     });
   });
 
-  // Bind Practice Option Audio Buttons
-  modalBody.querySelectorAll('.practice-opt-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
-      try {
-        await speakText(text);
-      } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
-      }
-    });
-  });
-
   // Bind Explanation Audio Buttons
   modalBody.querySelectorAll('.explanation-speak-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
@@ -395,9 +381,6 @@ function renderPracticeQuestions(topic) {
               <button class="${btnClass}" data-q-idx="${qIdx}" data-opt-idx="${optIdx}" ${hasAnswered ? 'disabled' : ''}>
                 <span class="opt-letter">${String.fromCharCode(65 + optIdx)}</span>
                 <span class="opt-text">${opt}</span>
-                <button class="mini-speak-btn practice-opt-speak-btn" type="button" data-text="${opt.replace(/"/g, '&quot;')}" title="Listen option">
-                  <i class="fa-solid fa-volume-high"></i>
-                </button>
               </button>
             `;
           }).join('')}
