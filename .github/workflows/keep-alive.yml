@@ -1,0 +1,23 @@
+name: Supabase Automatic Keep-Alive Ping
+
+on:
+  schedule:
+    # Run every 3 days at 12:00 UTC (0 12 */3 * *)
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Keep-Alive Ping to Supabase PostgreSQL Database
+        run: |
+          SUPABASE_URL="https://iqngleyyuwyaomufdmlm.supabase.co"
+          echo "Pinging Supabase Project: $SUPABASE_URL"
+          RESPONSE=$(curl -s -w "%{http_code}" "$SUPABASE_URL/rest/v1/vault_items?select=id&limit=1" -o /dev/null)
+          echo "Supabase HTTP Response Code: $RESPONSE"
+          if [ "$RESPONSE" -ge 200 ] && [ "$RESPONSE" -lt 500 ]; then
+            echo "Supabase keep-alive ping successful! Database is active and awake."
+          else
+            echo "Warning: Received HTTP $RESPONSE from Supabase endpoint."
+          fi

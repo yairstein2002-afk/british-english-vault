@@ -52,7 +52,6 @@ function setupSearchHandler() {
 
 export function renderTopicsList() {
   const container = document.getElementById('learn-topics-container');
-  const detailPanel = document.getElementById('learn-detail-panel');
   if (!container) return;
 
   const searchQuery = (document.getElementById('learn-search-input')?.value || '').toLowerCase().trim();
@@ -167,12 +166,19 @@ function renderTopicDetailContent(topic) {
 
   modalBody.innerHTML = `
     <div class="topic-detail-header">
-      <span class="category-pill">${catData.emoji} ${catData.titleEng}</span>
-      <h2 class="topic-modal-title">${topic.title}</h2>
-      <p class="topic-modal-summary">${topic.summary}</p>
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
+        <div>
+          <span class="category-pill">${catData.emoji} ${catData.titleEng}</span>
+          <h2 class="topic-modal-title">${topic.title}</h2>
+          <p class="topic-modal-summary">${topic.summary}</p>
+        </div>
+        <button class="btn btn-secondary topic-speak-btn" id="btn-speak-lesson" style="margin-top: 0.5rem;" title="Listen to entire lesson out loud (UK Accent)">
+          <i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>
+        </button>
+      </div>
 
       <!-- Topic View Switcher (Rules vs Practice) -->
-      <div class="learn-tab-bar">
+      <div class="learn-tab-bar" style="margin-top: 1.25rem;">
         <button class="learn-tab-btn ${currentTopicTab === 'rules' ? 'active' : ''}" id="btn-tab-rules">
           <i class="fa-solid fa-book-open"></i> Learn Rules & Examples
         </button>
@@ -187,7 +193,12 @@ function renderTopicDetailContent(topic) {
       <div class="rules-list-grid">
         ${(topic.rules || []).map(rule => `
           <div class="rule-card">
-            <h4><i class="fa-solid fa-circle-info" style="color: var(--uk-blue);"></i> ${rule.title}</h4>
+            <div class="rule-card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+              <h4><i class="fa-solid fa-circle-info" style="color: var(--uk-blue);"></i> ${rule.title}</h4>
+              <button class="mini-speak-btn rule-speak-btn" data-text="${rule.title}. ${rule.details}" title="Listen Rule (UK Accent)">
+                <i class="fa-solid fa-volume-high"></i> Listen
+              </button>
+            </div>
             <p>${rule.details}</p>
           </div>
         `).join('')}
@@ -238,15 +249,55 @@ function renderTopicDetailContent(topic) {
     renderTopicDetailContent(topic);
   });
 
-  // Bind Audio Buttons
+  // Bind Speak Lesson Full Audio
+  const speakLessonBtn = document.getElementById('btn-speak-lesson');
+  if (speakLessonBtn) {
+    speakLessonBtn.addEventListener('click', async () => {
+      const fullScript = `${topic.title}. ${topic.summary}. ${(topic.rules || []).map(r => `${r.title}: ${r.details}`).join('. ')}`;
+      speakLessonBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Reading Lesson...</span>';
+      try {
+        await speakText(fullScript);
+      } finally {
+        speakLessonBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>';
+      }
+    });
+  }
+
+  // Bind Rule Audio Buttons
+  modalBody.querySelectorAll('.rule-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      try {
+        await speakText(text);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      }
+    });
+  });
+
+  // Bind Sentence Audio Buttons
   modalBody.querySelectorAll('.ex-speak-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Playing...';
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
       try {
         await speakText(text);
       } finally {
         btn.innerHTML = '<i class="fa-solid fa-circle-play"></i> Listen';
+      }
+    });
+  });
+
+  // Bind Question Audio Buttons
+  modalBody.querySelectorAll('.q-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const text = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      try {
+        await speakText(text);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       }
     });
   });
@@ -260,6 +311,15 @@ function renderTopicDetailContent(topic) {
       renderTopicDetailContent(topic);
     });
   });
+
+  // Bind Retry Practice Button
+  const retryBtn = document.getElementById('btn-retry-topic-practice');
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => {
+      practiceAnswers = {};
+      renderTopicDetailContent(topic);
+    });
+  }
 }
 
 function renderPracticeQuestions(topic) {
@@ -282,11 +342,16 @@ function renderPracticeQuestions(topic) {
       <div class="practice-question-card ${hasAnswered ? (isCorrect ? 'correct' : 'incorrect') : ''}">
         <div class="q-header">
           <span class="q-number">Question ${qIdx + 1} of ${questions.length}</span>
-          ${hasAnswered ? `
-            <span class="q-badge ${isCorrect ? 'correct' : 'incorrect'}">
-              ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
-            </span>
-          ` : ''}
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button class="mini-speak-btn q-speak-btn" data-text="${q.question.replace(/"/g, '&quot;')}" title="Listen Question (UK Accent)">
+              <i class="fa-solid fa-volume-high"></i> Listen
+            </button>
+            ${hasAnswered ? `
+              <span class="q-badge ${isCorrect ? 'correct' : 'incorrect'}">
+                ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+              </span>
+            ` : ''}
+          </div>
         </div>
         <h4 class="q-text">${q.question}</h4>
 
