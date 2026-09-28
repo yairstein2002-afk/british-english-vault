@@ -20,8 +20,8 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-9cAGBv0X.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BDqG9Cc_.css">
+  <script type="module" crossorigin src="/assets/index-CwL24WKD.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-26PfGb13.css">
 </head>
 <body>
   <!-- App Container -->
@@ -645,7 +645,7 @@
             </div>
             <div class="goals-summary-actions">
               <button id="btn-create-custom-goal" class="btn btn-primary">
-                <i class="fa-solid fa-plus"></i> <span>➕ Create Custom Goal</span>
+                <i class="fa-solid fa-plus"></i> <span>Create Custom Goal</span>
               </button>
             </div>
           </div>
@@ -653,10 +653,10 @@
           <!-- View Mode Switcher (Goals vs Achievements) -->
           <div class="goals-view-toggle-bar">
             <button class="goals-tab-btn active" data-tab="goals">
-              🎯 Goals (מטרות)
+              🎯 Goals
             </button>
             <button class="goals-tab-btn" data-tab="achievements">
-              🏆 Achievements (הישגים)
+              🏆 Achievements
             </button>
           </div>
 
@@ -677,6 +677,105 @@
           <!-- Goals & Achievements Grid Container -->
           <div id="goals-grid-container" class="goals-grid">
             <!-- Loaded dynamically from src/goals.js -->
+          </div>
+
+          <!-- CUSTOM GOAL MODAL (Scoped inside Goals view) -->
+          <div id="custom-goal-modal" class="modal-backdrop">
+            <div class="modal-card">
+              <div class="modal-header">
+                <h3><i class="fa-solid fa-bullseye"></i> Create Custom Goal</h3>
+                <button id="custom-goal-close-btn" class="icon-btn" aria-label="Close modal">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <form id="custom-goal-form">
+                <div class="form-group">
+                  <label for="custom-goal-title" class="form-label">Goal Title</label>
+                  <input type="text" id="custom-goal-title" class="form-control" placeholder="e.g. Speak with a tourist in English" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="custom-goal-category" class="form-label">Domain</label>
+                  <select id="custom-goal-category" class="form-control">
+                    <option value="speaking">🗣️ Speaking & Conversation</option>
+                    <option value="listening">🎧 Listening</option>
+                    <option value="reading">📖 Reading</option>
+                    <option value="writing">✍️ Writing</option>
+                    <option value="vocabulary">🧠 Vocabulary</option>
+                    <option value="british">🇬🇧 British English</option>
+                    <option value="entertainment">📺 Content & Entertainment</option>
+                    <option value="consistency">🔥 Consistency & Streaks</option>
+                    <option value="special">🌟 Special Achievements</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div>
+                    <label for="custom-goal-target" class="form-label">Target Count</label>
+                    <input type="number" id="custom-goal-target" class="form-control" value="1" min="1">
+                  </div>
+                  <div>
+                    <label for="custom-goal-date" class="form-label">Target Date</label>
+                    <input type="date" id="custom-goal-date" class="form-control">
+                  </div>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" id="custom-goal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                  <button type="submit" class="btn btn-primary">➕ Create Goal</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- EDIT GOAL MODAL (Scoped inside Goals view) -->
+          <div id="edit-goal-modal" class="modal-backdrop">
+            <div class="modal-card">
+              <div class="modal-header">
+                <h3><i class="fa-solid fa-pen-to-square"></i> Edit Goal</h3>
+                <button id="edit-goal-close-btn" class="icon-btn" aria-label="Close modal">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <form id="edit-goal-form">
+                <input type="hidden" id="edit-goal-id">
+                
+                <div class="form-group">
+                  <label for="edit-goal-title" class="form-label">Goal Title</label>
+                  <input type="text" id="edit-goal-title" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                  <label for="edit-goal-category" class="form-label">Domain</label>
+                  <select id="edit-goal-category" class="form-control">
+                    <option value="speaking">🗣️ Speaking & Conversation</option>
+                    <option value="listening">🎧 Listening</option>
+                    <option value="reading">📖 Reading</option>
+                    <option value="writing">✍️ Writing</option>
+                    <option value="vocabulary">🧠 Vocabulary</option>
+                    <option value="british">🇬🇧 British English</option>
+                    <option value="entertainment">📺 Content & Entertainment</option>
+                    <option value="consistency">🔥 Consistency & Streaks</option>
+                    <option value="special">🌟 Special Achievements</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-goal-achievement-title" class="form-label">Achievement Trophy Title</label>
+                  <input type="text" id="edit-goal-achievement-title" class="form-control">
+                </div>
+
+                <div class="form-group">
+                  <label for="edit-goal-date" class="form-label">Target Date</label>
+                  <input type="date" id="edit-goal-date" class="form-control">
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" id="edit-goal-cancel-btn" class="btn btn-secondary">Cancel</button>
+                  <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                </div>
+              </form>
+            </div>
           </div>
         </section>
         
@@ -724,117 +823,6 @@
           <button type="submit" class="btn btn-primary">Save Entry</button>
         </div>
       </form>
-    </div>
-  </div>
-  
-  <!-- CUSTOM GOAL MODAL -->
-  <div id="custom-goal-modal" class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-bullseye"></i> Create Custom Goal (מטרה אישית)</h3>
-        <button id="custom-goal-close-btn" class="icon-btn" aria-label="Close modal">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <form id="custom-goal-form">
-        <div class="form-group">
-          <label for="custom-goal-title" class="form-label">Goal Title (שם המטרה)</label>
-          <input type="text" id="custom-goal-title" class="form-control" placeholder="e.g. Speak with a tourist in English" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="custom-goal-category" class="form-label">Domain (תחום)</label>
-          <select id="custom-goal-category" class="form-control">
-            <option value="speaking">🗣️ Speaking & Conversation</option>
-            <option value="listening">🎧 Listening</option>
-            <option value="reading">📖 Reading</option>
-            <option value="writing">✍️ Writing</option>
-            <option value="vocabulary">🧠 Vocabulary</option>
-            <option value="british">🇬🇧 British English</option>
-            <option value="entertainment">📺 Content & Entertainment</option>
-            <option value="consistency">🔥 Consistency & Streaks</option>
-            <option value="special">🌟 Special Achievements</option>
-          </select>
-        </div>
-
-        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div>
-            <label for="custom-goal-target" class="form-label">Target Count (יעד)</label>
-            <input type="number" id="custom-goal-target" class="form-control" value="1" min="1">
-          </div>
-          <div>
-            <label for="custom-goal-date" class="form-label">Target Date (תאריך יעד)</label>
-            <input type="date" id="custom-goal-date" class="form-control">
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" id="custom-goal-cancel-btn" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">➕ Create Goal</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- EDIT GOAL MODAL -->
-  <div id="edit-goal-modal" class="modal-backdrop">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3><i class="fa-solid fa-pen-to-square"></i> Edit Goal (עריכת מטרה)</h3>
-        <button id="edit-goal-close-btn" class="icon-btn" aria-label="Close modal">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-      <form id="edit-goal-form">
-        <input type="hidden" id="edit-goal-id">
-        
-        <div class="form-group">
-          <label for="edit-goal-title" class="form-label">Goal Title (שם המטרה)</label>
-          <input type="text" id="edit-goal-title" class="form-control" required>
-        </div>
-        
-        <div class="form-group">
-          <label for="edit-goal-category" class="form-label">Domain (תחום)</label>
-          <select id="edit-goal-category" class="form-control">
-            <option value="speaking">🗣️ Speaking & Conversation</option>
-            <option value="listening">🎧 Listening</option>
-            <option value="reading">📖 Reading</option>
-            <option value="writing">✍️ Writing</option>
-            <option value="vocabulary">🧠 Vocabulary</option>
-            <option value="british">🇬🇧 British English</option>
-            <option value="entertainment">📺 Content & Entertainment</option>
-            <option value="consistency">🔥 Consistency & Streaks</option>
-            <option value="special">🌟 Special Achievements</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="edit-goal-achievement-title" class="form-label">Achievement Trophy Title (שם ההישג / גביע)</label>
-          <input type="text" id="edit-goal-achievement-title" class="form-control">
-        </div>
-
-        <div class="form-group">
-          <label for="edit-goal-date" class="form-label">Target Date (תאריך יעד)</label>
-          <input type="date" id="edit-goal-date" class="form-control">
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" id="edit-goal-cancel-btn" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">💾 Save Changes</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- CELEBRATION UNLOCK MODAL -->
-  <div id="celebration-modal" class="modal-backdrop">
-    <div class="modal-card celebration-card">
-      <div class="celebration-icon">🏆</div>
-      <h2 style="color: #FFD700; margin-bottom: 0.5rem;">🎉 New Achievement Unlocked!</h2>
-      <h3 id="celebration-title" style="color: var(--text-main); margin-bottom: 1.5rem;">🏆 Achievement Title</h3>
-      <button id="celebration-close-btn" class="btn btn-primary" style="width: 100%;">
-        Awesome! Keep Going 🚀
-      </button>
     </div>
   </div>
 
