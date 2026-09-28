@@ -45,10 +45,11 @@ import {
   deleteGoal, 
   calculateGoalsStats 
 } from './goals.js';
+import { initLearnUI, closeTopicDetail } from './learn.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
-let currentView = 'words'; // words, slangs, phrases, idioms, quiz, stats, settings
+let currentView = 'words'; // words, slangs, phrases, idioms, learn, quiz, stats, settings, ai, goals
 let isSyncing = false;
 let syncQueue = false;
 
@@ -58,6 +59,7 @@ let brVoices = [];
 // DOM Elements
 const views = {
   cards: document.getElementById('view-cards-container'),
+  learn: document.getElementById('view-learn'),
   quiz: document.getElementById('view-quiz'),
   stats: document.getElementById('view-stats'),
   settings: document.getElementById('view-settings'),
@@ -121,7 +123,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'quiz', 'stats', 'settings', 'ai', 'goals'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -152,7 +154,9 @@ function updateView() {
   });
 
   // Hide all views first
-  Object.values(views).forEach(v => v.classList.remove('active'));
+  Object.values(views).forEach(v => {
+    if (v) v.classList.remove('active');
+  });
 
   // Update Header title and visible content view
   const titleMap = {
@@ -160,6 +164,7 @@ function updateView() {
     slangs: 'Slangs',
     phrases: 'Phrases',
     idioms: 'Idioms',
+    learn: 'Learn & Practice (לימוד ותרגול)',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
     settings: 'App Settings',
@@ -177,7 +182,10 @@ function updateView() {
     renderCardsGrid();
   } else {
     addBtn.style.display = 'none';
-    if (currentView === 'quiz') {
+    if (currentView === 'learn') {
+      if (views.learn) views.learn.classList.add('active');
+      initLearnUI();
+    } else if (currentView === 'quiz') {
       views.quiz.classList.add('active');
       setupQuizUI();
     } else if (currentView === 'stats') {
@@ -1242,6 +1250,16 @@ function initEventListeners() {
 
   // Init Goals & Achievements handlers
   setupGoalsEventListeners();
+
+  // Init Learn Topic Modal Close Listener
+  const learnModal = document.getElementById('learn-topic-modal');
+  const learnCloseBtn = document.getElementById('learn-topic-close-btn');
+  if (learnCloseBtn) learnCloseBtn.addEventListener('click', closeTopicDetail);
+  if (learnModal) {
+    learnModal.addEventListener('click', (e) => {
+      if (e.target === learnModal) closeTopicDetail();
+    });
+  }
 }
 
 function updateThemeButtonUI(theme) {

@@ -92,8 +92,11 @@
         <a href="#idioms" class="nav-item" data-view="idioms">
           <i class="fa-solid fa-crown"></i> <span>Idioms</span>
         </a>
+        <a href="#learn" class="nav-item" data-view="learn">
+          <i class="fa-solid fa-graduation-cap"></i> <span>Learn & Practice</span>
+        </a>
         <a href="#quiz" class="nav-item" data-view="quiz">
-          <i class="fa-solid fa-graduation-cap"></i> <span>Quiz</span>
+          <i class="fa-solid fa-spell-check"></i> <span>Quiz</span>
         </a>
         <a href="#stats" class="nav-item" data-view="stats">
           <i class="fa-solid fa-chart-line"></i> <span>Statistics</span>
@@ -138,8 +141,12 @@
         <i class="fa-solid fa-crown"></i>
         <span>Idioms</span>
       </a>
-      <a href="#quiz" class="mobile-nav-item" data-view="quiz">
+      <a href="#learn" class="mobile-nav-item" data-view="learn">
         <i class="fa-solid fa-graduation-cap"></i>
+        <span>Learn</span>
+      </a>
+      <a href="#quiz" class="mobile-nav-item" data-view="quiz">
+        <i class="fa-solid fa-spell-check"></i>
         <span>Quiz</span>
       </a>
       <a href="#stats" class="mobile-nav-item" data-view="stats">
@@ -781,8 +788,57 @@
           </div>
         </section>
         
+        <!-- LEARN & PRACTICE VIEW -->
+        <section id="view-learn" class="view-section">
+          <!-- Summary Banner -->
+          <div class="card goals-summary-card">
+            <div class="goals-summary-main">
+              <div class="summary-trophy-badge" style="background: linear-gradient(135deg, #00247D 0%, #00123e 100%); color: #FFF;">
+                <i class="fa-solid fa-graduation-cap" style="font-size: 1.8rem;"></i>
+              </div>
+              <div class="summary-info">
+                <h3>Grammar Learn & Practice (לימוד ותרגול דקדוק)</h3>
+                <p>Master English grammar rules, tenses, syntax, and parts of speech with interactive UK lessons & practice quizzes.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search Box -->
+          <div class="control-panel" style="margin-bottom: 1.25rem;">
+            <div class="search-box" style="width: 100%;">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="learn-search-input" placeholder="Search grammar rules, tenses, topics...">
+            </div>
+          </div>
+
+          <!-- Category Filter Chips -->
+          <div class="domain-filter-chips" id="learn-chips-container">
+            <!-- Loaded dynamically from src/learn.js -->
+          </div>
+
+          <!-- Topics Grid -->
+          <div id="learn-topics-container" class="learn-topics-grid">
+            <!-- Loaded dynamically from src/learn.js -->
+          </div>
+        </section>
+
       </div>
     </main>
+  </div>
+
+  <!-- LEARN TOPIC DETAIL & PRACTICE MODAL -->
+  <div id="learn-topic-modal" class="modal-backdrop">
+    <div class="modal-card learn-topic-modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-graduation-cap"></i> Lesson & Practice</h3>
+        <button id="learn-topic-close-btn" class="icon-btn" aria-label="Close modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div id="learn-modal-body" class="learn-modal-body">
+        <!-- Filled dynamically in src/learn.js -->
+      </div>
+    </div>
   </div>
   
   <!-- ADD / EDIT ITEM MODAL -->
