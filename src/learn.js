@@ -302,6 +302,34 @@ function renderTopicDetailContent(topic) {
     });
   });
 
+  // Bind Practice Option Audio Buttons
+  modalBody.querySelectorAll('.practice-opt-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const text = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+      try {
+        await speakText(text);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+      }
+    });
+  });
+
+  // Bind Explanation Audio Buttons
+  modalBody.querySelectorAll('.explanation-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const text = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      try {
+        await speakText(text);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      }
+    });
+  });
+
   // Bind Practice Answer Selections
   modalBody.querySelectorAll('.practice-opt-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
@@ -367,6 +395,9 @@ function renderPracticeQuestions(topic) {
               <button class="${btnClass}" data-q-idx="${qIdx}" data-opt-idx="${optIdx}" ${hasAnswered ? 'disabled' : ''}>
                 <span class="opt-letter">${String.fromCharCode(65 + optIdx)}</span>
                 <span class="opt-text">${opt}</span>
+                <button class="mini-speak-btn practice-opt-speak-btn" type="button" data-text="${opt.replace(/"/g, '&quot;')}" title="Listen option">
+                  <i class="fa-solid fa-volume-high"></i>
+                </button>
               </button>
             `;
           }).join('')}
@@ -374,7 +405,13 @@ function renderPracticeQuestions(topic) {
 
         ${hasAnswered ? `
           <div class="q-explanation-box">
-            <strong><i class="fa-solid fa-lightbulb"></i> Explanation:</strong> ${q.explanation}
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+              <strong><i class="fa-solid fa-lightbulb"></i> Explanation:</strong>
+              <button class="mini-speak-btn explanation-speak-btn" type="button" data-text="${q.explanation.replace(/"/g, '&quot;')}" title="Listen Explanation (UK Accent)">
+                <i class="fa-solid fa-volume-high"></i> Listen
+              </button>
+            </div>
+            <span>${q.explanation}</span>
           </div>
         ` : ''}
       </div>

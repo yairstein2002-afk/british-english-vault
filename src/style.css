@@ -1652,6 +1652,39 @@ button, input, select, textarea {
   width: 100%;
 }
 
+.quiz-opt-text {
+  flex: 1;
+}
+
+.quiz-opt-speak-btn, .practice-opt-speak-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 0.5rem;
+}
+
+.quiz-opt-speak-btn:hover, .practice-opt-speak-btn:hover {
+  background-color: var(--uk-blue);
+  color: #FFFFFF;
+  border-color: var(--uk-blue);
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .quiz-opt-speak-btn:hover, [data-theme="dark"] .practice-opt-speak-btn:hover {
+  background-color: var(--gold);
+  color: var(--bg-main);
+  border-color: var(--gold);
+}
+
 .quiz-option-btn:hover:not(:disabled) {
   border-color: var(--uk-blue);
   background-color: rgba(0, 36, 125, 0.02);

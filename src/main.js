@@ -837,6 +837,25 @@ function showQuizQuestion() {
     }
   });
 
+  // Bind Meaning Speech Handler in Quiz Card
+  const meaningSpeakBtn = document.getElementById('quiz-meaning-speak-btn');
+  if (meaningSpeakBtn) {
+    const newMeaningSpeakBtn = meaningSpeakBtn.cloneNode(true);
+    meaningSpeakBtn.parentNode.replaceChild(newMeaningSpeakBtn, meaningSpeakBtn);
+    newMeaningSpeakBtn.addEventListener('click', async () => {
+      newMeaningSpeakBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
+      try {
+        const rateSelect = document.getElementById('quiz-word-rate');
+        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+        await speakText(item.meaning, { rate });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        newMeaningSpeakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      }
+    });
+  }
+
   // Render Multiple Choice Option Buttons
   const optionsContainer = document.getElementById('quiz-options');
   optionsContainer.innerHTML = '';
@@ -857,7 +876,32 @@ function showQuizQuestion() {
       btn.style.textAlign = 'left';
     }
 
-    btn.innerText = choice.text;
+    const textSpan = document.createElement('span');
+    textSpan.className = 'quiz-opt-text';
+    textSpan.innerText = choice.text;
+
+    const speakOptBtn = document.createElement('button');
+    speakOptBtn.className = 'quiz-opt-speak-btn';
+    speakOptBtn.type = 'button';
+    speakOptBtn.title = 'Listen option (UK Accent)';
+    speakOptBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+
+    speakOptBtn.addEventListener('click', async (e) => {
+      e.stopPropagation(); // Prevent answer selection when listening
+      speakOptBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      try {
+        const rateSelect = document.getElementById('quiz-word-rate');
+        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+        await speakText(choice.text, { rate });
+      } catch (err) {
+        console.error(err);
+      } finally {
+        speakOptBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+      }
+    });
+
+    btn.appendChild(textSpan);
+    btn.appendChild(speakOptBtn);
 
     btn.addEventListener('click', () => {
       handleQuizChoiceSelected(choice, btn, choices);
