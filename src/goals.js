@@ -218,11 +218,85 @@ export function addCustomGoal(customGoalData, vaultData) {
 }
 
 /**
- * Delete Custom Personal Goal
+ * Get all active goals (Default goals minus deleted ones, merged with edits, plus custom goals)
  */
-export function deleteCustomGoal(goalId, vaultData) {
-  if (!vaultData.goals || !vaultData.goals.customGoals) return;
-  vaultData.goals.customGoals = vaultData.goals.customGoals.filter(g => g.id !== goalId);
+export function getAllActiveGoals(vaultData) {
+  if (!vaultData.goals) {
+    vaultData.goals = { completedIds: [], deletedIds: [], editedGoals: {}, customGoals: [] };
+  }
+  const deletedSet = new Set(vaultData.goals.deletedIds || []);
+  const editedDict = vaultData.goals.editedGoals || {};
+
+  // 1. Process default goals
+  const activeDefaults = DEFAULT_GOALS
+    .filter(g => !deletedSet.has(g.id))
+    .map(g => {
+      if (editedDict[g.id]) {
+        return { ...g, ...editedDict[g.id] };
+      }
+      return g;
+    });
+
+  // 2. Process custom goals
+  const activeCustoms = (vaultData.goals.customGoals || [])
+    .filter(g => !deletedSet.has(g.id))
+    .map(g => {
+      if (editedDict[g.id]) {
+        return { ...g, ...editedDict[g.id] };
+      }
+      return g;
+    });
+
+  return [...activeDefaults, ...activeCustoms];
+}
+
+/**
+ * Edit an existing goal (default or custom)
+ */
+export function editGoal(goalId, updatedData, vaultData) {
+  if (!vaultData.goals) {
+    vaultData.goals = { completedIds: [], deletedIds: [], editedGoals: {}, customGoals: [] };
+  }
+  if (!vaultData.goals.editedGoals) vaultData.goals.editedGoals = {};
+
+  const cleanData = {
+    title: updatedData.title.trim(),
+    category: updatedData.category || 'special',
+    targetDate: updatedData.targetDate || '',
+    achievementTitle: updatedData.achievementTitle ? updatedData.achievementTitle.trim() : `🏆 ${updatedData.title.trim()}`
+  };
+
+  vaultData.goals.editedGoals[goalId] = cleanData;
+
+  // If it's a custom goal, also update customGoals array
+  if (vaultData.goals.customGoals) {
+    const customIndex = vaultData.goals.customGoals.findIndex(g => g.id === goalId);
+    if (customIndex !== -1) {
+      vaultData.goals.customGoals[customIndex] = {
+        ...vaultData.goals.customGoals[customIndex],
+        ...cleanData
+      };
+    }
+  }
+}
+
+/**
+ * Delete any Goal (Default or Custom)
+ */
+export function deleteGoal(goalId, vaultData) {
+  if (!vaultData.goals) {
+    vaultData.goals = { completedIds: [], deletedIds: [], editedGoals: {}, customGoals: [] };
+  }
+  if (!vaultData.goals.deletedIds) vaultData.goals.deletedIds = [];
+
+  if (!vaultData.goals.deletedIds.includes(goalId)) {
+    vaultData.goals.deletedIds.push(goalId);
+  }
+
+  if (vaultData.goals.customGoals) {
+    vaultData.goals.customGoals = vaultData.goals.customGoals.filter(g => g.id !== goalId);
+  }
+
   const completedSet = new Set(vaultData.goals.completedIds || []);
   completedSet.delete(goalId);
   vaultData.goals.completedIds = Array.from(completedSet);
@@ -235,7 +309,7 @@ export function calculateGoalsStats(vaultData) {
   const goalsState = getGoalsState(vaultData);
   const completedSet = new Set(goalsState.completedIds || []);
 
-  const allGoals = [...DEFAULT_GOALS, ...(goalsState.customGoals || [])];
+  const allGoals = getAllActiveGoals(vaultData);
   const totalGoalsCount = allGoals.length;
   const completedCount = allGoals.filter(g => completedSet.has(g.id) || g.completed).length;
 

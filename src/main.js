@@ -38,9 +38,11 @@ import {
   DEFAULT_GOALS, 
   GOAL_CATEGORIES, 
   getGoalsState, 
+  getAllActiveGoals, 
   toggleGoalCompletion, 
   addCustomGoal, 
-  deleteCustomGoal, 
+  editGoal, 
+  deleteGoal, 
   calculateGoalsStats 
 } from './goals.js';
 
@@ -1551,7 +1553,7 @@ function renderGoalsUI() {
   const goalsState = getGoalsState(vaultData);
   const completedSet = new Set(goalsState.completedIds || []);
 
-  const allGoals = [...DEFAULT_GOALS, ...(goalsState.customGoals || [])];
+  const allGoals = getAllActiveGoals(vaultData);
 
   const filteredGoals = allGoals.filter(goal => {
     if (activeGoalsDomain !== 'all' && goal.category !== activeGoalsDomain) return false;
@@ -1586,7 +1588,14 @@ function renderGoalsUI() {
             ${goal.targetDate ? `<span>📅 ${goal.targetDate}</span>` : ''}
           </div>
         </div>
-        ${goal.isCustom ? `<button class="icon-btn delete-custom-goal-btn" data-id="${goal.id}" title="Delete Custom Goal" style="color: var(--danger);"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+        <div class="goal-card-actions">
+          <button class="goal-action-btn edit-goal-btn" data-id="${goal.id}" title="Edit Goal">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <button class="goal-action-btn delete-goal-btn" data-id="${goal.id}" title="Delete Goal">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
       `;
       grid.appendChild(card);
     } else {
@@ -1597,12 +1606,20 @@ function renderGoalsUI() {
         <div class="achievement-icon">
           ${isCompleted ? '🏆' : '🔒'}
         </div>
-        <div>
+        <div style="flex: 1;">
           <h4 style="font-size: 1rem; margin-bottom: 0.25rem; color: var(--text-main);">${goal.achievementTitle || goal.title}</h4>
           <span class="goal-badge">${catInfo.emoji} ${catInfo.labelHeb}</span>
           <span style="font-size: 0.75rem; color: ${isCompleted ? 'var(--success)' : 'var(--text-muted)'}; margin-left: 0.5rem; font-weight: 600;">
             ${isCompleted ? '✓ Unlocked' : '🔒 Locked'}
           </span>
+        </div>
+        <div class="goal-card-actions">
+          <button class="goal-action-btn edit-goal-btn" data-id="${goal.id}" title="Edit Goal">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+          <button class="goal-action-btn delete-goal-btn" data-id="${goal.id}" title="Delete Goal">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         </div>
       `;
       grid.appendChild(card);
@@ -1625,14 +1642,32 @@ function renderGoalsUI() {
     });
   });
 
-  // Bind delete custom goal events
-  grid.querySelectorAll('.delete-custom-goal-btn').forEach(btn => {
+  // Bind edit goal events
+  grid.querySelectorAll('.edit-goal-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const goalId = e.currentTarget.getAttribute('data-id');
-      if (confirm("Delete this custom goal?")) {
-        deleteCustomGoal(goalId, vaultData);
+      const goalObj = allGoals.find(g => g.id === goalId);
+      if (!goalObj) return;
+
+      document.getElementById('edit-goal-id').value = goalObj.id;
+      document.getElementById('edit-goal-title').value = goalObj.title || '';
+      document.getElementById('edit-goal-category').value = goalObj.category || 'special';
+      document.getElementById('edit-goal-achievement-title').value = goalObj.achievementTitle || `🏆 ${goalObj.title || ''}`;
+      document.getElementById('edit-goal-date').value = goalObj.targetDate || '';
+
+      document.getElementById('edit-goal-modal').classList.add('active');
+    });
+  });
+
+  // Bind delete goal events
+  grid.querySelectorAll('.delete-goal-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const goalId = e.currentTarget.getAttribute('data-id');
+      if (confirm("Are you sure you want to delete this goal?")) {
+        deleteGoal(goalId, vaultData);
         saveDatabase();
         renderGoalsUI();
+        showBannerAlert("🗑️ Goal deleted successfully.", "info");
       }
     });
   });
@@ -1691,6 +1726,32 @@ function setupGoalsEventListeners() {
       customModal.classList.remove('active');
       customForm.reset();
       showBannerAlert("➕ Custom Goal created successfully!", "success");
+      renderGoalsUI();
+    });
+  }
+
+  // Edit Goal Modal Controls & Submit
+  const editModal = document.getElementById('edit-goal-modal');
+  const editCloseBtn = document.getElementById('edit-goal-close-btn');
+  const editCancelBtn = document.getElementById('edit-goal-cancel-btn');
+  const editForm = document.getElementById('edit-goal-form');
+
+  if (editCloseBtn) editCloseBtn.addEventListener('click', () => editModal.classList.remove('active'));
+  if (editCancelBtn) editCancelBtn.addEventListener('click', () => editModal.classList.remove('active'));
+
+  if (editForm) {
+    editForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const goalId = document.getElementById('edit-goal-id').value;
+      const title = document.getElementById('edit-goal-title').value;
+      const category = document.getElementById('edit-goal-category').value;
+      const achievementTitle = document.getElementById('edit-goal-achievement-title').value;
+      const targetDate = document.getElementById('edit-goal-date').value;
+
+      editGoal(goalId, { title, category, achievementTitle, targetDate }, vaultData);
+      saveDatabase();
+      editModal.classList.remove('active');
+      showBannerAlert("✏️ Goal updated successfully!", "success");
       renderGoalsUI();
     });
   }
