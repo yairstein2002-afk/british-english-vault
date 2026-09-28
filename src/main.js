@@ -1341,6 +1341,12 @@ function initAIHandlers() {
         const data = await askGeminiTutor(mode, textInput);
         renderAIResponse(mode, data);
         responsePanel.style.display = 'block';
+
+        if (mode === 'grammar') {
+          vaultData.stats = vaultData.stats || {};
+          vaultData.stats.aiGrammarCount = (vaultData.stats.aiGrammarCount || 0) + 1;
+          saveDatabase();
+        }
       } catch (err) {
         console.error(err);
         let userFriendlyMsg = err.message;

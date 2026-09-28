@@ -3,6 +3,7 @@
  */
 
 export const GOAL_CATEGORIES = {
+  grammar: { id: 'grammar', name: 'Grammar', labelEng: 'Grammar', icon: 'fa-spell-check', emoji: '📝' },
   speaking: { id: 'speaking', name: 'Speaking & Conversation', labelEng: 'Speaking & Conversation', icon: 'fa-comments', emoji: '🗣️' },
   listening: { id: 'listening', name: 'Listening', labelEng: 'Listening', icon: 'fa-headphones', emoji: '🎧' },
   reading: { id: 'reading', name: 'Reading', labelEng: 'Reading', icon: 'fa-book-open-reader', emoji: '📖' },
@@ -15,6 +16,18 @@ export const GOAL_CATEGORIES = {
 };
 
 export const DEFAULT_GOALS = [
+  // 📝 Grammar
+  { id: 'grm-1', category: 'grammar', title: 'Learn 5 core English grammar rules', achievementTitle: '🏆 Learned 5 Core Grammar Rules' },
+  { id: 'grm-2', category: 'grammar', title: 'Master Present Perfect vs Past Simple', achievementTitle: '🏆 Mastered Present Perfect Tense' },
+  { id: 'grm-3', category: 'grammar', title: 'Master British Modal Verbs (shall, ought to, might)', achievementTitle: '🏆 Mastered British Modals' },
+  { id: 'grm-4', category: 'grammar', title: 'Check 5 sentences using AI Grammar Checker', autoType: 'aiGrammarCount', autoTarget: 5, achievementTitle: '🏆 Used AI Grammar Checker 5 Times' },
+  { id: 'grm-5', category: 'grammar', title: 'Check 25 sentences using AI Grammar Checker', autoType: 'aiGrammarCount', autoTarget: 25, achievementTitle: '🏆 Used AI Grammar Checker 25 Times' },
+  { id: 'grm-6', category: 'grammar', title: 'Master English Conditional Sentences (If clauses)', achievementTitle: '🏆 Mastered Conditionals' },
+  { id: 'grm-7', category: 'grammar', title: 'Master Passive Voice in English', achievementTitle: '🏆 Mastered Passive Voice' },
+  { id: 'grm-8', category: 'grammar', title: 'Write 10 error-free English sentences', achievementTitle: '🏆 Wrote 10 Error-Free Sentences' },
+  { id: 'grm-9', category: 'grammar', title: 'Master Subject-Verb Agreement', achievementTitle: '🏆 Mastered Subject-Verb Agreement' },
+  { id: 'grm-10', category: 'grammar', title: 'Master Articles (a, an, the) usage', achievementTitle: '🏆 Mastered English Articles' },
+
   // 🗣️ Speaking & Conversation
   { id: 'spk-1', category: 'speaking', title: 'Conduct a 5-minute conversation in English', achievementTitle: '🏆 Conducted First English Conversation' },
   { id: 'spk-2', category: 'speaking', title: 'Conduct a 10-minute conversation in English', achievementTitle: '🏆 Conducted 10-Minute Conversation' },
@@ -155,6 +168,7 @@ export function evaluateAutoGoals(vaultData) {
   const britishWordsCount = vaultData.items.filter(i => i.category === 'words' || i.category === 'slangs').length;
   const britishPhrasesCount = vaultData.items.filter(i => i.category === 'phrases' || i.category === 'idioms').length;
   const quizzesCompleted = vaultData.stats?.quizzesCompleted || 0;
+  const aiGrammarCount = vaultData.stats?.aiGrammarCount || 0;
 
   let newlyCompletedCount = 0;
 
@@ -165,6 +179,7 @@ export function evaluateAutoGoals(vaultData) {
       if (goal.autoType === 'britishWordsCount' && britishWordsCount >= goal.autoTarget) isMet = true;
       if (goal.autoType === 'britishPhrasesCount' && britishPhrasesCount >= goal.autoTarget) isMet = true;
       if (goal.autoType === 'quizAttempts' && quizzesCompleted >= goal.autoTarget) isMet = true;
+      if (goal.autoType === 'aiGrammarCount' && aiGrammarCount >= goal.autoTarget) isMet = true;
 
       if (isMet) {
         completedSet.add(goal.id);
