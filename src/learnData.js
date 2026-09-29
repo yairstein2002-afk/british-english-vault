@@ -45,6 +45,27 @@ export const LEARN_CATEGORIES = [
     icon: 'fa-font',
     emoji: '✍️',
     desc: 'Punctuation, Capitalization, Apostrophe rules, Semicolons, Prefixes, and Suffixes.'
+  },
+  {
+    id: 'pragmatics',
+    titleEng: 'Politeness & Social Pragmatics',
+    icon: 'fa-comments',
+    emoji: '💬',
+    desc: 'British courtesy, polite requests, hedging, tag questions, indirect questions, and social registers.'
+  },
+  {
+    id: 'discourse',
+    titleEng: 'Discourse Markers & Sentence Cohesion',
+    icon: 'fa-link',
+    emoji: '🔗',
+    desc: 'Connectors, contrast, addition, cause-and-effect transitions, cleft sentences, and emphasis.'
+  },
+  {
+    id: 'academic-business',
+    titleEng: 'Business & Formal Written English',
+    icon: 'fa-briefcase',
+    emoji: '💼',
+    desc: 'Formal correspondence, email conventions, hedging, professional sign-offs, and academic style.'
   }
 ];
 
@@ -1165,33 +1186,317 @@ export const LEARN_TOPICS = [
       }
     ]
   },
+  // =========================================================================
+  // 7. POLITENESS & SOCIAL PRAGMATICS
+  // =========================================================================
   {
-    id: 'word-formation',
-    categoryId: 'mechanics',
-    subgroup: 'Morphology',
-    title: 'Prefixes, Suffixes & Word Formation',
-    summary: 'Deriving nouns, verbs, adjectives, and adverbs using prefixes and suffixes.',
+    id: 'tag-questions',
+    categoryId: 'pragmatics',
+    subgroup: 'Conversational Grammar',
+    title: 'Question Tags (Tag Questions)',
+    summary: 'Forming agreement checks, confirmation tags, and polite conversational prompts in British English.',
     rules: [
       {
-        title: 'Negation Prefixes',
-        details: 'un- (unhappy), in- (informal), im- (impossible), il- (illegal), ir- (irregular), dis- (disagree).'
+        title: 'Polarity Inversion Rule',
+        details: 'A positive main clause takes a negative tag (e.g. You live in London, don\'t you?). A negative main clause takes a positive tag (e.g. He hasn\'t arrived, has he?).'
       },
       {
-        title: 'Derivational Suffixes',
-        details: 'Nouns: -tion, -ment, -ness, -ity. Adjectives: -ful, -less, -able, -ous. Verbs: -ize/-ise, -ify. Adverbs: -ly.'
+        title: 'Auxiliary & Modal Matching',
+        details: 'Match the auxiliary or modal verb from the main sentence (is -> isn\'t, can -> can\'t). If no auxiliary is present, use do/does/did.'
+      },
+      {
+        title: 'Special British Tags',
+        details: 'For "I am", the negative tag is "aren\'t I?" (e.g. I am right, aren\'t I?). For imperatives: "Pass the tea, will you?" or "Let\'s have a break, shall we?".'
       }
     ],
-    keywords: ['un-', 'dis-', '-tion', '-ment', '-ful', '-less'],
+    keywords: ['tag questions', 'aren\'t I', 'shall we', 'will you', 'don\'t you'],
     examples: [
-      'Learning English requires patience and dedication.',
-      'It is illegal to park here.'
+      'Lovely afternoon for a walk, isn\'t it?',
+      'You haven\'t seen my umbrella, have you?',
+      'Let\'s pop into the cafe, shall we?'
     ],
     practice: [
       {
-        question: 'What is the opposite of "possible"?',
-        options: ['unpossible', 'inpossible', 'impossible', 'dispossible'],
+        question: 'I am invited to the garden party, _____?',
+        options: ['am not I', 'aren\'t I', 'don\'t I', 'isn\'t it'],
+        correctIndex: 1,
+        explanation: 'The standard tag for "I am" in spoken British English is "aren\'t I?".'
+      },
+      {
+        question: 'They didn\'t catch the early train, _____?',
+        options: ['did they', 'didn\'t they', 'do they', 'have they'],
+        correctIndex: 0,
+        explanation: 'A negative statement (didn\'t catch) takes a positive tag (did they).'
+      }
+    ]
+  },
+  {
+    id: 'polite-requests',
+    categoryId: 'pragmatics',
+    subgroup: 'British Social Courtesy',
+    title: 'Polite Requests, Softening & Hedging',
+    summary: 'Using indirect questions, modal verbs, and hedging phrases to make polite requests without sounding abrupt.',
+    rules: [
+      {
+        title: 'Indirect Questions',
+        details: 'Structure requests with tentative introductory frames: "Could you possibly...", "I was wondering if you could...", "Do you happen to know..."'
+      },
+      {
+        title: 'Gerund after "Would you mind"',
+        details: 'Always follow "Would you mind" with a gerund (verb-ing) (e.g. Would you mind opening the window?).'
+      },
+      {
+        title: 'Hedging Words',
+        details: 'Softening phrases like "quite", "rather", "perhaps", "I\'m afraid", "possibly" prevent sentences from sounding too demanding.'
+      }
+    ],
+    keywords: ['would you mind', 'I was wondering', 'could you possibly', 'hedging', 'I\'m afraid'],
+    examples: [
+      'I was wondering if I could borrow your pen for a second.',
+      'Would you mind waiting in the reception room, please?',
+      'I\'m afraid the manager is currently in a meeting.'
+    ],
+    practice: [
+      {
+        question: 'Would you mind _____ the window a little?',
+        options: ['open', 'to open', 'opening', 'opened'],
         correctIndex: 2,
-        explanation: 'The prefix im- attaches to words beginning with p or m (impossible).'
+        explanation: '"Would you mind" is always followed by a verb in the -ing form (opening).'
+      },
+      {
+        question: 'Choose the most polite British request:',
+        options: ['Give me that paper now.', 'I want that paper.', 'Could you possibly pass that paper?', 'Pass paper.'],
+        correctIndex: 2,
+        explanation: '"Could you possibly..." softens the request politely.'
+      }
+    ]
+  },
+
+  // =========================================================================
+  // 8. DISCOURSE MARKERS & SENTENCE COHESION
+  // =========================================================================
+  {
+    id: 'sentence-connectors',
+    categoryId: 'discourse',
+    subgroup: 'Text Cohesion',
+    title: 'Cohesive Transitions & Sentence Connectors',
+    summary: 'Linking sentences logically using contrast, addition, cause, and concession.',
+    rules: [
+      {
+        title: 'Contrast & Concession',
+        details: 'However, Nevertheless (introduce independent clauses). Although, Even though (+ subject + verb). Despite, In spite of (+ noun / verb-ing).'
+      },
+      {
+        title: 'Addition & Elaboration',
+        details: 'Furthermore, Moreover, In addition, Besides (used to introduce further supporting arguments).'
+      },
+      {
+        title: 'Cause & Result',
+        details: 'Therefore, Consequently, As a result, Thus (indicate logical outcome).'
+      }
+    ],
+    keywords: ['however', 'nevertheless', 'despite', 'furthermore', 'therefore', 'consequently'],
+    examples: [
+      'The weather was foggy; nevertheless, the flight landed safely at Heathrow.',
+      'Despite the heavy rain, the football match continued.',
+      'She passed with distinction; furthermore, she won the academic prize.'
+    ],
+    practice: [
+      {
+        question: '_____ the heavy traffic, we arrived at Piccadilly Circus on time.',
+        options: ['Although', 'Despite', 'However', 'Even though'],
+        correctIndex: 1,
+        explanation: '"Despite" is followed directly by a noun phrase ("the heavy traffic"). "Although" requires a subject + verb.'
+      },
+      {
+        question: 'The museum was closed; _____, we visited the gallery nearby.',
+        options: ['therefore', 'because', 'despite', 'in order to'],
+        correctIndex: 0,
+        explanation: '"Therefore" introduces the logical consequence of the first clause.'
+      }
+    ]
+  },
+  {
+    id: 'cleft-sentences',
+    categoryId: 'discourse',
+    subgroup: 'Emphasis & Focus',
+    title: 'Emphasis & Cleft Sentences',
+    summary: 'Structuring sentences with "It is... that" or "What... is" to highlight specific information.',
+    rules: [
+      {
+        title: 'It-Cleft Sentences',
+        details: 'Structure: It + be + [emphasized element] + that/who... (e.g. It was William Shakespeare who wrote Hamlet).'
+      },
+      {
+        title: 'Wh-Cleft Sentences (Pseudo-clefts)',
+        details: 'Structure: What + clause + be + [emphasized element] (e.g. What I really enjoy is a walk along the River Thames).'
+      },
+      {
+        title: 'Inversion for High Rhetorical Emphasis',
+        details: 'Fronting negative adverbs requires subject-auxiliary inversion (e.g. Seldom have I heard such impressive eloquence).'
+      }
+    ],
+    keywords: ['it was... that', 'what I need is', 'cleft sentence', 'emphasis', 'seldom have I'],
+    examples: [
+      'It was in Edinburgh that they first met.',
+      'What amazed us most was the architecture of St Paul\'s Cathedral.',
+      'Rarely have we experienced such outstanding service.'
+    ],
+    practice: [
+      {
+        question: 'Rewrite for emphasis: "I love the historical atmosphere in York." -> "What I love about York _____ the historical atmosphere."',
+        options: ['is', 'are', 'were', 'being'],
+        correctIndex: 0,
+        explanation: 'In a Wh-cleft sentence focusing on a singular concept, use "is" (or "was" for past tense).'
+      }
+    ]
+  },
+  {
+    id: 'collocations-prepositions',
+    categoryId: 'discourse',
+    subgroup: 'Lexical Collocations',
+    title: 'Fixed Prepositional Phrases & Collocations',
+    summary: 'Mastering set prepositional combinations in formal and spoken British English.',
+    rules: [
+      {
+        title: 'Fixed Prepositional Phrases',
+        details: 'at short notice, on behalf of, in light of, under no circumstances, by accident, in charge of.'
+      },
+      {
+        title: 'Dependent Prepositions',
+        details: 'Verbs and adjectives take fixed prepositions: rely ON, accuse OF, interested IN, famous FOR, congratulate ON.'
+      }
+    ],
+    keywords: ['at short notice', 'on behalf of', 'in light of', 'under no circumstances', 'rely on'],
+    examples: [
+      'I am writing on behalf of the director.',
+      'In light of recent news, the event has been postponed.',
+      'Under no circumstances should you leave your luggage unattended.'
+    ],
+    practice: [
+      {
+        question: 'He accepted the job offer _____ short notice.',
+        options: ['in', 'at', 'on', 'with'],
+        correctIndex: 1,
+        explanation: 'The fixed prepositional phrase is "at short notice".'
+      }
+    ]
+  },
+
+  // =========================================================================
+  // 9. BUSINESS & FORMAL WRITTEN ENGLISH
+  // =========================================================================
+  {
+    id: 'formal-correspondence',
+    categoryId: 'academic-business',
+    subgroup: 'Professional Writing',
+    title: 'British Business Email & Letter Conventions',
+    summary: 'Salutations, sign-offs, formal register, and polite phrasing in British correspondence.',
+    rules: [
+      {
+        title: 'Salutation & Sign-off Pairing',
+        details: 'If you start with "Dear Sir/Madam" (unknown name) -> end with "Yours faithfully". If you start with "Dear Mr Smith" (known name) -> end with "Yours sincerely".'
+      },
+      {
+        title: 'Opening & Closing Phrasing',
+        details: 'Opening: "I am writing to inquire regarding...", "Further to our phone conversation...". Closing: "I look forward to hearing from you."'
+      },
+      {
+        title: 'Look forward to + -ing',
+        details: 'The phrase "look forward to" requires a gerund (-ing verb) (e.g. I look forward to meeting you, NOT to meet).'
+      }
+    ],
+    keywords: ['yours faithfully', 'yours sincerely', 'dear sir or madam', 'look forward to', 'formal email'],
+    examples: [
+      'Dear Ms Davies, Further to your email, please find attached the invoice. Yours sincerely, Arthur Pendelton.',
+      'I look forward to receiving your reply.'
+    ],
+    practice: [
+      {
+        question: 'If a formal British letter begins with "Dear Sir or Madam", how should it end?',
+        options: ['Yours sincerely,', 'Yours faithfully,', 'Best wishes,', 'Cheers,'],
+        correctIndex: 1,
+        explanation: '"Yours faithfully" is paired with "Dear Sir or Madam" when the recipient\'s name is unknown.'
+      },
+      {
+        question: 'I look forward to _____ from you soon.',
+        options: ['hear', 'hearing', 'heard', 'be hearing'],
+        correctIndex: 1,
+        explanation: '"Look forward to" is followed by the -ing form (hearing).'
+      }
+    ]
+  },
+
+  // =========================================================================
+  // 10. EXTRA HABITS & DETERMINERS
+  // =========================================================================
+  {
+    id: 'used-to-would',
+    categoryId: 'special-verbs',
+    subgroup: 'Habitual Past',
+    title: 'Used To vs. Would vs. Be/Get Used To',
+    summary: 'Distinguishing past habits, repeated actions, and becoming accustomed to something.',
+    rules: [
+      {
+        title: 'Used To + Base Verb',
+        details: 'Expresses past habits or past states that are no longer true (e.g. I used to live in Oxford).'
+      },
+      {
+        title: 'Would + Base Verb',
+        details: 'Expresses repeated past ACTIONS only, NOT past states (e.g. Every summer we would visit Brighton; NOT "I would be a child").'
+      },
+      {
+        title: 'Be / Get Used To + -ing / Noun',
+        details: 'To be or become accustomed to a situation (e.g. She is used to driving in London traffic).'
+      }
+    ],
+    keywords: ['used to', 'would', 'be used to', 'get used to', 'past habit'],
+    examples: [
+      'I used to work in Manchester.',
+      'When we were young, we would spend hours playing in the park.',
+      'He is getting used to the British weather.'
+    ],
+    practice: [
+      {
+        question: 'She _____ living in a cold climate now.',
+        options: ['used to', 'is used to', 'would', 'use to'],
+        correctIndex: 1,
+        explanation: '"is used to" (+ -ing) means she is currently accustomed to it.'
+      }
+    ]
+  },
+  {
+    id: 'determiners-quantifiers',
+    categoryId: 'parts-of-speech',
+    subgroup: 'Determiners',
+    title: 'Determiners: Each, Every, Both, Either, Neither',
+    summary: 'Expressing distribution, dual choices, and negative pairings in formal English.',
+    rules: [
+      {
+        title: 'Each vs Every',
+        details: '"Each" considers items individually (each student). "Every" considers them as a total group (every day).'
+      },
+      {
+        title: 'Both / Either / Neither (Dual Items)',
+        details: 'Used strictly for TWO items. "Both" takes a plural verb. "Either" means one or the other. "Neither" means not one nor the other (takes singular verb).'
+      },
+      {
+        title: 'Neither... nor / Either... or',
+        details: 'Neither John nor Mary was available. Either option is acceptable.'
+      }
+    ],
+    keywords: ['each', 'every', 'both', 'either', 'neither', 'determiners'],
+    examples: [
+      'Both candidates interviewed well.',
+      'Neither answer is correct.',
+      'Each ticket has a unique seat number.'
+    ],
+    practice: [
+      {
+        question: '_____ of the two proposals was accepted by the committee.',
+        options: ['Neither', 'None', 'No one', 'Not'],
+        correctIndex: 0,
+        explanation: 'When referring to two items, use "Neither" (not one nor the other).'
       }
     ]
   }
