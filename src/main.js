@@ -1275,22 +1275,38 @@ function initEventListeners() {
     renderCardsGrid();
   });
 
-  // Theme Toggler
+  // Theme Toggler (Desktop & Mobile)
   const themeToggle = document.getElementById('theme-toggle-btn');
+  const mobileThemeToggle = document.getElementById('mobile-theme-toggle-btn');
   
-  // Set initial theme
-  const savedTheme = localStorage.getItem('bev_theme') || 'light';
+  // Detect saved theme or phone system preference (Dark / Light)
+  const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const savedTheme = localStorage.getItem('bev_theme') || (systemPrefersDark ? 'dark' : 'light');
   document.documentElement.setAttribute('data-theme', savedTheme);
   updateThemeButtonUI(savedTheme);
 
-  themeToggle.addEventListener('click', () => {
+  const toggleThemeAction = () => {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('bev_theme', newTheme);
     updateThemeButtonUI(newTheme);
-  });
+  };
+
+  if (themeToggle) themeToggle.addEventListener('click', toggleThemeAction);
+  if (mobileThemeToggle) mobileThemeToggle.addEventListener('click', toggleThemeAction);
+
+  // Listen to OS system dark mode changes dynamically if user hasn't overridden
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (!localStorage.getItem('bev_theme')) {
+        const newSystemTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newSystemTheme);
+        updateThemeButtonUI(newSystemTheme);
+      }
+    });
+  }
 
   // Init AI Assistant controllers
   initAIHandlers();
@@ -1311,10 +1327,20 @@ function initEventListeners() {
 
 function updateThemeButtonUI(theme) {
   const btn = document.getElementById('theme-toggle-btn');
+  const mobileBtn = document.getElementById('mobile-theme-toggle-btn');
+  
   if (theme === 'dark') {
-    btn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light Mode</span>';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-sun"></i> <span>Light Mode</span>';
+    if (mobileBtn) {
+      mobileBtn.innerHTML = '<i class="fa-solid fa-sun" style="color: var(--gold);"></i>';
+      mobileBtn.title = "Switch to Light Mode";
+    }
   } else {
-    btn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark Mode</span>';
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-moon"></i> <span>Dark Mode</span>';
+    if (mobileBtn) {
+      mobileBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
+      mobileBtn.title = "Switch to Dark Mode";
+    }
   }
 }
 

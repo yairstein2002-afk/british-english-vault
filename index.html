@@ -204,6 +204,9 @@
           <div class="sync-status" id="github-sync-indicator" style="display: none;">
             <i class="fa-solid fa-arrows-rotate fa-spin"></i> Syncing...
           </div>
+          <button id="mobile-theme-toggle-btn" class="theme-toggle-mobile-btn" title="Toggle Theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
           <button id="add-item-btn" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> <span>Add New</span>
           </button>
@@ -616,12 +619,12 @@
 
           <!-- Active Play Screen Container -->
           <div id="game-active-panel" class="card" style="display: none;">
-            <div class="game-play-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+            <div class="game-play-header">
               <button class="btn btn-secondary" id="btn-exit-game">
                 <i class="fa-solid fa-arrow-left"></i> Exit Game
               </button>
-              <h3 id="active-game-title" style="margin: 0; font-family: 'Playfair Display', serif;">Game</h3>
-              <div class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border: 1px solid rgba(212, 175, 55, 0.3);">
+              <h3 id="active-game-title">Game</h3>
+              <div class="reward-tag game-status-badge">
                 <i class="fa-solid fa-star"></i> In Progress
               </div>
             </div>
