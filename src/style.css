@@ -2800,6 +2800,42 @@ button, input, select, textarea {
   }
 }
 
+/* Mini Speak Button for In-Game Audio */
+.game-speak-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--uk-blue);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .game-speak-btn {
+  color: var(--gold);
+}
+
+.game-speak-btn:hover {
+  background-color: var(--uk-blue);
+  color: #FFFFFF;
+  border-color: var(--uk-blue);
+  transform: scale(1.1);
+}
+
+[data-theme="dark"] .game-speak-btn:hover {
+  background-color: var(--gold);
+  color: var(--bg-main);
+  border-color: var(--gold);
+}
+
 /* Daily Challenge Card */
 .daily-challenge-card {
   display: flex;

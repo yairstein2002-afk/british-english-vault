@@ -211,16 +211,29 @@ export function startWordMatchGame(stageEl, vaultData, onComplete = () => {}) {
     <div class="match-game-grid">
       <div class="match-column" id="match-col-left">
         ${leftCards.map(c => `
-          <button class="match-card left-card" data-id="${c.id}">${c.text}</button>
+          <button class="match-card left-card" data-id="${c.id}" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>${c.text}</span>
+            <button class="game-speak-btn card-speak-btn" data-text="${c.text.replace(/"/g, '&quot;')}" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+          </button>
         `).join('')}
       </div>
       <div class="match-column" id="match-col-right">
         ${rightCards.map(c => `
-          <button class="match-card right-card" data-id="${c.id}">${c.text}</button>
+          <button class="match-card right-card" data-id="${c.id}" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>${c.text}</span>
+            <button class="game-speak-btn card-speak-btn" data-text="${c.text.replace(/"/g, '&quot;')}" title="Listen"><i class="fa-solid fa-volume-high"></i></button>
+          </button>
         `).join('')}
       </div>
     </div>
   `;
+
+  stageEl.querySelectorAll('.card-speak-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      speakText(btn.getAttribute('data-text'));
+    });
+  });
 
   const leftBtns = stageEl.querySelectorAll('.left-card');
   const rightBtns = stageEl.querySelectorAll('.right-card');
@@ -1917,23 +1930,55 @@ function runChoiceGame(stageEl, dataset, title, promptText, onComplete) {
     }
 
     const item = shuffledDataset[currentIdx];
-    // 2. Shuffle answer options (A, B, C, D) every single time!
     const shuffledChoices = shuffleArray(item.choices);
+    const promptString = (item.word || item.prompt || '').trim();
 
     stageEl.innerHTML = `
       <div class="card text-center" style="padding: 1.75rem;">
         <span class="category-pill">${title}</span>
-        <h3 style="font-size: 1.25rem; margin: 1.25rem 0; font-family: 'Playfair Display', serif; white-space: pre-line;">${item.word || item.prompt}</h3>
+        
+        <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 1.25rem 0 0.5rem 0;">
+          <h3 style="font-size: 1.25rem; margin: 0; font-family: 'Playfair Display', serif; white-space: pre-line;">${promptString}</h3>
+          ${promptString ? `
+            <button class="game-speak-btn prompt-speak-btn" data-text="${promptString.replace(/"/g, '&quot;')}" title="Listen to prompt">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          ` : ''}
+        </div>
+        
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${promptText}</p>
 
         <div class="practice-options-grid">
           ${shuffledChoices.map(c => `
-            <button class="btn btn-secondary mc-opt-btn" data-choice="${c}">${c}</button>
+            <button class="btn btn-secondary mc-opt-btn" data-choice="${c}" style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
+              <span style="flex: 1;">${c}</span>
+              <button class="game-speak-btn opt-speak-btn" data-text="${c.replace(/"/g, '&quot;')}" title="Listen to pronunciation">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </button>
           `).join('')}
         </div>
       </div>
     `;
 
+    // Prompt speaker button listener
+    const promptBtn = stageEl.querySelector('.prompt-speak-btn');
+    if (promptBtn) {
+      promptBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakText(promptBtn.getAttribute('data-text'));
+      });
+    }
+
+    // Option mini-speaker button listeners (stops propagation so it doesn't trigger option submit)
+    stageEl.querySelectorAll('.opt-speak-btn').forEach(speakBtn => {
+      speakBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speakText(speakBtn.getAttribute('data-text'));
+      });
+    });
+
+    // Option selection button listener
     stageEl.querySelectorAll('.mc-opt-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const choice = btn.getAttribute('data-choice');
