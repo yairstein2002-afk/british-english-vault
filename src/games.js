@@ -130,6 +130,38 @@ function shuffleArray(arr) {
   return a;
 }
 
+export function getAllVaultItems(vaultData) {
+  const items = vaultData.items || [];
+  const fallbacks = getFallbackVaultItems();
+  const map = new Map();
+  items.forEach(i => { if (i && i.term) map.set(i.term.toLowerCase().trim(), i); });
+  fallbacks.forEach(f => { if (f && f.term && !map.has(f.term.toLowerCase().trim())) map.set(f.term.toLowerCase().trim(), f); });
+  return Array.from(map.values());
+}
+
+export function makeDynamicMC(vaultData, promptKey, answerKey, count = 5) {
+  const all = getAllVaultItems(vaultData);
+  const shuffledItems = shuffleArray(all).slice(0, count);
+  
+  return shuffledItems.map(item => {
+    const prompt = item[promptKey] || item.term;
+    const correct = item[answerKey] || item.meaning;
+    
+    const otherValues = all
+      .filter(i => i[answerKey] && i[answerKey].toLowerCase().trim() !== correct.toLowerCase().trim())
+      .map(i => i[answerKey]);
+    
+    const uniqueDistractors = Array.from(new Set(otherValues));
+    const chosenDistractors = shuffleArray(uniqueDistractors).slice(0, 3);
+    
+    return {
+      word: prompt,
+      target: correct,
+      choices: [correct, ...chosenDistractors]
+    };
+  });
+}
+
 export function getFallbackVaultItems() {
   return [
     { id: 'fb-1', term: 'Chuffed', meaning: 'Very pleased or happy', category: 'slangs', example: 'I was absolutely chuffed with my exam results.' },
@@ -139,7 +171,19 @@ export function getFallbackVaultItems() {
     { id: 'fb-5', term: 'Skint', meaning: 'Having no money, broke', category: 'slangs', example: 'I can\'t go to the cinema tonight because I\'m skint.' },
     { id: 'fb-6', term: 'Fancy a cuppa?', meaning: 'Would you like a cup of tea?', category: 'phrases', example: 'Come in from the cold! Fancy a cuppa?' },
     { id: 'fb-7', term: 'Piece of cake', meaning: 'Something very easy to do', category: 'idioms', example: 'Don\'t worry, the exam will be a piece of cake.' },
-    { id: 'fb-8', term: 'Bite the bullet', meaning: 'Face a difficult situation with courage', category: 'idioms', example: 'I decided to bite the bullet and speak to the boss.' }
+    { id: 'fb-8', term: 'Bite the bullet', meaning: 'Face a difficult situation with courage', category: 'idioms', example: 'I decided to bite the bullet and speak to the boss.' },
+    { id: 'fb-9', term: 'Dodgy', meaning: 'Suspicious, unreliable or risky', category: 'slangs', example: 'That building looks a bit dodgy to enter.' },
+    { id: 'fb-10', term: 'Posh', meaning: 'Elegant, high class or luxurious', category: 'words', example: 'They stayed at a very posh hotel in Mayfair.' },
+    { id: 'fb-11', term: 'Bloke', meaning: 'A man, guy or fellow', category: 'slangs', example: 'He is a nice bloke from Manchester.' },
+    { id: 'fb-12', term: 'Cheerio', meaning: 'Goodbye, see you later', category: 'phrases', example: 'Cheerio! Have a safe trip home.' },
+    { id: 'fb-13', term: 'Break a leg', meaning: 'Good luck before a performance', category: 'idioms', example: 'Break a leg on stage tonight!' },
+    { id: 'fb-14', term: 'Spill the tea', meaning: 'Share gossip or secret information', category: 'phrases', example: 'Come on, spill the tea about what happened!' },
+    { id: 'fb-15', term: 'Under the weather', meaning: 'Feeling slightly unwell or sick', category: 'idioms', example: 'I\'m feeling a bit under the weather today.' },
+    { id: 'fb-16', term: 'Splendid', meaning: 'Magnificent, excellent or grand', category: 'words', example: 'We had a splendid afternoon in the gardens.' },
+    { id: 'fb-17', term: 'Quaint', meaning: 'Attractively unusual or old-fashioned', category: 'words', example: 'It is a quaint little village in the Cotswolds.' },
+    { id: 'fb-18', term: 'Proper', meaning: 'Genuine, thorough or correct', category: 'words', example: 'Make sure to get a proper night\'s sleep.' },
+    { id: 'fb-19', term: 'Fortnight', meaning: 'A period of two weeks (14 days)', category: 'words', example: 'We are going on holiday for a fortnight.' },
+    { id: 'fb-20', term: 'Rubbish', meaning: 'Waste material, or nonsense', category: 'words', example: 'Don\'t talk rubbish, of course you can do it!' }
   ];
 }
 
@@ -1047,13 +1091,7 @@ export function startEnglishQuizGame(stageEl, vaultData, onComplete = () => {}) 
 // 11. GAME: SYNONYM HUNT 🧠
 // ==========================================================================
 export function startSynonymHuntGame(stageEl, vaultData, onComplete = () => {}) {
-  const dataset = [
-    { word: 'Delighted', target: 'Thrilled', choices: ['Thrilled', 'Furious', 'Bored', 'Anxious'] },
-    { word: 'Knackered', target: 'Exhausted', choices: ['Exhausted', 'Energetic', 'Rested', 'Noisy'] },
-    { word: 'Gobsmacked', target: 'Astonished', choices: ['Astonished', 'Unimpressed', 'Silent', 'Calm'] },
-    { word: 'Skint', target: 'Broke', choices: ['Broke', 'Wealthy', 'Generous', 'Busy'] },
-    { word: 'Chuffed', target: 'Pleased', choices: ['Pleased', 'Upset', 'Scared', 'Cold'] }
-  ];
+  const dataset = makeDynamicMC(vaultData, 'term', 'meaning', 5);
   runChoiceGame(stageEl, dataset, '🧠 Synonym Hunt', 'Select the word with the closest meaning:', onComplete);
 }
 
@@ -1075,13 +1113,7 @@ export function startAntonymAttackGame(stageEl, vaultData, onComplete = () => {}
 // 13. GAME: DEFINITION DUEL 📖
 // ==========================================================================
 export function startDefinitionDuelGame(stageEl, vaultData, onComplete = () => {}) {
-  const dataset = [
-    { word: 'Very pleased or happy about something good', target: 'Chuffed', choices: ['Chuffed', 'Gutted', 'Skint', 'Dodgy'] },
-    { word: 'Deeply shocked, amazed or astonished', target: 'Gobsmacked', choices: ['Gobsmacked', 'Knackered', 'Proper', 'Quaint'] },
-    { word: 'To face a difficult situation with courage', target: 'Bite the bullet', choices: ['Bite the bullet', 'Spill the tea', 'Piece of cake', 'Cost an arm and a leg'] },
-    { word: 'Having no money left at all; broke', target: 'Skint', choices: ['Skint', 'Posh', 'Knickers', 'Naff'] },
-    { word: 'Something very easy or simple to accomplish', target: 'Piece of cake', choices: ['Piece of cake', 'Cold turkey', 'Spill beans', 'Break a leg'] }
-  ];
+  const dataset = makeDynamicMC(vaultData, 'meaning', 'term', 5);
   runChoiceGame(stageEl, dataset, '📖 Definition Duel', 'Which English word or phrase matches this definition?', onComplete);
 }
 
@@ -1144,17 +1176,12 @@ export function startWordLadderGame(stageEl, vaultData, onComplete = () => {}) {
 // 15. GAME: MISSING LETTER 🔤
 // ==========================================================================
 export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}) {
-  const dataset = [
-    { display: 'C H _ F F E D', letter: 'U', word: 'Chuffed' },
-    { display: 'G O B S M _ C K E D', letter: 'A', word: 'Gobsmacked' },
-    { display: 'K N _ C K E R E D', letter: 'A', word: 'Knackered' },
-    { display: 'S K _ N T', letter: 'I', word: 'Skint' }
-  ];
+  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 5);
   let currentIdx = 0;
   let score = 0;
 
   const render = () => {
-    if (currentIdx >= dataset.length) {
+    if (currentIdx >= items.length) {
       onComplete({
         title: 'Missing Letter Cleared! 🔤',
         xp: 25,
@@ -1164,15 +1191,20 @@ export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}
       return;
     }
 
-    const item = dataset[currentIdx];
-    const alphabet = shuffleArray(['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'K', 'M']).slice(0, 5);
-    if (!alphabet.includes(item.letter)) alphabet[0] = item.letter;
+    const item = items[currentIdx];
+    const wordStr = item.term.toUpperCase();
+    const midIdx = Math.floor(wordStr.length / 2);
+    const targetChar = wordStr[midIdx];
+    const displayStr = wordStr.substring(0, midIdx) + ' _ ' + wordStr.substring(midIdx + 1);
+
+    const alphabet = shuffleArray(['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'K', 'M', 'R', 'S', 'T']).slice(0, 5);
+    if (!alphabet.includes(targetChar)) alphabet[0] = targetChar;
     const shuffledLetters = shuffleArray(alphabet);
 
     stageEl.innerHTML = `
       <div class="card text-center" style="padding: 1.75rem;">
         <span class="category-pill">Spelling Detective</span>
-        <h3 style="font-size: 2rem; letter-spacing: 0.2em; margin: 1.5rem 0;">${item.display}</h3>
+        <h3 style="font-size: 2rem; letter-spacing: 0.2em; margin: 1.5rem 0;">${displayStr}</h3>
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Tap the missing letter:</p>
 
         <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
@@ -1186,10 +1218,10 @@ export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}
     stageEl.querySelectorAll('.letter-tile-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const l = btn.getAttribute('data-letter');
-        if (l === item.letter) {
+        if (l === targetChar) {
           btn.style.backgroundColor = 'var(--success)';
           score++;
-          speakText(item.word);
+          speakText(item.term);
           setTimeout(() => { currentIdx++; render(); }, 1000);
         } else {
           btn.style.backgroundColor = 'var(--danger)';
@@ -1205,22 +1237,23 @@ export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}
 // 16. GAME: SPELL RACE 🏁
 // ==========================================================================
 export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
-  const words = ['Splendid', 'Chuffed', 'Brilliant', 'Proper', 'Cheerio'];
+  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 5);
   let currentIdx = 0;
   let score = 0;
 
   const render = () => {
-    if (currentIdx >= words.length) {
+    if (currentIdx >= items.length) {
       onComplete({
         title: 'Spell Race Winner! 🏁',
         xp: 30,
         coins: 10,
-        details: `Spelled ${score} out of ${words.length} UK words correctly!`
+        details: `Spelled ${score} out of ${items.length} UK words correctly!`
       });
       return;
     }
 
-    const word = words[currentIdx];
+    const item = items[currentIdx];
+    const word = item.term;
 
     stageEl.innerHTML = `
       <div class="card text-center" style="padding: 1.75rem;">
@@ -1864,23 +1897,27 @@ export function startWordConnectionsGame(stageEl, vaultData, onComplete = () => 
   runChoiceGame(stageEl, dataset, '🧩 Word Connections', 'What is the common connection between these words?', onComplete);
 }
 
-// Helper choice runner for quick MC games
+// Helper choice runner for quick MC games with dynamic Fisher-Yates shuffling
 function runChoiceGame(stageEl, dataset, title, promptText, onComplete) {
   let currentIdx = 0;
   let score = 0;
 
+  // 1. Shuffle question order every game session!
+  const shuffledDataset = shuffleArray(dataset);
+
   const render = () => {
-    if (currentIdx >= dataset.length) {
+    if (currentIdx >= shuffledDataset.length) {
       onComplete({
         title: `${title} Completed! 🎉`,
         xp: Math.max(15, score * 10),
         coins: 10,
-        details: `Answered ${score} out of ${dataset.length} questions correctly.`
+        details: `Answered ${score} out of ${shuffledDataset.length} questions correctly.`
       });
       return;
     }
 
-    const item = dataset[currentIdx];
+    const item = shuffledDataset[currentIdx];
+    // 2. Shuffle answer options (A, B, C, D) every single time!
     const shuffledChoices = shuffleArray(item.choices);
 
     stageEl.innerHTML = `
