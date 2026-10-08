@@ -1043,6 +1043,878 @@ export function startEnglishQuizGame(stageEl, vaultData, onComplete = () => {}) 
   startQuickChoiceGame(stageEl, vaultData, onComplete);
 }
 
+// ==========================================================================
+// 11. GAME: SYNONYM HUNT 🧠
+// ==========================================================================
+export function startSynonymHuntGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'Delighted', target: 'Thrilled', choices: ['Thrilled', 'Furious', 'Bored', 'Anxious'] },
+    { word: 'Knackered', target: 'Exhausted', choices: ['Exhausted', 'Energetic', 'Rested', 'Noisy'] },
+    { word: 'Gobsmacked', target: 'Astonished', choices: ['Astonished', 'Unimpressed', 'Silent', 'Calm'] },
+    { word: 'Skint', target: 'Broke', choices: ['Broke', 'Wealthy', 'Generous', 'Busy'] },
+    { word: 'Chuffed', target: 'Pleased', choices: ['Pleased', 'Upset', 'Scared', 'Cold'] }
+  ];
+  runChoiceGame(stageEl, dataset, '🧠 Synonym Hunt', 'Select the word with the closest meaning:', onComplete);
+}
+
+// ==========================================================================
+// 12. GAME: ANTONYM ATTACK ⚔️
+// ==========================================================================
+export function startAntonymAttackGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'Ancient', target: 'Modern', choices: ['Modern', 'Old', 'Historic', 'Traditional'] },
+    { word: 'Gutted', target: 'Delighted', choices: ['Delighted', 'Saddened', 'Disappointed', 'Hurt'] },
+    { word: 'Generous', target: 'Stingy', choices: ['Stingy', 'Kind', 'Friendly', 'Rich'] },
+    { word: 'Formal', target: 'Casual', choices: ['Casual', 'Official', 'Polite', 'Serious'] },
+    { word: 'Conceal', target: 'Reveal', choices: ['Reveal', 'Hide', 'Mask', 'Cover'] }
+  ];
+  runChoiceGame(stageEl, dataset, '⚔️ Antonym Attack', 'Select the word with the OPPOSITE meaning:', onComplete);
+}
+
+// ==========================================================================
+// 13. GAME: DEFINITION DUEL 📖
+// ==========================================================================
+export function startDefinitionDuelGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'Very pleased or happy about something good', target: 'Chuffed', choices: ['Chuffed', 'Gutted', 'Skint', 'Dodgy'] },
+    { word: 'Deeply shocked, amazed or astonished', target: 'Gobsmacked', choices: ['Gobsmacked', 'Knackered', 'Proper', 'Quaint'] },
+    { word: 'To face a difficult situation with courage', target: 'Bite the bullet', choices: ['Bite the bullet', 'Spill the tea', 'Piece of cake', 'Cost an arm and a leg'] },
+    { word: 'Having no money left at all; broke', target: 'Skint', choices: ['Skint', 'Posh', 'Knickers', 'Naff'] },
+    { word: 'Something very easy or simple to accomplish', target: 'Piece of cake', choices: ['Piece of cake', 'Cold turkey', 'Spill beans', 'Break a leg'] }
+  ];
+  runChoiceGame(stageEl, dataset, '📖 Definition Duel', 'Which English word or phrase matches this definition?', onComplete);
+}
+
+// ==========================================================================
+// 14. GAME: WORD LADDER 🪜
+// ==========================================================================
+export function startWordLadderGame(stageEl, vaultData, onComplete = () => {}) {
+  const steps = [
+    { from: 'COLD', to: 'WARM', missingIndex: 2, options: ['CARD', 'BIRD', 'HARD', 'FORD'], correct: 'CARD' },
+    { from: 'CAT', to: 'DOG', missingIndex: 1, options: ['COT', 'BAT', 'RAT', 'HAT'], correct: 'COT' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= steps.length) {
+      onComplete({
+        title: 'Word Ladder Completed! 🪜',
+        xp: 30,
+        coins: 10,
+        details: `Successfully climbed the word ladder with ${score} correct moves.`
+      });
+      return;
+    }
+
+    const step = steps[currentIdx];
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Word Ladder</span>
+        <h4 style="margin-top: 0.75rem;">Change 1 letter per step: <strong>${step.from} ➔ ??? ➔ ${step.to}</strong></h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Pick the word that completes the step:</p>
+        
+        <div class="practice-options-grid">
+          ${step.options.map(opt => `
+            <button class="btn btn-secondary ladder-opt-btn" data-word="${opt}">${opt}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.ladder-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const chosen = btn.getAttribute('data-word');
+        if (chosen === step.correct) {
+          btn.classList.add('correct');
+          score++;
+          speakText(chosen);
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        } else {
+          btn.classList.add('incorrect');
+          setTimeout(() => { currentIdx++; render(); }, 1200);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 15. GAME: MISSING LETTER 🔤
+// ==========================================================================
+export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { display: 'C H _ F F E D', letter: 'U', word: 'Chuffed' },
+    { display: 'G O B S M _ C K E D', letter: 'A', word: 'Gobsmacked' },
+    { display: 'K N _ C K E R E D', letter: 'A', word: 'Knackered' },
+    { display: 'S K _ N T', letter: 'I', word: 'Skint' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= dataset.length) {
+      onComplete({
+        title: 'Missing Letter Cleared! 🔤',
+        xp: 25,
+        coins: 10,
+        details: `Found ${score} missing letters accurately.`
+      });
+      return;
+    }
+
+    const item = dataset[currentIdx];
+    const alphabet = shuffleArray(['A', 'E', 'I', 'O', 'U', 'Y', 'B', 'C', 'D', 'K', 'M']).slice(0, 5);
+    if (!alphabet.includes(item.letter)) alphabet[0] = item.letter;
+    const shuffledLetters = shuffleArray(alphabet);
+
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Spelling Detective</span>
+        <h3 style="font-size: 2rem; letter-spacing: 0.2em; margin: 1.5rem 0;">${item.display}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Tap the missing letter:</p>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          ${shuffledLetters.map(l => `
+            <button class="scramble-tile-btn letter-tile-btn" data-letter="${l}">${l}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.letter-tile-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const l = btn.getAttribute('data-letter');
+        if (l === item.letter) {
+          btn.style.backgroundColor = 'var(--success)';
+          score++;
+          speakText(item.word);
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        } else {
+          btn.style.backgroundColor = 'var(--danger)';
+          setTimeout(() => { currentIdx++; render(); }, 1200);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 16. GAME: SPELL RACE 🏁
+// ==========================================================================
+export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
+  const words = ['Splendid', 'Chuffed', 'Brilliant', 'Proper', 'Cheerio'];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= words.length) {
+      onComplete({
+        title: 'Spell Race Winner! 🏁',
+        xp: 30,
+        coins: 10,
+        details: `Spelled ${score} out of ${words.length} UK words correctly!`
+      });
+      return;
+    }
+
+    const word = words[currentIdx];
+
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Listening & Spelling</span>
+        <h4 style="margin-top: 0.75rem;">Listen to the UK pronunciation and type the spelling:</h4>
+        
+        <button class="btn btn-primary" id="btn-listen-spell" style="margin: 1.5rem 0; padding: 0.85rem 1.5rem;">
+          <i class="fa-solid fa-volume-high"></i> Play Sound 🎧
+        </button>
+
+        <div style="max-width: 320px; margin: 0 auto 1.5rem auto;">
+          <input type="text" id="spell-input" class="form-control text-center" placeholder="Type word here..." autocomplete="off">
+        </div>
+
+        <button class="btn btn-primary" id="btn-submit-spell"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+      </div>
+    `;
+
+    speakText(word);
+
+    stageEl.querySelector('#btn-listen-spell').addEventListener('click', () => speakText(word));
+    
+    const checkAnswer = () => {
+      const val = stageEl.querySelector('#spell-input').value.trim().toLowerCase();
+      if (val === word.toLowerCase()) {
+        score++;
+        stageEl.querySelector('#spell-input').style.borderColor = 'var(--success)';
+        setTimeout(() => { currentIdx++; render(); }, 900);
+      } else {
+        stageEl.querySelector('#spell-input').style.borderColor = 'var(--danger)';
+        setTimeout(() => { currentIdx++; render(); }, 1200);
+      }
+    };
+
+    stageEl.querySelector('#btn-submit-spell').addEventListener('click', checkAnswer);
+    stageEl.querySelector('#spell-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 17. GAME: SENTENCE DETECTIVE 🕵️
+// ==========================================================================
+export function startSentenceDetectiveGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { sentence: 'She don\'t like drinking tea in the morning.', error: 'don\'t', correct: 'doesn\'t' },
+    { sentence: 'They has lived in London for five years.', error: 'has', correct: 'have' },
+    { sentence: 'I am looking forward to meet you tomorrow.', error: 'meet', correct: 'meeting' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= dataset.length) {
+      onComplete({
+        title: 'Sentence Detective Solved! 🕵️',
+        xp: 25,
+        coins: 10,
+        details: `Identified ${score} grammar mistakes accurately.`
+      });
+      return;
+    }
+
+    const item = dataset[currentIdx];
+    const words = item.sentence.split(' ');
+
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Sentence Detective</span>
+        <h4 style="margin-top: 0.75rem;">Tap the word block containing the grammatical error:</h4>
+        
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 1.5rem 0;">
+          ${words.map(w => `
+            <button class="word-tile-btn word-detect-btn" data-word="${w}">${w}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.word-detect-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wordText = btn.getAttribute('data-word').replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
+        const targetClean = item.error.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, "");
+
+        if (wordText.toLowerCase() === targetClean.toLowerCase()) {
+          btn.style.backgroundColor = 'var(--success)';
+          score++;
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        } else {
+          btn.style.backgroundColor = 'var(--danger)';
+          setTimeout(() => { currentIdx++; render(); }, 1200);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 18. GAME: GRAMMAR BATTLE ⚔️
+// ==========================================================================
+export function startGrammarBattleGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      prompt: 'Which sentence is grammatically flawless?',
+      target: 'If I were you, I would accept the job offer.',
+      choices: [
+        'If I was you, I would accept the job offer.',
+        'If I were you, I would accept the job offer.',
+        'If I am you, I will accepted the job offer.',
+        'If I be you, I would accept job offer.'
+      ]
+    },
+    {
+      prompt: 'Which sentence is grammatically flawless?',
+      target: 'She has been working here since 2020.',
+      choices: [
+        'She has been working here for 2020.',
+        'She is working here since 2020.',
+        'She has been working here since 2020.',
+        'She works here for since 2020.'
+      ]
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '⚔️ Grammar Battle', 'Choose the sentence that is grammatically flawless:', onComplete);
+}
+
+// ==========================================================================
+// 19. GAME: TENSE CHALLENGE ⏳
+// ==========================================================================
+export function startTenseChallengeGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'By the time we arrived at the station, the train ________.', target: 'had already left', choices: ['had already left', 'already left', 'has left', 'was leaving'] },
+    { word: 'I ________ in London since 2018.', target: 'have lived', choices: ['have lived', 'lived', 'am living', 'was lived'] },
+    { word: 'While she ________ tea, the doorbell rang.', target: 'was drinking', choices: ['was drinking', 'drank', 'is drinking', 'had drunk'] }
+  ];
+  runChoiceGame(stageEl, dataset, '⏳ Tense Challenge', 'Complete the sentence with the correct verb tense:', onComplete);
+}
+
+// ==========================================================================
+// 20. GAME: PREPOSITION MASTER 🎯
+// ==========================================================================
+export function startPrepositionMasterGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'She is remarkably good _____ playing the piano.', target: 'at', choices: ['at', 'in', 'on', 'with'] },
+    { word: 'We arrived _____ London Heathrow Airport at midnight.', target: 'at', choices: ['at', 'in', 'to', 'on'] },
+    { word: 'Are you interested _____ learning British slang?', target: 'in', choices: ['in', 'on', 'for', 'about'] }
+  ];
+  runChoiceGame(stageEl, dataset, '🎯 Preposition Master', 'Choose the correct preposition:', onComplete);
+}
+
+// ==========================================================================
+// 21. GAME: ARTICLE CHALLENGE 📝
+// ==========================================================================
+export function startArticleChallengeGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { word: 'Honesty is _____ best policy.', target: 'the', choices: ['the', 'a', 'an', 'Ø (No article)'] },
+    { word: 'He is studying to become _____ architect.', target: 'an', choices: ['an', 'a', 'the', 'Ø (No article)'] },
+    { word: 'I love drinking _____ hot tea in the afternoon.', target: 'Ø (No article)', choices: ['Ø (No article)', 'a', 'an', 'the'] }
+  ];
+  runChoiceGame(stageEl, dataset, '📝 Article Challenge', 'Choose the correct article:', onComplete);
+}
+
+// ==========================================================================
+// 22. GAME: NATURAL ENGLISH 🌍
+// ==========================================================================
+export function startNaturalEnglishGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'I am going to make a quick phone call.',
+      choices: [
+        'I am going to make a quick phone call.',
+        'I am going to do a quick phone call.',
+        'I am going to perform a phone call.',
+        'I am making phone call quickly.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'Could you do me a quick favor?',
+      choices: [
+        'Could you do me a quick favor?',
+        'Could you make me a quick favor?',
+        'Could you create me a favor?',
+        'Could you render me a favor?'
+      ]
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '🌍 Natural English', 'Select the expression that sounds most natural:', onComplete);
+}
+
+// ==========================================================================
+// 23. GAME: FORMAL OR CASUAL? 🎩
+// ==========================================================================
+export function startFormalCasualGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    { phrase: 'I look forward to hearing from you at your earliest convenience.', correct: 'Formal' },
+    { phrase: 'Catch you later! Cheers!', correct: 'Casual' },
+    { phrase: 'Please accept my sincere apologies for the delay.', correct: 'Formal' },
+    { phrase: 'No worries at all, mate!', correct: 'Casual' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= dataset.length) {
+      onComplete({
+        title: 'Formal or Casual Completed! 🎩',
+        xp: 25,
+        coins: 10,
+        details: `Classified ${score} phrases accurately.`
+      });
+      return;
+    }
+
+    const item = dataset[currentIdx];
+
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Register Classifier</span>
+        <h3 style="font-size: 1.3rem; margin: 1.5rem 0; font-style: italic;">"${item.phrase}"</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Is this expression Formal or Casual?</p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+          <button class="btn btn-primary fc-btn" data-type="Formal" style="padding: 1rem 2rem; font-size: 1.1rem;">🎩 Formal</button>
+          <button class="btn btn-secondary fc-btn" data-type="Casual" style="padding: 1rem 2rem; font-size: 1.1rem;">🗣️ Casual</button>
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.fc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const choice = btn.getAttribute('data-type');
+        if (choice === item.correct) {
+          btn.style.backgroundColor = 'var(--success)';
+          score++;
+          setTimeout(() => { currentIdx++; render(); }, 800);
+        } else {
+          btn.style.backgroundColor = 'var(--danger)';
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 24. GAME: COMPLETE THE CONVERSATION 💬
+// ==========================================================================
+export function startCompleteConversationGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'Person A: "Fancy grabbing a pint at the local pub after work?"\nPerson B: "_______________"',
+      target: 'I\'d love to! Cheers, see you at 6.',
+      choices: [
+        'I\'d love to! Cheers, see you at 6.',
+        'Yes, my favorite color is blue.',
+        'It rained heavily yesterday.',
+        'No, I am a doctor.'
+      ]
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '💬 Complete Conversation', 'Choose the response that completes the conversation naturally:', onComplete);
+}
+
+// ==========================================================================
+// 25. GAME: STORY BUILDER 📚
+// ==========================================================================
+export function startStoryBuilderGame(stageEl, vaultData, onComplete = () => {}) {
+  const storySteps = [
+    { prompt: 'Oliver woke up early on a foggy London morning and decided to...', target: 'take a walk in Hyde Park', choices: ['take a walk in Hyde Park', 'fly to Jupiter', 'buy 100 cats'] },
+    { prompt: 'While walking near the lake, he suddenly spotted a...', target: 'mysterious golden envelope', choices: ['mysterious golden envelope', 'flying saucer', 'talking submarine'] },
+    { prompt: 'He opened it and found...', target: 'an invitation to the Royal Opera', choices: ['an invitation to the Royal Opera', 'a slice of pizza', 'a maths exam'] }
+  ];
+  runChoiceGame(stageEl, storySteps, '📚 Story Builder', 'Choose the next logical step in the story:', onComplete);
+}
+
+// ==========================================================================
+// 26. GAME: WORD CATEGORIES 🗂️
+// ==========================================================================
+export function startWordCategoriesGame(stageEl, vaultData, onComplete = () => {}) {
+  const words = [
+    { word: 'Scone', cat: 'Food' },
+    { word: 'Subway', cat: 'Travel' },
+    { word: 'Tea', cat: 'Food' },
+    { word: 'Double-decker', cat: 'Travel' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= words.length) {
+      onComplete({
+        title: 'Categories Sorted! 🗂️',
+        xp: 25,
+        coins: 10,
+        details: `Sorted ${score} items into correct categories.`
+      });
+      return;
+    }
+
+    const item = words[currentIdx];
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Category Classifier</span>
+        <h3 style="font-size: 2rem; margin: 1.5rem 0;">${item.word}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Select the correct category for this item:</p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+          <button class="btn btn-primary cat-btn" data-cat="Food">☕ Food & Drink</button>
+          <button class="btn btn-secondary cat-btn" data-cat="Travel">🚇 Travel & Transport</button>
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.cat-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const choice = btn.getAttribute('data-cat');
+        if (choice === item.cat) {
+          btn.style.backgroundColor = 'var(--success)';
+          score++;
+          setTimeout(() => { currentIdx++; render(); }, 800);
+        } else {
+          btn.style.backgroundColor = 'var(--danger)';
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 27. GAME: SPEED READING ⚡
+// ==========================================================================
+export function startSpeedReadingGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'Reading Passage:\n"Afternoon tea is a traditional British meal served between 3:30 PM and 5:00 PM. It traditionally consists of finely cut sandwiches, freshly baked scones with clotted cream, and a hot pot of tea."',
+      target: 'Between 3:30 PM and 5:00 PM',
+      choices: ['Between 3:30 PM and 5:00 PM', 'At midnight', 'Early morning 6:00 AM', 'Only on Sundays']
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '⚡ Speed Reading', 'Read the passage and answer the question:', onComplete);
+}
+
+// ==========================================================================
+// 28. GAME: TRUE OR FALSE? ✅❌
+// ==========================================================================
+export function startTrueFalseGame(stageEl, vaultData, onComplete = () => {}) {
+  const questions = [
+    { statement: 'In British English, "chips" usually refers to thick French fries.', target: 'True' },
+    { statement: 'The UK currency is the Euro.', target: 'False' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= questions.length) {
+      onComplete({
+        title: 'True or False Completed! ✅',
+        xp: 25,
+        coins: 10,
+        details: `Answered ${score} statements correctly.`
+      });
+      return;
+    }
+
+    const q = questions[currentIdx];
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Fact Check</span>
+        <h4 style="margin: 1.5rem 0; font-size: 1.15rem;">"${q.statement}"</h4>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+          <button class="btn btn-primary tf-btn" data-ans="True" style="padding: 0.85rem 2rem;">✅ True</button>
+          <button class="btn btn-secondary tf-btn" data-ans="False" style="padding: 0.85rem 2rem;">❌ False</button>
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.tf-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const choice = btn.getAttribute('data-ans');
+        if (choice === q.target) {
+          btn.style.backgroundColor = 'var(--success)';
+          score++;
+          setTimeout(() => { currentIdx++; render(); }, 800);
+        } else {
+          btn.style.backgroundColor = 'var(--danger)';
+          setTimeout(() => { currentIdx++; render(); }, 1000);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 29. GAME: MEMORY CHALLENGE 🧠
+// ==========================================================================
+export function startMemoryChallengeGame(stageEl, vaultData, onComplete = () => {}) {
+  const targetWords = ['Chuffed', 'Splendid', 'Gobsmacked', 'Brilliant', 'Proper'];
+  const pool = [...targetWords, 'Bored', 'Angry', 'Noisy'];
+  const shuffledOptions = shuffleArray(pool);
+
+  stageEl.innerHTML = `
+    <div class="card text-center" style="padding: 1.75rem;" id="memory-stage">
+      <span class="category-pill">Memory Challenge</span>
+      <h4 style="margin-top: 0.75rem;">Memorize these 5 words before they disappear!</h4>
+      <div style="font-size: 2rem; color: var(--gold); font-weight: 800; margin: 0.5rem 0;" id="mem-timer">5</div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 1.25rem 0;">
+        ${targetWords.map(w => `<span class="badge" style="font-size: 1.1rem; padding: 0.5rem 1rem;">${w}</span>`).join('')}
+      </div>
+    </div>
+  `;
+
+  let timeLeft = 5;
+  const timer = setInterval(() => {
+    timeLeft--;
+    const timerEl = stageEl.querySelector('#mem-timer');
+    if (timerEl) timerEl.innerText = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      renderRecall();
+    }
+  }, 1000);
+
+  function renderRecall() {
+    let selected = [];
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Recall Phase</span>
+        <h4 style="margin-top: 0.75rem;">Select the 5 words that were displayed:</h4>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin: 1.5rem 0;">
+          ${shuffledOptions.map(w => `
+            <button class="word-tile-btn recall-btn" data-word="${w}">${w}</button>
+          `).join('')}
+        </div>
+
+        <button class="btn btn-primary" id="btn-check-recall"><i class="fa-solid fa-circle-check"></i> Submit Recall</button>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.recall-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = btn.getAttribute('data-word');
+        if (selected.includes(w)) {
+          selected = selected.filter(x => x !== w);
+          btn.classList.remove('selected');
+        } else {
+          selected.push(w);
+          btn.classList.add('selected');
+        }
+      });
+    });
+
+    stageEl.querySelector('#btn-check-recall').addEventListener('click', () => {
+      let correctCount = 0;
+      selected.forEach(w => {
+        if (targetWords.includes(w)) correctCount++;
+      });
+
+      onComplete({
+        title: 'Memory Challenge Completed! 🧠',
+        xp: correctCount * 6,
+        coins: 10,
+        details: `Successfully recalled ${correctCount} out of 5 words!`
+      });
+    });
+  }
+}
+
+// ==========================================================================
+// 30. GAME: WORD CHAIN 🔗
+// ==========================================================================
+export function startWordChainGame(stageEl, vaultData, onComplete = () => {}) {
+  const chain = [
+    { start: 'LONDON', lastLetter: 'N', choices: ['Nifty', 'Cat', 'Dog', 'Book'], correct: 'Nifty' },
+    { start: 'NIFTY', lastLetter: 'Y', choices: ['Yummy', 'Apple', 'Pen', 'Car'], correct: 'Yummy' }
+  ];
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= chain.length) {
+      onComplete({
+        title: 'Word Chain Complete! 🔗',
+        xp: 30,
+        coins: 10,
+        details: `Connected ${score} word links in sequence.`
+      });
+      return;
+    }
+
+    const item = chain[currentIdx];
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">Word Chain</span>
+        <h3 style="font-size: 2rem; margin: 1.25rem 0;">${item.start} ➔ <span style="color: var(--gold);">?</span></h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">Pick the word starting with letter '<strong>${item.lastLetter}</strong>':</p>
+
+        <div class="practice-options-grid">
+          ${item.choices.map(c => `
+            <button class="btn btn-secondary chain-btn" data-word="${c}">${c}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.chain-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const w = btn.getAttribute('data-word');
+        if (w === item.correct) {
+          btn.classList.add('correct');
+          score++;
+          speakText(w);
+          setTimeout(() => { currentIdx++; render(); }, 900);
+        } else {
+          btn.classList.add('incorrect');
+          setTimeout(() => { currentIdx++; render(); }, 1100);
+        }
+      });
+    });
+  };
+  render();
+}
+
+// ==========================================================================
+// 31. GAME: CATEGORY RUSH 🚀
+// ==========================================================================
+export function startCategoryRushGame(stageEl, vaultData, onComplete = () => {}) {
+  const words = [
+    { word: 'Chuffed', isSlang: true },
+    { word: 'Knackered', isSlang: true },
+    { word: 'Gobsmacked', isSlang: true },
+    { word: 'Elephant', isSlang: false },
+    { word: 'Telephone', isSlang: false },
+    { word: 'Skint', isSlang: true }
+  ];
+  let selectedCount = 0;
+
+  stageEl.innerHTML = `
+    <div class="card text-center" style="padding: 1.75rem;">
+      <span class="category-pill">Category Rush</span>
+      <h3 style="margin: 0.75rem 0;">Tap all <strong>British Slangs</strong> before time runs out!</h3>
+      <div style="font-size: 2rem; color: #EF4444; font-weight: 800;" id="rush-timer">15</div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin: 1.5rem 0;">
+        ${shuffleArray(words).map(w => `
+          <button class="word-tile-btn rush-btn" data-slang="${w.isSlang}">${w.word}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  let time = 15;
+  const interval = setInterval(() => {
+    time--;
+    const timerEl = stageEl.querySelector('#rush-timer');
+    if (timerEl) timerEl.innerText = time;
+
+    if (time <= 0) {
+      clearInterval(interval);
+      onComplete({
+        title: 'Category Rush Finished! 🚀',
+        xp: selectedCount * 8,
+        coins: 10,
+        details: `Successfully selected ${selectedCount} category items.`
+      });
+    }
+  }, 1000);
+
+  stageEl.querySelectorAll('.rush-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isSlang = btn.getAttribute('data-slang') === 'true';
+      if (isSlang && !btn.disabled) {
+        btn.disabled = true;
+        btn.style.backgroundColor = 'var(--success)';
+        selectedCount++;
+      } else if (!isSlang && !btn.disabled) {
+        btn.disabled = true;
+        btn.style.backgroundColor = 'var(--danger)';
+      }
+    });
+  });
+}
+
+// ==========================================================================
+// 32. GAME: FORBIDDEN WORD 🚫
+// ==========================================================================
+export function startForbiddenWordGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'Target Word: TEA',
+      prompt: 'Clue: Popular warm British beverage served with milk in the afternoon.\nForbidden words: [drink, cup, leaf]',
+      target: 'Tea',
+      choices: ['Tea', 'Coffee', 'Juice', 'Water']
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '🚫 Forbidden Word', 'Guess the target word from the clue:', onComplete);
+}
+
+// ==========================================================================
+// 33. GAME: ENGLISH TRIVIA 🌎
+// ==========================================================================
+export function startEnglishTriviaGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'What is the popular nickname for London\'s Underground railway network?',
+      target: 'The Tube',
+      choices: ['The Tube', 'The Metro', 'The Subway', 'The Cable']
+    },
+    {
+      word: 'What traditional British dish consists of battered fish and deep-fried potatoes?',
+      target: 'Fish and Chips',
+      choices: ['Fish and Chips', 'Bangers and Mash', 'Shepherd\'s Pie', 'Full English']
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '🌎 English Trivia', 'Answer the British English trivia question:', onComplete);
+}
+
+// ==========================================================================
+// 34. GAME: WORD CONNECTIONS 🧩
+// ==========================================================================
+export function startWordConnectionsGame(stageEl, vaultData, onComplete = () => {}) {
+  const dataset = [
+    {
+      word: 'Words: [Big Ben, London Eye, Tower Bridge, Buckingham Palace]',
+      target: 'London Landmarks',
+      choices: ['London Landmarks', 'British Foods', 'TV Shows', 'Royal Titles']
+    }
+  ];
+  runChoiceGame(stageEl, dataset, '🧩 Word Connections', 'What is the common connection between these words?', onComplete);
+}
+
+// Helper choice runner for quick MC games
+function runChoiceGame(stageEl, dataset, title, promptText, onComplete) {
+  let currentIdx = 0;
+  let score = 0;
+
+  const render = () => {
+    if (currentIdx >= dataset.length) {
+      onComplete({
+        title: `${title} Completed! 🎉`,
+        xp: Math.max(15, score * 10),
+        coins: 10,
+        details: `Answered ${score} out of ${dataset.length} questions correctly.`
+      });
+      return;
+    }
+
+    const item = dataset[currentIdx];
+    const shuffledChoices = shuffleArray(item.choices);
+
+    stageEl.innerHTML = `
+      <div class="card text-center" style="padding: 1.75rem;">
+        <span class="category-pill">${title}</span>
+        <h3 style="font-size: 1.25rem; margin: 1.25rem 0; font-family: 'Playfair Display', serif; white-space: pre-line;">${item.word || item.prompt}</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${promptText}</p>
+
+        <div class="practice-options-grid">
+          ${shuffledChoices.map(c => `
+            <button class="btn btn-secondary mc-opt-btn" data-choice="${c}">${c}</button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    stageEl.querySelectorAll('.mc-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const choice = btn.getAttribute('data-choice');
+        if (choice === item.target) {
+          btn.classList.add('correct');
+          score++;
+          speakText(choice);
+          setTimeout(() => { currentIdx++; render(); }, 900);
+        } else {
+          btn.classList.add('incorrect');
+          setTimeout(() => { currentIdx++; render(); }, 1100);
+        }
+      });
+    });
+  };
+  render();
+}
+
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

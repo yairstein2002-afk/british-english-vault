@@ -59,7 +59,31 @@ import {
   startGuessWordGame,
   startOddOneOutGame,
   startBuildSentenceGame,
-  startEnglishQuizGame
+  startEnglishQuizGame,
+  startSynonymHuntGame,
+  startAntonymAttackGame,
+  startDefinitionDuelGame,
+  startWordLadderGame,
+  startMissingLetterGame,
+  startSpellRaceGame,
+  startSentenceDetectiveGame,
+  startGrammarBattleGame,
+  startTenseChallengeGame,
+  startPrepositionMasterGame,
+  startArticleChallengeGame,
+  startNaturalEnglishGame,
+  startFormalCasualGame,
+  startCompleteConversationGame,
+  startStoryBuilderGame,
+  startWordCategoriesGame,
+  startSpeedReadingGame,
+  startTrueFalseGame,
+  startMemoryChallengeGame,
+  startWordChainGame,
+  startCategoryRushGame,
+  startForbiddenWordGame,
+  startEnglishTriviaGame,
+  startWordConnectionsGame
 } from './games.js';
 
 // Global State
@@ -1877,6 +1901,22 @@ function initGamesEventListeners() {
     });
   });
 
+  // Filter chips in Games Hub
+  document.querySelectorAll('#game-category-chips .chip').forEach(chip => {
+    chip.addEventListener('click', (e) => {
+      document.querySelectorAll('#game-category-chips .chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const cat = chip.getAttribute('data-cat');
+      document.querySelectorAll('.games-grid .game-card').forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+
   const dailyBtn = document.getElementById('btn-start-daily-challenge');
   if (dailyBtn) {
     dailyBtn.addEventListener('click', () => {
@@ -1909,7 +1949,31 @@ function launchGame(gameKey, isDaily = false) {
     'guess-word': '🕵️ Guess the Word',
     'odd-one-out': '🚫 Odd One Out',
     'build-sentence': '💬 Build the Sentence',
-    'english-quiz': '🏆 English Quiz'
+    'english-quiz': '🏆 English Quiz',
+    'synonym-hunt': '🧠 Synonym Hunt',
+    'antonym-attack': '⚔️ Antonym Attack',
+    'definition-duel': '📖 Definition Duel',
+    'word-ladder': '🪜 Word Ladder',
+    'missing-letter': '🔤 Missing Letter',
+    'spell-race': '🏁 Spell Race',
+    'sentence-detective': '🕵️ Sentence Detective',
+    'grammar-battle': '⚔️ Grammar Battle',
+    'tense-challenge': '⏳ Tense Challenge',
+    'preposition-master': '🎯 Preposition Master',
+    'article-challenge': '📝 Article Challenge',
+    'natural-english': '🌍 Natural English',
+    'formal-casual': '🎩 Formal or Casual?',
+    'complete-conversation': '💬 Complete Conversation',
+    'story-builder': '📚 Story Builder',
+    'word-categories': '🗂️ Word Categories',
+    'speed-reading': '⚡ Speed Reading',
+    'true-false': '✅❌ True or False?',
+    'memory-challenge': '🧠 Memory Challenge',
+    'word-chain': '🔗 Word Chain',
+    'category-rush': '🚀 Category Rush',
+    'forbidden-word': '🚫 Forbidden Word',
+    'english-trivia': '🌎 English Trivia',
+    'word-connections': '🧩 Word Connections'
   };
 
   if (titleEl) titleEl.innerText = (isDaily ? '⭐ Daily Challenge: ' : '') + (gameTitles[gameKey] || 'Mini Game');
@@ -1969,14 +2033,43 @@ function launchGame(gameKey, isDaily = false) {
     });
   };
 
-  if (gameKey === 'word-match') startWordMatchGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'quick-choice') startQuickChoiceGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'fill-gap') startFillGapGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'word-scramble') startWordScrambleGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'listen-choose') startListenChooseGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'say-it') startSayItGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'guess-word') startGuessWordGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'odd-one-out') startOddOneOutGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'build-sentence') startBuildSentenceGame(stageEl, vaultData, handleGameComplete);
-  else if (gameKey === 'english-quiz') startEnglishQuizGame(stageEl, vaultData, handleGameComplete);
+  const launchers = {
+    'word-match': startWordMatchGame,
+    'quick-choice': startQuickChoiceGame,
+    'fill-gap': startFillGapGame,
+    'word-scramble': startWordScrambleGame,
+    'listen-choose': startListenChooseGame,
+    'say-it': startSayItGame,
+    'guess-word': startGuessWordGame,
+    'odd-one-out': startOddOneOutGame,
+    'build-sentence': startBuildSentenceGame,
+    'english-quiz': startEnglishQuizGame,
+    'synonym-hunt': startSynonymHuntGame,
+    'antonym-attack': startAntonymAttackGame,
+    'definition-duel': startDefinitionDuelGame,
+    'word-ladder': startWordLadderGame,
+    'missing-letter': startMissingLetterGame,
+    'spell-race': startSpellRaceGame,
+    'sentence-detective': startSentenceDetectiveGame,
+    'grammar-battle': startGrammarBattleGame,
+    'tense-challenge': startTenseChallengeGame,
+    'preposition-master': startPrepositionMasterGame,
+    'article-challenge': startArticleChallengeGame,
+    'natural-english': startNaturalEnglishGame,
+    'formal-casual': startFormalCasualGame,
+    'complete-conversation': startCompleteConversationGame,
+    'story-builder': startStoryBuilderGame,
+    'word-categories': startWordCategoriesGame,
+    'speed-reading': startSpeedReadingGame,
+    'true-false': startTrueFalseGame,
+    'memory-challenge': startMemoryChallengeGame,
+    'word-chain': startWordChainGame,
+    'category-rush': startCategoryRushGame,
+    'forbidden-word': startForbiddenWordGame,
+    'english-trivia': startEnglishTriviaGame,
+    'word-connections': startWordConnectionsGame
+  };
+
+  const fn = launchers[gameKey] || startQuickChoiceGame;
+  fn(stageEl, vaultData, handleGameComplete);
 }
