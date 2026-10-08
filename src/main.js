@@ -46,10 +46,25 @@ import {
   calculateGoalsStats 
 } from './goals.js';
 import { initLearnUI, closeTopicDetail } from './learn.js';
+import {
+  getGameStats,
+  calculateUserLevel,
+  awardGameRewards,
+  startWordMatchGame,
+  startQuickChoiceGame,
+  startFillGapGame,
+  startWordScrambleGame,
+  startListenChooseGame,
+  startSayItGame,
+  startGuessWordGame,
+  startOddOneOutGame,
+  startBuildSentenceGame,
+  startEnglishQuizGame
+} from './games.js';
 
 // Global State
 let vaultData = { items: [], stats: {} };
-let currentView = 'words'; // words, slangs, phrases, idioms, learn, quiz, stats, settings, ai, goals
+let currentView = 'words'; // words, slangs, phrases, idioms, learn, games, quiz, stats, settings, ai, goals
 let isSyncing = false;
 let syncQueue = false;
 
@@ -60,6 +75,7 @@ let brVoices = [];
 const views = {
   cards: document.getElementById('view-cards-container'),
   learn: document.getElementById('view-learn'),
+  games: document.getElementById('view-games'),
   quiz: document.getElementById('view-quiz'),
   stats: document.getElementById('view-stats'),
   settings: document.getElementById('view-settings'),
@@ -123,7 +139,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'quiz', 'stats', 'settings', 'ai', 'goals'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -165,6 +181,7 @@ function updateView() {
     phrases: 'Phrases',
     idioms: 'Idioms',
     learn: 'Learn & Practice',
+    games: 'Interactive Games',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
     settings: 'App Settings',
@@ -185,6 +202,9 @@ function updateView() {
     if (currentView === 'learn') {
       if (views.learn) views.learn.classList.add('active');
       initLearnUI();
+    } else if (currentView === 'games') {
+      if (views.games) views.games.classList.add('active');
+      renderGamesUI();
     } else if (currentView === 'quiz') {
       views.quiz.classList.add('active');
       setupQuizUI();
@@ -1786,4 +1806,151 @@ function setupGoalsEventListeners() {
       renderGoalsUI();
     });
   }
+
+  // Games Event Listeners
+  initGamesEventListeners();
+}
+
+// ==========================================================================
+// GAMES & GAMIFICATION CONTROLLER
+// ==========================================================================
+function renderGamesUI() {
+  const stats = getGameStats(vaultData);
+  const lvlInfo = calculateUserLevel(stats.xp);
+
+  const crownEl = document.getElementById('game-level-crown');
+  const levelTitleEl = document.getElementById('game-user-level-title');
+  const xpSubtextEl = document.getElementById('game-xp-subtext');
+  const xpBarFill = document.getElementById('game-xp-bar-fill');
+
+  if (crownEl) crownEl.innerText = lvlInfo.badge.split(' ')[0];
+  if (levelTitleEl) levelTitleEl.innerText = lvlInfo.title;
+  if (xpSubtextEl) xpSubtextEl.innerText = `${stats.xp} / ${lvlInfo.nextXp} XP`;
+  if (xpBarFill) xpBarFill.style.width = `${lvlInfo.pct}%`;
+
+  const streakEl = document.getElementById('game-user-streak');
+  const coinsEl = document.getElementById('game-user-coins');
+  const xpEl = document.getElementById('game-user-xp');
+
+  if (streakEl) streakEl.innerText = stats.streak;
+  if (coinsEl) coinsEl.innerText = stats.coins;
+  if (xpEl) xpEl.innerText = stats.xp;
+
+  const hubPanel = document.getElementById('games-hub-panel');
+  const activePanel = document.getElementById('game-active-panel');
+
+  if (hubPanel) hubPanel.style.display = 'block';
+  if (activePanel) activePanel.style.display = 'none';
+}
+
+function initGamesEventListeners() {
+  document.querySelectorAll('.btn-launch-game').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const gameKey = e.currentTarget.getAttribute('data-game');
+      launchGame(gameKey);
+    });
+  });
+
+  const dailyBtn = document.getElementById('btn-start-daily-challenge');
+  if (dailyBtn) {
+    dailyBtn.addEventListener('click', () => {
+      launchGame('word-match', true);
+    });
+  }
+
+  const exitBtn = document.getElementById('btn-exit-game');
+  if (exitBtn) {
+    exitBtn.addEventListener('click', () => {
+      document.getElementById('games-hub-panel').style.display = 'block';
+      document.getElementById('game-active-panel').style.display = 'none';
+    });
+  }
+}
+
+function launchGame(gameKey, isDaily = false) {
+  const hubPanel = document.getElementById('games-hub-panel');
+  const activePanel = document.getElementById('game-active-panel');
+  const stageEl = document.getElementById('game-stage-container');
+  const titleEl = document.getElementById('active-game-title');
+
+  const gameTitles = {
+    'word-match': '🧩 Word Match',
+    'quick-choice': '⚡ Quick Choice',
+    'fill-gap': '📝 Fill the Gap',
+    'word-scramble': '🔤 Word Scramble',
+    'listen-choose': '🎧 Listen & Choose',
+    'say-it': '🗣️ Say It',
+    'guess-word': '🕵️ Guess the Word',
+    'odd-one-out': '🚫 Odd One Out',
+    'build-sentence': '💬 Build the Sentence',
+    'english-quiz': '🏆 English Quiz'
+  };
+
+  if (titleEl) titleEl.innerText = (isDaily ? '⭐ Daily Challenge: ' : '') + (gameTitles[gameKey] || 'Mini Game');
+
+  if (hubPanel) hubPanel.style.display = 'none';
+  if (activePanel) activePanel.style.display = 'block';
+  if (stageEl) stageEl.innerHTML = '';
+
+  const handleGameComplete = (result) => {
+    let xpAward = result.xp || 20;
+    let coinAward = result.coins || 5;
+
+    if (isDaily) {
+      xpAward += 50;
+      coinAward += 20;
+    }
+
+    awardGameRewards(vaultData, xpAward, coinAward, gameKey, result.isPerfect || false, saveDatabase);
+
+    stageEl.innerHTML = `
+      <div class="text-center card" style="padding: 2.5rem 1.5rem;">
+        <div class="trophy-icon" style="font-size: 3.5rem; color: var(--gold); margin-bottom: 1rem;">
+          <i class="fa-solid fa-trophy"></i>
+        </div>
+        <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.5rem;">${result.title}</h3>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">${result.details}</p>
+
+        <div class="reward-tags" style="justify-content: center; margin-bottom: 2rem; scale: 1.2;">
+          <span class="reward-tag" style="background-color: rgba(0, 36, 125, 0.1); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2);">
+            <i class="fa-solid fa-bolt"></i> +${xpAward} XP Earned
+          </span>
+          <span class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border-color: rgba(212, 175, 55, 0.3);">
+            <i class="fa-solid fa-coins"></i> +${coinAward} Coins Earned
+          </span>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem;">
+          <button class="btn btn-primary" id="btn-play-again">
+            <i class="fa-solid fa-rotate-right"></i> Play Again
+          </button>
+          <button class="btn btn-secondary" id="btn-back-hub">
+            <i class="fa-solid fa-gamepad"></i> Games Hub
+          </button>
+        </div>
+      </div>
+    `;
+
+    renderGamesUI();
+
+    stageEl.querySelector('#btn-play-again').addEventListener('click', () => {
+      launchGame(gameKey, isDaily);
+    });
+
+    stageEl.querySelector('#btn-back-hub').addEventListener('click', () => {
+      if (hubPanel) hubPanel.style.display = 'block';
+      if (activePanel) activePanel.style.display = 'none';
+    });
+  };
+
+  if (gameKey === 'word-match') startWordMatchGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'quick-choice') startQuickChoiceGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'fill-gap') startFillGapGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'word-scramble') startWordScrambleGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'listen-choose') startListenChooseGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'say-it') startSayItGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'guess-word') startGuessWordGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'odd-one-out') startOddOneOutGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'build-sentence') startBuildSentenceGame(stageEl, vaultData, handleGameComplete);
+  else if (gameKey === 'english-quiz') startEnglishQuizGame(stageEl, vaultData, handleGameComplete);
 }

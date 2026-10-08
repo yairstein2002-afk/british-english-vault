@@ -95,6 +95,9 @@
         <a href="#learn" class="nav-item" data-view="learn">
           <i class="fa-solid fa-graduation-cap"></i> <span>Learn & Practice</span>
         </a>
+        <a href="#games" class="nav-item" data-view="games">
+          <i class="fa-solid fa-gamepad"></i> <span>Games 🎮</span>
+        </a>
         <a href="#quiz" class="nav-item" data-view="quiz">
           <i class="fa-solid fa-spell-check"></i> <span>Quiz</span>
         </a>
@@ -144,6 +147,10 @@
       <a href="#learn" class="mobile-nav-item" data-view="learn">
         <i class="fa-solid fa-graduation-cap"></i>
         <span>Learn</span>
+      </a>
+      <a href="#games" class="mobile-nav-item" data-view="games">
+        <i class="fa-solid fa-gamepad"></i>
+        <span>Games</span>
       </a>
       <a href="#quiz" class="mobile-nav-item" data-view="quiz">
         <i class="fa-solid fa-spell-check"></i>
@@ -407,6 +414,224 @@
               </button>
             </div>
           </div>
+        </section>
+
+        <!-- GAMES & GAMIFICATION VIEW -->
+        <section id="view-games" class="view-section">
+          
+          <!-- Gamification Status Bar (Level, XP, Coins, Streak) -->
+          <div class="card game-user-status-card">
+            <div class="game-status-header">
+              <div class="user-level-badge" id="game-level-badge">
+                <span class="level-crown" id="game-level-crown">🌱</span>
+                <div>
+                  <h4 id="game-user-level-title">Level A1 Novice Learner</h4>
+                  <span class="xp-subtext" id="game-xp-subtext">0 / 200 XP</span>
+                </div>
+              </div>
+              <div class="game-currency-group">
+                <div class="stat-pill streak" title="Daily Play Streak">
+                  <i class="fa-solid fa-fire"></i> <span id="game-user-streak">1</span>d Streak
+                </div>
+                <div class="stat-pill coins" title="Vault Coins">
+                  <i class="fa-solid fa-coins"></i> <span id="game-user-coins">50</span> Coins
+                </div>
+                <div class="stat-pill xp" title="Total Experience Points">
+                  <i class="fa-solid fa-bolt"></i> <span id="game-user-xp">0</span> XP
+                </div>
+              </div>
+            </div>
+            
+            <!-- Level XP Progress Bar -->
+            <div class="game-xp-bar-container">
+              <div class="game-xp-bar-fill" id="game-xp-bar-fill" style="width: 0%;"></div>
+            </div>
+          </div>
+
+          <!-- Daily Challenge Card -->
+          <div class="daily-challenge-card card">
+            <div class="daily-challenge-content">
+              <div class="daily-badge"><i class="fa-solid fa-star"></i> Daily Challenge</div>
+              <h3 id="daily-challenge-title">Word Match Challenge</h3>
+              <p id="daily-challenge-desc">Match 5 English pairs in under 60 seconds to earn bonus XP and coins!</p>
+              <div class="reward-tags">
+                <span class="reward-tag"><i class="fa-solid fa-bolt"></i> +50 Bonus XP</span>
+                <span class="reward-tag"><i class="fa-solid fa-coins"></i> +20 Coins</span>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg" id="btn-start-daily-challenge">
+              <i class="fa-solid fa-play"></i> Play Challenge
+            </button>
+          </div>
+
+          <!-- Main Games Hub Panel -->
+          <div id="games-hub-panel">
+            <div class="games-hub-header" style="margin-bottom: 1.5rem;">
+              <h3 class="panel-title"><i class="fa-solid fa-gamepad" style="color: var(--uk-blue);"></i> Choose a Mini-Game</h3>
+              <p class="panel-desc">Quick 2–5 minute interactive learning challenges to boost your vocabulary and grammar.</p>
+            </div>
+            
+            <div class="games-grid">
+              <!-- Game Card 1: Word Match -->
+              <div class="game-card card">
+                <div class="game-card-icon blue"><i class="fa-solid fa-puzzle-piece"></i></div>
+                <div class="game-card-body">
+                  <h4>Word Match</h4>
+                  <p>Pair English words with their correct meanings.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Vocabulary</span>
+                    <span class="game-xp-reward">+20 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="word-match">Play 🧩</button>
+              </div>
+
+              <!-- Game Card 2: Quick Choice -->
+              <div class="game-card card">
+                <div class="game-card-icon gold"><i class="fa-solid fa-bolt"></i></div>
+                <div class="game-card-body">
+                  <h4>Quick Choice</h4>
+                  <p>Speed race! Answer questions before the timer runs out.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Speed & Vocab</span>
+                    <span class="game-xp-reward">+25 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="quick-choice">Play ⚡</button>
+              </div>
+
+              <!-- Game Card 3: Fill the Gap -->
+              <div class="game-card card">
+                <div class="game-card-icon green"><i class="fa-solid fa-pen-to-square"></i></div>
+                <div class="game-card-body">
+                  <h4>Fill the Gap</h4>
+                  <p>Select the missing word to complete the sentence.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Grammar</span>
+                    <span class="game-xp-reward">+20 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="fill-gap">Play 📝</button>
+              </div>
+
+              <!-- Game Card 4: Word Scramble -->
+              <div class="game-card card">
+                <div class="game-card-icon purple"><i class="fa-solid fa-arrow-down-a-z"></i></div>
+                <div class="game-card-body">
+                  <h4>Word Scramble</h4>
+                  <p>Unscramble shuffled letters to spell the target word.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Spelling</span>
+                    <span class="game-xp-reward">+25 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="word-scramble">Play 🔤</button>
+              </div>
+
+              <!-- Game Card 5: Listen & Choose -->
+              <div class="game-card card">
+                <div class="game-card-icon red"><i class="fa-solid fa-headphones"></i></div>
+                <div class="game-card-body">
+                  <h4>Listen & Choose</h4>
+                  <p>Listen to British English audio and pick what you heard.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Listening</span>
+                    <span class="game-xp-reward">+20 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="listen-choose">Play 🎧</button>
+              </div>
+
+              <!-- Game Card 6: Say It -->
+              <div class="game-card card">
+                <div class="game-card-icon cyan"><i class="fa-solid fa-microphone"></i></div>
+                <div class="game-card-body">
+                  <h4>Say It</h4>
+                  <p>Read sentences aloud and verify your pronunciation.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Speaking</span>
+                    <span class="game-xp-reward">+30 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="say-it">Play 🗣️</button>
+              </div>
+
+              <!-- Game Card 7: Guess the Word -->
+              <div class="game-card card">
+                <div class="game-card-icon orange"><i class="fa-solid fa-user-secret"></i></div>
+                <div class="game-card-body">
+                  <h4>Guess the Word</h4>
+                  <p>Detective clues! Guess letter blanks before running out of lives.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Vocab Clues</span>
+                    <span class="game-xp-reward">+25 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="guess-word">Play 🕵️</button>
+              </div>
+
+              <!-- Game Card 8: Odd One Out -->
+              <div class="game-card card">
+                <div class="game-card-icon pink"><i class="fa-solid fa-ban"></i></div>
+                <div class="game-card-body">
+                  <h4>Odd One Out</h4>
+                  <p>Identify the word that doesn't belong in the category.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Semantics</span>
+                    <span class="game-xp-reward">+20 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="odd-one-out">Play 🚫</button>
+              </div>
+
+              <!-- Game Card 9: Build the Sentence -->
+              <div class="game-card card">
+                <div class="game-card-icon emerald"><i class="fa-solid fa-cubes-stacked"></i></div>
+                <div class="game-card-body">
+                  <h4>Build the Sentence</h4>
+                  <p>Tap word tiles in sequence to construct proper SVO syntax.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">Syntax</span>
+                    <span class="game-xp-reward">+25 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="build-sentence">Play 💬</button>
+              </div>
+
+              <!-- Game Card 10: English Quiz -->
+              <div class="game-card card">
+                <div class="game-card-icon yellow"><i class="fa-solid fa-trophy"></i></div>
+                <div class="game-card-body">
+                  <h4>English Quiz</h4>
+                  <p>Fast mixed quiz with vocabulary, slangs, idioms & grammar.</p>
+                  <div class="game-meta">
+                    <span class="game-tag">General Practice</span>
+                    <span class="game-xp-reward">+30 XP</span>
+                  </div>
+                </div>
+                <button class="btn btn-primary btn-block btn-launch-game" data-game="english-quiz">Play 🏆</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Play Screen Container -->
+          <div id="game-active-panel" class="card" style="display: none;">
+            <div class="game-play-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color);">
+              <button class="btn btn-secondary" id="btn-exit-game">
+                <i class="fa-solid fa-arrow-left"></i> Exit Game
+              </button>
+              <h3 id="active-game-title" style="margin: 0; font-family: 'Playfair Display', serif;">Game</h3>
+              <div class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border: 1px solid rgba(212, 175, 55, 0.3);">
+                <i class="fa-solid fa-star"></i> In Progress
+              </div>
+            </div>
+
+            <!-- Active Stage -->
+            <div id="game-stage-container" class="game-stage">
+              <!-- Game content injected via JS -->
+            </div>
+          </div>
+
         </section>
         
         <!-- STATISTICS VIEW -->

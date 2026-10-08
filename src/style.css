@@ -2624,4 +2624,314 @@ button, input, select, textarea {
   border: 1px solid var(--border-color);
 }
 
+/* ==========================================================================
+   GAMES & GAMIFICATION STYLING
+   ========================================================================== */
+#view-games {
+  padding-bottom: 7rem !important;
+}
+
+.game-user-status-card {
+  background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-card-subtle) 100%);
+  border: 1px solid var(--border-color);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius-lg);
+}
+
+.game-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.user-level-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.level-crown {
+  font-size: 2.2rem;
+}
+
+.user-level-badge h4 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin-bottom: 0.15rem;
+  color: var(--text-main);
+}
+
+.xp-subtext {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.game-currency-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.stat-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+}
+
+.stat-pill.streak { color: #EF4444; border-color: rgba(239, 68, 68, 0.3); }
+.stat-pill.coins { color: var(--gold); border-color: rgba(212, 175, 55, 0.3); }
+.stat-pill.xp { color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.3); }
+[data-theme="dark"] .stat-pill.xp { color: var(--gold); }
+
+.game-xp-bar-container {
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.game-xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--uk-blue) 0%, var(--gold) 100%);
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Daily Challenge Card */
+.daily-challenge-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border: 2px solid var(--gold);
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, var(--card-bg) 100%);
+  margin-bottom: 2rem;
+  border-radius: var(--radius-lg);
+}
+
+.daily-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--gold);
+  color: var(--bg-main);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.reward-tags {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.reward-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+}
+
+/* Games Grid */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.game-card-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+.game-card-icon.blue { background-color: rgba(0, 36, 125, 0.1); color: var(--uk-blue); }
+.game-card-icon.gold { background-color: rgba(212, 175, 55, 0.15); color: var(--gold); }
+.game-card-icon.green { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+.game-card-icon.purple { background-color: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.game-card-icon.red { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+.game-card-icon.cyan { background-color: rgba(6, 182, 212, 0.1); color: #06B6D4; }
+.game-card-icon.orange { background-color: rgba(249, 115, 22, 0.1); color: #F97316; }
+.game-card-icon.pink { background-color: rgba(236, 72, 153, 0.1); color: #EC4899; }
+.game-card-icon.emerald { background-color: rgba(16, 185, 129, 0.1); color: #10B981; }
+.game-card-icon.yellow { background-color: rgba(234, 179, 8, 0.1); color: #EAB308; }
+
+.game-card-body h4 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.game-card-body p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.game-tag {
+  color: var(--text-muted);
+}
+
+.game-xp-reward {
+  color: var(--gold);
+}
+
+/* Word Match Game Grid */
+.match-game-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.match-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.match-card {
+  padding: 1.1rem;
+  border-radius: 12px;
+  border: 2px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-main);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.match-card:hover:not(:disabled) {
+  border-color: var(--uk-blue);
+  transform: scale(1.02);
+}
+
+.match-card.selected {
+  border-color: var(--gold) !important;
+  background-color: rgba(212, 175, 55, 0.15) !important;
+}
+
+.match-card.matched {
+  border-color: var(--success) !important;
+  background-color: var(--success-light) !important;
+  color: var(--success) !important;
+  opacity: 0.7;
+}
+
+.match-card.mismatch {
+  border-color: var(--danger) !important;
+  background-color: var(--danger-light) !important;
+  animation: shake 0.4s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+.scramble-slot {
+  width: 42px;
+  height: 48px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 800;
+  background-color: var(--input-bg);
+}
+
+.scramble-slot.filled {
+  border-color: var(--uk-blue);
+  color: var(--uk-blue);
+}
+
+[data-theme="dark"] .scramble-slot.filled {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.scramble-tile-btn, .word-tile-btn, .btn-kb-key {
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scramble-tile-btn:hover:not(:disabled), .word-tile-btn:hover:not(:disabled), .btn-kb-key:hover:not(:disabled) {
+  border-color: var(--uk-blue);
+  transform: translateY(-2px);
+}
+
+.scramble-tile-btn.used, .word-tile-btn.used {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .daily-challenge-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .match-game-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 
