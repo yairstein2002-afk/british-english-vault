@@ -1413,6 +1413,8 @@ function loadAIUI() {
 
 function initAIHandlers() {
   const actions = [
+    { btnId: 'btn-ai-english-spoken', mode: 'english-spoken' },
+    { btnId: 'btn-ai-british-spoken', mode: 'british-spoken' },
     { btnId: 'btn-ai-explore', mode: 'explore' },
     { btnId: 'btn-ai-grammar', mode: 'grammar' },
     { btnId: 'btn-ai-tutor', mode: 'tutor' },
@@ -1431,7 +1433,7 @@ function initAIHandlers() {
       }
 
       const apiKey = getGeminiApiKey();
-      if (!apiKey) {
+      if (!apiKey && mode !== 'english-spoken' && mode !== 'british-spoken') {
         showBannerAlert("Please configure your Gemini API Key in Settings first.", "error");
         navigateTo('settings');
         return;
@@ -1440,6 +1442,20 @@ function initAIHandlers() {
       // Show loading panel, hide response
       const loadingPanel = document.getElementById('ai-loading');
       const responsePanel = document.getElementById('ai-response');
+      const loadingTitle = document.querySelector('#ai-loading h4');
+      const loadingDesc = document.querySelector('#ai-loading p');
+
+      if (mode === 'english-spoken') {
+        if (loadingTitle) loadingTitle.innerText = "Analyzing Spoken English Phrasing...";
+        if (loadingDesc) loadingDesc.innerText = "Checking how native speakers say this in real everyday conversations.";
+      } else if (mode === 'british-spoken') {
+        if (loadingTitle) loadingTitle.innerText = "Converting to Authentic British English...";
+        if (loadingDesc) loadingDesc.innerText = "Transforming vocabulary, British idioms, and UK slang.";
+      } else {
+        if (loadingTitle) loadingTitle.innerText = "Tuning in with British AI Tutor...";
+        if (loadingDesc) loadingDesc.innerText = "Fetching structured definitions and audio examples.";
+      }
+
       loadingPanel.style.display = 'block';
       responsePanel.style.display = 'none';
       responsePanel.innerHTML = '';
@@ -1627,7 +1643,136 @@ function renderAIResponse(mode, data) {
         </div>
       </div>
     `;
+  } else if (mode === 'english-spoken') {
+    const statusLower = (data.status || '').toLowerCase();
+    const isNatural = statusLower.includes('natural') && !statusLower.includes('unnatural');
+    const badgeClass = isNatural ? 'correct' : 'spoken';
+    const badgeIcon = isNatural ? 'fa-circle-check' : 'fa-comments';
+
+    const alternativesHTML = (data.alternatives && data.alternatives.length > 0) ? `
+      <div class="ai-section" style="margin-top: 1.25rem;">
+        <h4>Alternative Spoken Expressions (ביטויים מדוברים נוספים)</h4>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          ${data.alternatives.map(alt => `
+            <span class="reward-tag ai-pill-input" data-val="${alt.replace(/"/g, '&quot;')}" style="background: rgba(0, 36, 125, 0.08); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2); font-size: 0.9rem; padding: 0.45rem 0.85rem; cursor: pointer;" title="Click to test in AI box">
+              <i class="fa-solid fa-comment-dots"></i> ${alt}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    container.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <div class="ai-badge ${badgeClass}" style="margin-bottom: 0;">
+          <i class="fa-solid ${badgeIcon}"></i> ${data.status || 'Natural Spoken English'}
+        </div>
+        ${data.context ? `<span class="category-pill" style="margin: 0; font-size: 0.8rem;"><i class="fa-solid fa-tag"></i> ${data.context}</span>` : ''}
+      </div>
+
+      <div class="ai-section">
+        <h4>Natural Spoken English (איך שמדברים באמת)</h4>
+        <div class="ai-correction-text" style="font-size: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <span>"${data.spokenVersion}"</span>
+          <div class="sentence-speech-toolbar" style="margin: 0;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="Listen to pronunciation">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+
+      <div class="ai-section">
+        <h4>Why Native Speakers Use This (הסבר למה כך מדברים)</h4>
+        <p style="font-size: 1.05rem; line-height: 1.6;">${data.explanation}</p>
+      </div>
+
+      <div class="ai-section">
+        <h4>Real-Life Spoken Conversation Example (דוגמה משיחה אמיתית)</h4>
+        <div class="ai-example-box">
+          <div class="example-text">"${data.spokenExample}"</div>
+          <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="Speak sentence">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
+          </div>
+        </div>
+      </div>
+
+      ${alternativesHTML}
+    `;
+  } else if (mode === 'british-spoken') {
+    const relatedHTML = (data.relatedBritishTerms && data.relatedBritishTerms.length > 0) ? `
+      <div class="ai-section" style="margin-top: 1.25rem;">
+        <h4>Related British Expressions (ביטויים בריטיים קשורים)</h4>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
+          ${data.relatedBritishTerms.map(term => `
+            <span class="reward-tag ai-pill-input" data-val="${term.replace(/"/g, '&quot;')}" style="background: rgba(200, 16, 46, 0.08); color: var(--uk-red); border-color: rgba(200, 16, 46, 0.2); font-size: 0.9rem; padding: 0.45rem 0.85rem; cursor: pointer;" title="Click to test in AI box">
+              <i class="fa-solid fa-crown"></i> ${term}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    container.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.25rem;">
+        <div class="ai-badge british" style="background-color: rgba(200, 16, 46, 0.1); color: var(--uk-red); border: 1px solid rgba(200, 16, 46, 0.3); margin-bottom: 0;">
+          <i class="fa-solid fa-crown"></i> 🇬🇧 ${data.britishSlangLevel || 'Authentic British English'}
+        </div>
+        ${data.usOrNeutral ? `<span class="category-pill" style="margin: 0; font-size: 0.8rem;">Standard / US: ${data.usOrNeutral}</span>` : ''}
+      </div>
+
+      <div class="ai-section">
+        <h4>Authentic British Expression (באנגלית בריטית אותנטית ומדוברת)</h4>
+        <div class="ai-correction-text" style="font-size: 1.5rem; border-left-color: var(--uk-red); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <span style="color: var(--uk-red);">"${data.britishVersion}"</span>
+          <div class="sentence-speech-toolbar" style="margin: 0;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="Listen to British pronunciation">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+
+      <div class="ai-section">
+        <h4>British Cultural Context & Usage (הסבר תרבותי ובריטי)</h4>
+        <p style="font-size: 1.05rem; line-height: 1.6;">${data.explanation}</p>
+      </div>
+
+      <div class="ai-section">
+        <h4>Quintessential British Dialogue (דוגמה מדוברת בסגנון בריטי)</h4>
+        <div class="ai-example-box" style="border-left: 3px solid var(--uk-blue);">
+          <div class="example-text">"${data.britishExample}"</div>
+          <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
+            <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="Speak British sentence">
+              <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (Pure British Accent)</span>
+          </div>
+        </div>
+      </div>
+
+      ${relatedHTML}
+    `;
   }
+
+  // Bind click on interactive suggestion pills to fill textarea
+  container.querySelectorAll('.ai-pill-input').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const term = pill.getAttribute('data-val');
+      const inputEl = document.getElementById('ai-input');
+      if (inputEl && term) {
+        inputEl.value = term;
+        inputEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
 
   // Bind speak click event listeners to speech buttons
   const speakButtons = container.querySelectorAll('.ai-speak-btn');

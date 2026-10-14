@@ -1069,15 +1069,21 @@
         <section id="view-ai" class="view-section">
           <div class="card form-card">
             <h3><i class="fa-solid fa-robot"></i> AI Study Assistant</h3>
-            <p class="panel-desc">Ask questions, explore word context, check grammar, or translate Hebrew phrases using Google Gemini 1.5 Flash.</p>
+            <p class="panel-desc">Check natural spoken English, convert to authentic British slang, check grammar, explore vocabulary, or translate with AI.</p>
             
             <div class="form-group">
               <label for="ai-input" class="form-label">Type your text, word, sentence, or question:</label>
-              <textarea id="ai-input" class="form-control" rows="4" placeholder="Enter English text to check grammar/explore, or Hebrew text to translate..."></textarea>
+              <textarea id="ai-input" class="form-control" rows="4" placeholder="Enter English text to check spoken phrasing or British slang, or Hebrew text to translate... (e.g. 'very hungry', 'apartment', 'I am very tired', 'Do you want tea?')"></textarea>
             </div>
             
             <!-- AI Action Buttons -->
             <div class="ai-actions-grid">
+              <button id="btn-ai-english-spoken" class="btn btn-primary" style="background: linear-gradient(135deg, var(--uk-blue) 0%, #1e3a8a 100%); color: white; border: none; font-weight: 700;">
+                <i class="fa-solid fa-comments"></i> 🗣️ English Spoken
+              </button>
+              <button id="btn-ai-british-spoken" class="btn btn-primary" style="background: linear-gradient(135deg, var(--uk-red) 0%, #991b1b 100%); color: white; border: none; font-weight: 700;">
+                <i class="fa-solid fa-crown"></i> 🇬🇧 British Spoken
+              </button>
               <button id="btn-ai-explore" class="btn btn-secondary">
                 <i class="fa-solid fa-magnifying-glass"></i> Explore Word
               </button>

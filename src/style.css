@@ -1838,6 +1838,39 @@ button, input, select, textarea {
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
+.ai-badge.spoken {
+  background-color: rgba(0, 36, 125, 0.1);
+  color: var(--uk-blue);
+  border: 1px solid rgba(0, 36, 125, 0.25);
+}
+
+[data-theme="dark"] .ai-badge.spoken {
+  background-color: rgba(212, 175, 55, 0.15);
+  color: var(--gold);
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.ai-badge.british {
+  background-color: rgba(200, 16, 46, 0.1);
+  color: var(--uk-red);
+  border: 1px solid rgba(200, 16, 46, 0.25);
+}
+
+[data-theme="dark"] .ai-badge.british {
+  background-color: rgba(239, 68, 68, 0.18);
+  color: #F87171;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.ai-pill-input {
+  transition: all 0.2s ease;
+}
+
+.ai-pill-input:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+}
+
 .ai-section {
   margin-bottom: 1.5rem;
 }
