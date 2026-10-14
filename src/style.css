@@ -1794,6 +1794,84 @@ button, input, select, textarea {
   margin-top: 1.25rem;
 }
 
+.ai-actions-grid button {
+  color: #FFFFFF !important;
+  border: none !important;
+  font-weight: 700;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md, 10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.ai-actions-grid button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.ai-actions-grid button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.ai-actions-grid button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+#btn-ai-english-spoken {
+  background: linear-gradient(135deg, #00247D 0%, #1E3A8A 100%) !important;
+  box-shadow: 0 4px 12px rgba(0, 36, 125, 0.25);
+}
+#btn-ai-english-spoken:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(0, 36, 125, 0.4);
+}
+
+#btn-ai-british-spoken {
+  background: linear-gradient(135deg, #C8102E 0%, #991B1B 100%) !important;
+  box-shadow: 0 4px 12px rgba(200, 16, 46, 0.25);
+}
+#btn-ai-british-spoken:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(200, 16, 46, 0.4);
+}
+
+#btn-ai-explore {
+  background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%) !important;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+#btn-ai-explore:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(13, 148, 136, 0.4);
+}
+
+#btn-ai-grammar {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+#btn-ai-grammar:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4);
+}
+
+#btn-ai-tutor {
+  background: linear-gradient(135deg, #D97706 0%, #B45309 100%) !important;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+#btn-ai-tutor:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(217, 119, 6, 0.4);
+}
+
+#btn-ai-translate {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+#btn-ai-translate:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);
+}
+
 .ai-loader-spinner {
   width: 48px;
   height: 48px;
