@@ -2076,6 +2076,14 @@ function initGamesEventListeners() {
       document.getElementById('game-active-panel').style.display = 'none';
     });
   }
+
+  const exitBtnX = document.getElementById('btn-active-panel-close-x');
+  if (exitBtnX) {
+    exitBtnX.addEventListener('click', () => {
+      document.getElementById('games-hub-panel').style.display = 'block';
+      document.getElementById('game-active-panel').style.display = 'none';
+    });
+  }
 }
 
 function launchGame(gameKey, isDaily = false) {
@@ -2142,13 +2150,53 @@ function launchGame(gameKey, isDaily = false) {
 
     awardGameRewards(vaultData, xpAward, coinAward, gameKey, correctCount === totalCount, saveDatabase);
 
+    // Dynamic praise & spoken feedback depending on the user's score
+    let feedbackAudio = '';
+    let feedbackHebrew = '';
+    let feedbackBadge = '';
+
+    if (percentage === 100) {
+      feedbackAudio = "Splendid! Absolutely chuffed with your perfect score! You are a true British English master.";
+      feedbackHebrew = "מושלם! 10 מתוך 10! שליטה מוחלטת באנגלית בריטית!";
+      feedbackBadge = "👑 ציון מושלם (Perfect Score)";
+    } else if (percentage >= 80) {
+      feedbackAudio = "Brilliant work! Jolly good effort, you are doing wonderfully!";
+      feedbackHebrew = "עבודה מבריקה! ציון מעולה, המשך כך!";
+      feedbackBadge = "🏆 הצטיינות (Excellent)";
+    } else if (percentage >= 60) {
+      feedbackAudio = "Good job! Practice makes perfect, keep at it and have another go.";
+      feedbackHebrew = "יפה מאוד! תוצאה טובה, עוד קצת תרגול ותגיע לשלמות.";
+      feedbackBadge = "👍 תוצאה טובה (Good Job)";
+    } else {
+      feedbackAudio = "Chin up! Keep practicing every day and you will master it in no time.";
+      feedbackHebrew = "לא נורא! כל טעות היא שלב בלמידה, שחק שוב ותשתפר!";
+      feedbackBadge = "💪 תרגול מביא להצלחה (Keep Trying)";
+    }
+
     stageEl.innerHTML = `
-      <div class="text-center card game-summary-card" style="padding: 2.5rem 1.5rem; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+      <div class="text-center card game-summary-card" style="position: relative; padding: 2.5rem 1.5rem; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+        <!-- Top Corner 'X' Close Button -->
+        <button id="btn-summary-close-x" class="btn-close-x" title="יציאה וחזרה למשחקים (Exit to Games Hub)">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
         <div class="trophy-icon" style="font-size: 3.5rem; color: ${percentage >= 70 ? 'var(--gold)' : 'var(--uk-blue)'}; margin-bottom: 0.75rem;">
           <i class="fa-solid ${percentage >= 90 ? 'fa-crown' : percentage >= 70 ? 'fa-trophy' : 'fa-award'}"></i>
         </div>
         <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.25rem;">${result.title}</h3>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">${result.details || 'סיימת בהצלחה את כל 10 השאלות!'}</p>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.25rem;">${result.details || 'סיימת בהצלחה את כל 10 השאלות!'}</p>
+
+        <!-- Spoken Feedback According to Score -->
+        <div class="summary-speech-box">
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="category-pill" style="margin: 0; font-size: 0.8rem;">${feedbackBadge}</span>
+            <button class="mini-speak-btn" id="btn-replay-feedback-audio" title="השמע משוב שוב (Play Voice Feedback)" style="width: 28px; height: 28px; font-size: 0.85rem;">
+              <i class="fa-solid fa-volume-high"></i>
+            </button>
+          </div>
+          <div class="summary-speech-quote">"${feedbackAudio}"</div>
+          <div class="summary-speech-hebrew">${feedbackHebrew}</div>
+        </div>
 
         <!-- 3 Performance Stat Cards -->
         <div class="results-stats-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
@@ -2187,6 +2235,20 @@ function launchGame(gameKey, isDaily = false) {
     `;
 
     renderGamesUI();
+
+    // Automatically speak the score feedback phrase out loud with UK accent
+    setTimeout(() => {
+      speakText(feedbackAudio);
+    }, 450);
+
+    stageEl.querySelector('#btn-replay-feedback-audio')?.addEventListener('click', () => {
+      speakText(feedbackAudio);
+    });
+
+    stageEl.querySelector('#btn-summary-close-x')?.addEventListener('click', () => {
+      if (hubPanel) hubPanel.style.display = 'block';
+      if (activePanel) activePanel.style.display = 'none';
+    });
 
     stageEl.querySelector('#btn-play-again').addEventListener('click', () => {
       launchGame(gameKey, isDaily);

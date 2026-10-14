@@ -3220,4 +3220,71 @@ button, input, select, textarea {
   animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Game Summary Close 'X' Button */
+.btn-close-x {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 10;
+}
+
+[dir="rtl"] .btn-close-x {
+  right: auto;
+  left: 1rem;
+}
+
+.btn-close-x:hover {
+  background-color: var(--danger-light) !important;
+  color: var(--danger) !important;
+  border-color: var(--danger) !important;
+  transform: scale(1.12);
+}
+
+.summary-speech-box {
+  background: rgba(0, 36, 125, 0.05);
+  border: 1px solid rgba(0, 36, 125, 0.15);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  margin: 1rem 0 1.5rem 0;
+  text-align: center;
+  position: relative;
+}
+
+[data-theme="dark"] .summary-speech-box {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.summary-speech-quote {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--uk-blue);
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  margin: 0.5rem 0 0.25rem 0;
+  line-height: 1.4;
+}
+
+[data-theme="dark"] .summary-speech-quote {
+  color: var(--gold);
+}
+
+.summary-speech-hebrew {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 
