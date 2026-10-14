@@ -3062,4 +3062,51 @@ button, input, select, textarea {
   }
 }
 
+/* Universal Game Option Answer Styles */
+.correct-answer,
+.btn.correct-answer,
+.btn.correct {
+  background-color: var(--success-light) !important;
+  border-color: var(--success) !important;
+  color: var(--success) !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .correct-answer,
+[data-theme="dark"] .btn.correct-answer,
+[data-theme="dark"] .btn.correct {
+  background-color: rgba(16, 185, 129, 0.25) !important;
+  border-color: #10B981 !important;
+  color: #34D399 !important;
+}
+
+.wrong-selected,
+.btn.wrong-selected,
+.btn.incorrect {
+  background-color: var(--danger-light) !important;
+  border-color: var(--danger) !important;
+  color: var(--danger) !important;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .wrong-selected,
+[data-theme="dark"] .btn.wrong-selected,
+[data-theme="dark"] .btn.incorrect {
+  background-color: rgba(239, 68, 68, 0.25) !important;
+  border-color: #EF4444 !important;
+  color: #F87171 !important;
+}
+
+.game-round-header {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 0.85rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.25rem;
+}
+
+.game-summary-card {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
 

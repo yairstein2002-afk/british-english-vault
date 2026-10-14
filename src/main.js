@@ -1983,39 +1983,59 @@ function launchGame(gameKey, isDaily = false) {
   if (stageEl) stageEl.innerHTML = '';
 
   const handleGameComplete = (result) => {
-    let xpAward = result.xp || 20;
-    let coinAward = result.coins || 5;
+    const totalCount = result.total || 10;
+    const correctCount = result.correct !== undefined ? result.correct : (result.isPerfect ? totalCount : Math.round(totalCount * 0.8));
+    const percentage = result.percentage !== undefined ? result.percentage : Math.round((correctCount / totalCount) * 100);
+
+    let xpAward = result.xp !== undefined ? result.xp : (correctCount * 10);
+    let coinAward = result.coins !== undefined ? result.coins : (correctCount * 2);
 
     if (isDaily) {
       xpAward += 50;
       coinAward += 20;
     }
 
-    awardGameRewards(vaultData, xpAward, coinAward, gameKey, result.isPerfect || false, saveDatabase);
+    awardGameRewards(vaultData, xpAward, coinAward, gameKey, correctCount === totalCount, saveDatabase);
 
     stageEl.innerHTML = `
-      <div class="text-center card" style="padding: 2.5rem 1.5rem;">
-        <div class="trophy-icon" style="font-size: 3.5rem; color: var(--gold); margin-bottom: 1rem;">
-          <i class="fa-solid fa-trophy"></i>
+      <div class="text-center card game-summary-card" style="padding: 2.5rem 1.5rem; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
+        <div class="trophy-icon" style="font-size: 3.5rem; color: ${percentage >= 70 ? 'var(--gold)' : 'var(--uk-blue)'}; margin-bottom: 0.75rem;">
+          <i class="fa-solid ${percentage >= 90 ? 'fa-crown' : percentage >= 70 ? 'fa-trophy' : 'fa-award'}"></i>
         </div>
-        <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.5rem;">${result.title}</h3>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">${result.details}</p>
+        <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.25rem;">${result.title}</h3>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.5rem;">${result.details || 'סיימת בהצלחה את כל 10 השאלות!'}</p>
 
-        <div class="reward-tags" style="justify-content: center; margin-bottom: 2rem; scale: 1.2;">
-          <span class="reward-tag" style="background-color: rgba(0, 36, 125, 0.1); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2);">
-            <i class="fa-solid fa-bolt"></i> +${xpAward} XP Earned
+        <!-- 3 Performance Stat Cards -->
+        <div class="results-stats-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+          <div class="results-stat-card" style="background: rgba(0, 36, 125, 0.05); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(0, 36, 125, 0.1);">
+            <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: var(--uk-blue); display: block;">${correctCount} / ${totalCount}</span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">תשובות נכונות<br><span style="font-size: 0.75rem; font-weight: normal;">(Correct)</span></span>
+          </div>
+          <div class="results-stat-card success" style="background: rgba(16, 185, 129, 0.08); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+            <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: #10B981; display: block;">${percentage}%</span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">אחוז הצלחה<br><span style="font-size: 0.75rem; font-weight: normal;">(Success Rate)</span></span>
+          </div>
+          <div class="results-stat-card" style="background: rgba(212, 175, 55, 0.1); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.25);">
+            <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: var(--gold); display: block;">+${xpAward}</span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">ניקוד סופי<br><span style="font-size: 0.75rem; font-weight: normal;">(Final XP)</span></span>
+          </div>
+        </div>
+
+        <div class="reward-tags" style="justify-content: center; margin-bottom: 2rem;">
+          <span class="reward-tag" style="background-color: rgba(0, 36, 125, 0.1); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2); font-size: 0.95rem; padding: 0.5rem 1rem;">
+            <i class="fa-solid fa-bolt"></i> +${xpAward} XP נצברו
           </span>
-          <span class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border-color: rgba(212, 175, 55, 0.3);">
-            <i class="fa-solid fa-coins"></i> +${coinAward} Coins Earned
+          <span class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border-color: rgba(212, 175, 55, 0.3); font-size: 0.95rem; padding: 0.5rem 1rem;">
+            <i class="fa-solid fa-coins"></i> +${coinAward} מטבעות
           </span>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 1rem;">
-          <button class="btn btn-primary" id="btn-play-again">
-            <i class="fa-solid fa-rotate-right"></i> Play Again
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btn-play-again" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+            <i class="fa-solid fa-rotate-right"></i> שחק שוב (Play Again)
           </button>
-          <button class="btn btn-secondary" id="btn-back-hub">
-            <i class="fa-solid fa-gamepad"></i> Games Hub
+          <button class="btn btn-secondary" id="btn-back-hub" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
+            <i class="fa-solid fa-gamepad"></i> חזרה למשחקים (Games Hub)
           </button>
         </div>
       </div>
