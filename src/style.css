@@ -765,6 +765,37 @@ button, input, select, textarea {
   color: var(--gold);
 }
 
+.sentence-speech-toolbar .mini-copy-btn,
+.mini-copy-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  padding: 2px;
+}
+
+.sentence-speech-toolbar .mini-copy-btn:hover,
+.mini-copy-btn:hover {
+  color: var(--uk-blue);
+  transform: scale(1.15);
+}
+
+[data-theme="dark"] .sentence-speech-toolbar .mini-copy-btn:hover,
+[data-theme="dark"] .mini-copy-btn:hover {
+  color: var(--gold);
+}
+
+.sentence-speech-toolbar .mini-copy-btn.copied,
+.mini-copy-btn.copied {
+  color: var(--success) !important;
+  transform: scale(1.15);
+}
+
 .sentence-speech-toolbar select {
   font-size: 0.75rem;
   border: none;

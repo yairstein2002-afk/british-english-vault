@@ -1523,6 +1523,9 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
+            </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
           </div>
         </div>
@@ -1545,6 +1548,9 @@ function renderAIResponse(mode, data) {
         <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
           <button class="mini-speak-btn ai-speak-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="Speak sentence">
             <i class="fa-solid fa-circle-play"></i>
+          </button>
+          <button class="mini-copy-btn ai-copy-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <i class="fa-regular fa-copy"></i>
           </button>
           <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
         </div>
@@ -1569,6 +1575,9 @@ function renderAIResponse(mode, data) {
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
           </div>
@@ -1595,6 +1604,9 @@ function renderAIResponse(mode, data) {
                 <button class="mini-speak-btn ai-speak-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="Speak sentence">
                   <i class="fa-solid fa-circle-play"></i>
                 </button>
+                <button class="mini-copy-btn ai-copy-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
                 <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
               </div>
             </div>
@@ -1619,6 +1631,9 @@ function renderAIResponse(mode, data) {
           <button class="mini-speak-btn ai-speak-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="Speak sentence">
             <i class="fa-solid fa-circle-play"></i>
           </button>
+          <button class="mini-copy-btn ai-copy-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <i class="fa-regular fa-copy"></i>
+          </button>
           <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
         </div>
       </div>
@@ -1637,6 +1652,9 @@ function renderAIResponse(mode, data) {
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
           </div>
@@ -1678,6 +1696,9 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="Listen to pronunciation">
               <i class="fa-solid fa-circle-play"></i>
             </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -1696,6 +1717,9 @@ function renderAIResponse(mode, data) {
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
           </div>
@@ -1734,6 +1758,9 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="Listen to British pronunciation">
               <i class="fa-solid fa-circle-play"></i>
             </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -1752,6 +1779,9 @@ function renderAIResponse(mode, data) {
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="Speak British sentence">
               <i class="fa-solid fa-circle-play"></i>
+            </button>
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+              <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (Pure British Accent)</span>
           </div>
@@ -1786,6 +1816,44 @@ function renderAIResponse(mode, data) {
         console.error(err);
       } finally {
         btn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
+      }
+    });
+  });
+
+  // Bind copy click event listeners to copy buttons
+  const copyButtons = container.querySelectorAll('.ai-copy-btn');
+  copyButtons.forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const textToCopy = btn.getAttribute('data-text');
+      if (!textToCopy) return;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(textToCopy);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = textToCopy;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+        }
+
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success);"></i>';
+        btn.classList.add('copied');
+        btn.setAttribute('title', 'הועתק! (Copied!)');
+
+        setTimeout(() => {
+          btn.innerHTML = originalHTML;
+          btn.classList.remove('copied');
+          btn.setAttribute('title', 'העתק משפט (Copy sentence)');
+        }, 1800);
+      } catch (err) {
+        console.error('Failed to copy text:', err);
       }
     });
   });
