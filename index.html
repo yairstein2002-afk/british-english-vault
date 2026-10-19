@@ -20,7 +20,7 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-BG-pnN_x.js"></script>
+  <script type="module" crossorigin src="/assets/index-QmFq5l5U.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-BhGFajjW.css">
 </head>
 <body>
@@ -470,9 +470,18 @@
 
           <!-- Main Games Hub Panel -->
           <div id="games-hub-panel">
-            <div class="games-hub-header" style="margin-bottom: 1.5rem;">
+            <div class="games-hub-header" style="margin-bottom: 1.25rem;">
               <h3 class="panel-title"><i class="fa-solid fa-gamepad" style="color: var(--uk-blue);"></i> Choose a Mini-Game</h3>
-              <p class="panel-desc">Quick 2–5 minute interactive learning challenges to boost your vocabulary and grammar.</p>
+              <p class="panel-desc">20 interactive rounds per game to boost your British English vocabulary and grammar.</p>
+            </div>
+
+            <!-- Games Search Bar -->
+            <div class="search-bar" style="margin-bottom: 1.15rem; max-width: 100%; position: relative;">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="games-search-input" placeholder="חיפוש משחק לפי שם, נושא או קטגוריה... (Search 34 mini-games...)" autocomplete="off">
+              <button id="games-search-clear" class="btn-close-x" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; font-size: 0.8rem;" title="נקה חיפוש (Clear search)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
             </div>
             
             <!-- Game Category Filter Chips -->
@@ -860,6 +869,13 @@
                 </div>
                 <button class="btn btn-primary btn-block btn-launch-game" data-game="word-connections">Play 🧩</button>
               </div>
+            </div>
+
+            <!-- Empty state when search finds no matching games -->
+            <div id="games-no-results" class="card text-center" style="display: none; padding: 2.5rem 1rem; margin-top: 1rem; color: var(--text-muted);">
+              <i class="fa-solid fa-gamepad" style="font-size: 2.2rem; margin-bottom: 0.75rem; color: var(--uk-blue);"></i>
+              <h4 style="margin-bottom: 0.35rem; color: var(--text-main);">לא נמצאו משחקים תואמים לחיפוש (No matching games found)</h4>
+              <p style="font-size: 0.9rem;">נסה לחפש מילה אחרת או לבחור קטגוריה אחרת.</p>
             </div>
           </div>
 
