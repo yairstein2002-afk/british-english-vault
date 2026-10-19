@@ -353,7 +353,7 @@ export function startQuickChoiceGame(stageEl, vaultData, onComplete = () => {}) 
   const allVault = getAllVaultItems(vaultData);
   let currentIdx = 0;
   let score = 0;
-  let timerVal = 10;
+  let timerVal = 30;
   let timerInterval = null;
 
   const renderQuestion = () => {
@@ -386,7 +386,7 @@ export function startQuickChoiceGame(stageEl, vaultData, onComplete = () => {}) 
       ${renderGameHeader('⚡ Quick Choice', currentIdx + 1, questions.length, score)}
 
       <div class="quick-choice-header" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-        <span class="timer-badge" id="qc-timer" style="font-weight: 700; color: var(--danger);"><i class="fa-solid fa-clock"></i> <b id="qc-timer-num">10</b>s</span>
+        <span class="timer-badge" id="qc-timer" style="font-weight: 700; color: var(--danger);"><i class="fa-solid fa-clock"></i> <b id="qc-timer-num">30</b>s</span>
         <div style="flex: 1; margin-left: 1rem; background: rgba(0,0,0,0.06); height: 6px; border-radius: 999px; overflow: hidden;">
           <div id="qc-timer-fill" style="width: 100%; height: 100%; background: var(--danger); transition: width 1s linear;"></div>
         </div>
@@ -421,14 +421,14 @@ export function startQuickChoiceGame(stageEl, vaultData, onComplete = () => {}) 
       });
     }
 
-    timerVal = 10;
+    timerVal = 30;
     const timerNum = stageEl.querySelector('#qc-timer-num');
     const timerFill = stageEl.querySelector('#qc-timer-fill');
 
     timerInterval = setInterval(() => {
       timerVal--;
       if (timerNum) timerNum.innerText = timerVal;
-      if (timerFill) timerFill.style.width = `${(timerVal / 10) * 100}%`;
+      if (timerFill) timerFill.style.width = `${(timerVal / 30) * 100}%`;
 
       if (timerVal <= 0) {
         clearInterval(timerInterval);
