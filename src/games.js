@@ -230,10 +230,10 @@ export function renderGameHeader(title, current, total = 20, score = 0) {
         <span class="category-pill" style="margin: 0; font-size: 0.85rem;"><i class="fa-solid fa-gamepad"></i> ${title}</span>
         <div style="display: flex; align-items: center; gap: 1rem;">
           <span style="font-weight: 700; color: var(--gold); font-size: 0.95rem;">
-            <i class="fa-solid fa-trophy"></i> ניקוד (Score): <span class="score-display">${score}</span>
+            <i class="fa-solid fa-trophy"></i> Score: <span class="score-display">${score}</span>
           </span>
           <span style="font-weight: 700; color: var(--uk-blue); font-size: 0.95rem;">
-            שאלה ${current} מתוך ${total} <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: normal;">(Q ${current}/${total})</span>
+            Question ${current} of ${total}
           </span>
         </div>
       </div>
@@ -612,9 +612,9 @@ export function startWordScrambleGame(stageEl, vaultData, onComplete = () => {})
       </div>
 
       <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
-        <button class="btn btn-secondary" id="btn-clear-scramble"><i class="fa-solid fa-rotate-left"></i> נקה (Clear)</button>
-        <button class="btn btn-primary" id="btn-submit-scramble"><i class="fa-solid fa-circle-check"></i> בדוק (Submit)</button>
-        <button class="btn btn-secondary" id="btn-skip-scramble" style="opacity: 0.85;"><i class="fa-solid fa-forward"></i> דלג (Skip)</button>
+        <button class="btn btn-secondary" id="btn-clear-scramble"><i class="fa-solid fa-rotate-left"></i> Clear</button>
+        <button class="btn btn-primary" id="btn-submit-scramble"><i class="fa-solid fa-circle-check"></i> Submit</button>
+        <button class="btn btn-secondary" id="btn-skip-scramble" style="opacity: 0.85;"><i class="fa-solid fa-forward"></i> Skip</button>
       </div>
     `;
 
@@ -803,23 +803,23 @@ export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
         <p style="color: var(--text-muted); margin-bottom: 1rem;">"${currentItem.example || currentItem.meaning}"</p>
         
         <button class="btn btn-secondary" id="btn-listen-target" style="margin-bottom: 1.25rem;">
-          <i class="fa-solid fa-volume-high"></i> השמע קודם במבטא בריטי (Listen UK)
+          <i class="fa-solid fa-volume-high"></i> Listen First (UK Accent)
         </button>
 
         <div id="speech-recognition-box">
           <button class="speech-btn speaking" id="btn-record-speech" style="width: 75px; height: 75px; font-size: 2rem; margin: 0 auto 0.75rem; border-radius: 50%;">
             <i class="fa-solid fa-microphone"></i>
           </button>
-          <p id="speech-status-text" style="font-size: 0.9rem; font-weight: 600;">לחץ על המיקרופון ואמור את המילה בקול רם</p>
+          <p id="speech-status-text" style="font-size: 0.9rem; font-weight: 600;">Tap the microphone and say the word out loud</p>
         </div>
       </div>
 
       <div class="text-center" style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
         <button class="btn btn-primary" id="btn-verify-pronunciation">
-          <i class="fa-solid fa-circle-check"></i> הגיתי נכון! (+XP)
+          <i class="fa-solid fa-circle-check"></i> I Pronounced It! (+XP)
         </button>
         <button class="btn btn-secondary" id="btn-skip-sayit">
-          <i class="fa-solid fa-forward"></i> הבא (Next)
+          <i class="fa-solid fa-forward"></i> Next
         </button>
       </div>
     `;
@@ -838,7 +838,7 @@ export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
       recognition.interimResults = false;
 
       micBtn.addEventListener('click', () => {
-        statusText.innerText = 'מקשיב... דבר עכשיו!';
+        statusText.innerText = 'Listening... Speak now!';
         micBtn.classList.add('speaking');
         try {
           recognition.start();
@@ -847,9 +847,9 @@ export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
 
       recognition.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        statusText.innerText = `נשמע: "${transcript}"`;
+        statusText.innerText = `Heard: "${transcript}"`;
         if (transcript.toLowerCase().includes(currentItem.term.toLowerCase())) {
-          statusText.innerHTML = `<span style="color: var(--success);">✓ הגייה מצוינת! נשמע: "${transcript}"</span>`;
+          statusText.innerHTML = `<span style="color: var(--success);">✓ Spot on pronunciation! Heard: "${transcript}"</span>`;
           score++;
           recordGameSuccess(vaultData, currentItem.id);
           setTimeout(() => {
@@ -857,17 +857,17 @@ export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
             renderSayIt();
           }, 1200);
         } else {
-          statusText.innerHTML = `<span style="color: var(--gold);">ניסיון טוב! נשמע: "${transcript}"</span>`;
+          statusText.innerHTML = `<span style="color: var(--gold);">Good try! Heard: "${transcript}"</span>`;
         }
       };
 
       recognition.onerror = () => {
-        statusText.innerText = 'לא הצלחנו לגשת למיקרופון. תוכל ללחוץ על "הגיתי נכון!" למטה.';
+        statusText.innerText = 'Could not access microphone. You can click "I Pronounced It!" below.';
       };
     } else {
       micBtn.addEventListener('click', () => {
         speakText(currentItem.term);
-        statusText.innerText = 'האזן להגייה הבריטית וחזור עליה בקול!';
+        statusText.innerText = 'Listen to the British pronunciation and repeat it aloud!';
       });
     }
 
@@ -946,7 +946,7 @@ export function startGuessWordGame(stageEl, vaultData, onComplete = () => {}) {
 
         <div class="text-center">
           <button class="btn btn-secondary" id="btn-skip-hangman" style="opacity: 0.85;">
-            <i class="fa-solid fa-forward"></i> דלג לשאלה הבאה (Skip)
+            <i class="fa-solid fa-forward"></i> Skip Question
           </button>
         </div>
       `;
@@ -1176,9 +1176,9 @@ export function startBuildSentenceGame(stageEl, vaultData, onComplete = () => {}
       </div>
 
       <div style="display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap;">
-        <button class="btn btn-secondary" id="btn-reset-sentence"><i class="fa-solid fa-rotate-left"></i> איפוס (Reset)</button>
-        <button class="btn btn-primary" id="btn-check-sentence"><i class="fa-solid fa-circle-check"></i> בדיקה (Check)</button>
-        <button class="btn btn-secondary" id="btn-skip-sentence" style="opacity: 0.85;"><i class="fa-solid fa-forward"></i> דלג (Skip)</button>
+        <button class="btn btn-secondary" id="btn-reset-sentence"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        <button class="btn btn-primary" id="btn-check-sentence"><i class="fa-solid fa-circle-check"></i> Check</button>
+        <button class="btn btn-secondary" id="btn-skip-sentence" style="opacity: 0.85;"><i class="fa-solid fa-forward"></i> Skip</button>
       </div>
     `;
 
@@ -1499,7 +1499,7 @@ export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
         <h4 style="margin-top: 0.75rem;">Listen to the UK pronunciation and type the spelling:</h4>
         
         <button class="btn btn-primary" id="btn-listen-spell" style="margin: 1.25rem 0; padding: 0.85rem 1.5rem;">
-          <i class="fa-solid fa-volume-high"></i> השמע מילה (Play Sound 🎧)
+          <i class="fa-solid fa-volume-high"></i> Play Sound 🎧
         </button>
 
         <div style="max-width: 320px; margin: 0 auto 1.25rem auto;">
@@ -1507,8 +1507,8 @@ export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
         </div>
 
         <div style="display: flex; justify-content: center; gap: 0.75rem;">
-          <button class="btn btn-primary" id="btn-submit-spell"><i class="fa-solid fa-paper-plane"></i> שלח (Submit)</button>
-          <button class="btn btn-secondary" id="btn-skip-spell"><i class="fa-solid fa-forward"></i> דלג (Skip)</button>
+          <button class="btn btn-primary" id="btn-submit-spell"><i class="fa-solid fa-paper-plane"></i> Submit</button>
+          <button class="btn btn-secondary" id="btn-skip-spell"><i class="fa-solid fa-forward"></i> Skip</button>
         </div>
       </div>
     `;
@@ -2253,8 +2253,8 @@ export function startFormalCasualGame(stageEl, vaultData, onComplete = () => {})
         <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">Is this expression Formal or Casual?</p>
 
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-          <button class="btn btn-primary fc-btn" data-type="Formal" style="padding: 0.85rem 2rem; font-size: 1.05rem;">🎩 Formal (רשמי)</button>
-          <button class="btn btn-secondary fc-btn" data-type="Casual" style="padding: 0.85rem 2rem; font-size: 1.05rem;">🗣️ Casual (יומיומי)</button>
+          <button class="btn btn-primary fc-btn" data-type="Formal" style="padding: 0.85rem 2rem; font-size: 1.05rem;">🎩 Formal</button>
+          <button class="btn btn-secondary fc-btn" data-type="Casual" style="padding: 0.85rem 2rem; font-size: 1.05rem;">🗣️ Casual</button>
         </div>
       </div>
     `;
@@ -2698,8 +2698,8 @@ export function startTrueFalseGame(stageEl, vaultData, onComplete = () => {}) {
         <h4 style="margin: 1.25rem 0; font-size: 1.2rem; line-height: 1.5;">"${q.statement}"</h4>
 
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-          <button class="btn btn-primary tf-btn" data-ans="True" style="padding: 0.85rem 2rem; font-size: 1.1rem;">✅ True (נכון)</button>
-          <button class="btn btn-secondary tf-btn" data-ans="False" style="padding: 0.85rem 2rem; font-size: 1.1rem;">❌ False (לא נכון)</button>
+          <button class="btn btn-primary tf-btn" data-ans="True" style="padding: 0.85rem 2rem; font-size: 1.1rem;">✅ True</button>
+          <button class="btn btn-secondary tf-btn" data-ans="False" style="padding: 0.85rem 2rem; font-size: 1.1rem;">❌ False</button>
         </div>
       </div>
     `;

@@ -484,14 +484,14 @@
                   type="text"
                   id="games-search-input"
                   class="games-search-input"
-                  placeholder="חיפוש משחק לפי שם, נושא או קטגוריה... (Search 34 mini-games...)"
+                  placeholder="Search 34 mini-games by name, topic, or category..."
                   autocomplete="off"
                 >
                 <div class="games-search-actions">
-                  <button id="games-search-clear" class="games-search-clear-btn" style="display: none;" title="נקה חיפוש (Clear search)">
+                  <button id="games-search-clear" class="games-search-clear-btn" style="display: none;" title="Clear search">
                     <i class="fa-solid fa-xmark"></i>
                   </button>
-                  <span id="games-search-count" class="games-search-count-badge">34 משחקים</span>
+                  <span id="games-search-count" class="games-search-count-badge">34 Games</span>
                 </div>
               </div>
             </div>
@@ -886,23 +886,23 @@
             <!-- Empty state when search finds no matching games -->
             <div id="games-no-results" class="card text-center" style="display: none; padding: 2.5rem 1rem; margin-top: 1rem; color: var(--text-muted);">
               <i class="fa-solid fa-gamepad" style="font-size: 2.2rem; margin-bottom: 0.75rem; color: var(--uk-blue);"></i>
-              <h4 style="margin-bottom: 0.35rem; color: var(--text-main);">לא נמצאו משחקים תואמים לחיפוש (No matching games found)</h4>
-              <p style="font-size: 0.9rem;">נסה לחפש מילה אחרת או לבחור קטגוריה אחרת.</p>
+              <h4 style="margin-bottom: 0.35rem; color: var(--text-main);">No matching games found</h4>
+              <p style="font-size: 0.9rem;">Try searching for a different keyword or selecting another category.</p>
             </div>
           </div>
 
           <!-- Active Play Screen Container -->
           <div id="game-active-panel" class="card" style="display: none;">
             <div class="game-play-header">
-              <button class="btn btn-secondary" id="btn-exit-game" title="חזרה למסך המשחקים (Exit to Games Hub)">
-                <i class="fa-solid fa-arrow-left"></i> יציאה (Exit Game)
+              <button class="btn btn-secondary" id="btn-exit-game" title="Exit to Games Hub">
+                <i class="fa-solid fa-arrow-left"></i> Exit Game
               </button>
               <h3 id="active-game-title">Game</h3>
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <div class="reward-tag game-status-badge">
                   <i class="fa-solid fa-star"></i> In Progress
                 </div>
-                <button class="btn-close-x" id="btn-active-panel-close-x" title="יציאה מהמשחק (Exit Game)" style="position: static; width: 34px; height: 34px;">
+                <button class="btn-close-x" id="btn-active-panel-close-x" title="Exit Game" style="position: static; width: 34px; height: 34px;">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>

@@ -1523,7 +1523,7 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1549,7 +1549,7 @@ function renderAIResponse(mode, data) {
           <button class="mini-speak-btn ai-speak-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="Speak sentence">
             <i class="fa-solid fa-circle-play"></i>
           </button>
-          <button class="mini-copy-btn ai-copy-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+          <button class="mini-copy-btn ai-copy-btn" data-text="${data.correction.replace(/"/g, '&quot;')}" title="Copy sentence">
             <i class="fa-regular fa-copy"></i>
           </button>
           <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1576,7 +1576,7 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1604,7 +1604,7 @@ function renderAIResponse(mode, data) {
                 <button class="mini-speak-btn ai-speak-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="Speak sentence">
                   <i class="fa-solid fa-circle-play"></i>
                 </button>
-                <button class="mini-copy-btn ai-copy-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+                <button class="mini-copy-btn ai-copy-btn" data-text="${ex.text.replace(/"/g, '&quot;')}" title="Copy sentence">
                   <i class="fa-regular fa-copy"></i>
                 </button>
                 <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1631,7 +1631,7 @@ function renderAIResponse(mode, data) {
           <button class="mini-speak-btn ai-speak-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="Speak sentence">
             <i class="fa-solid fa-circle-play"></i>
           </button>
-          <button class="mini-copy-btn ai-copy-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+          <button class="mini-copy-btn ai-copy-btn" data-text="${data.translation.replace(/"/g, '&quot;')}" title="Copy sentence">
             <i class="fa-regular fa-copy"></i>
           </button>
           <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1653,7 +1653,7 @@ function renderAIResponse(mode, data) {
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.example.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1669,7 +1669,7 @@ function renderAIResponse(mode, data) {
 
     const alternativesHTML = (data.alternatives && data.alternatives.length > 0) ? `
       <div class="ai-section" style="margin-top: 1.25rem;">
-        <h4>Alternative Spoken Expressions (ביטויים מדוברים נוספים)</h4>
+        <h4>Alternative Spoken Expressions</h4>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
           ${data.alternatives.map(alt => `
             <span class="reward-tag ai-pill-input" data-val="${alt.replace(/"/g, '&quot;')}" style="background: rgba(0, 36, 125, 0.08); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2); font-size: 0.9rem; padding: 0.45rem 0.85rem; cursor: pointer;" title="Click to test in AI box">
@@ -1689,14 +1689,14 @@ function renderAIResponse(mode, data) {
       </div>
 
       <div class="ai-section">
-        <h4>Natural Spoken English (איך שמדברים באמת)</h4>
+        <h4>Natural Spoken English</h4>
         <div class="ai-correction-text" style="font-size: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
           <span>"${data.spokenVersion}"</span>
           <div class="sentence-speech-toolbar" style="margin: 0;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="Listen to pronunciation">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenVersion.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -1706,19 +1706,19 @@ function renderAIResponse(mode, data) {
       <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
 
       <div class="ai-section">
-        <h4>Why Native Speakers Use This (הסבר למה כך מדברים)</h4>
+        <h4>Why Native Speakers Use This</h4>
         <p style="font-size: 1.05rem; line-height: 1.6;">${data.explanation}</p>
       </div>
 
       <div class="ai-section">
-        <h4>Real-Life Spoken Conversation Example (דוגמה משיחה אמיתית)</h4>
+        <h4>Real-Life Spoken Conversation Example</h4>
         <div class="ai-example-box">
           <div class="example-text">"${data.spokenExample}"</div>
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="Speak sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.spokenExample.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (UK Accent)</span>
@@ -1731,7 +1731,7 @@ function renderAIResponse(mode, data) {
   } else if (mode === 'british-spoken') {
     const relatedHTML = (data.relatedBritishTerms && data.relatedBritishTerms.length > 0) ? `
       <div class="ai-section" style="margin-top: 1.25rem;">
-        <h4>Related British Expressions (ביטויים בריטיים קשורים)</h4>
+        <h4>Related British Expressions</h4>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
           ${data.relatedBritishTerms.map(term => `
             <span class="reward-tag ai-pill-input" data-val="${term.replace(/"/g, '&quot;')}" style="background: rgba(200, 16, 46, 0.08); color: var(--uk-red); border-color: rgba(200, 16, 46, 0.2); font-size: 0.9rem; padding: 0.45rem 0.85rem; cursor: pointer;" title="Click to test in AI box">
@@ -1751,14 +1751,14 @@ function renderAIResponse(mode, data) {
       </div>
 
       <div class="ai-section">
-        <h4>Authentic British Expression (באנגלית בריטית אותנטית ומדוברת)</h4>
+        <h4>Authentic British Expression</h4>
         <div class="ai-correction-text" style="font-size: 1.5rem; border-left-color: var(--uk-red); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
           <span style="color: var(--uk-red);">"${data.britishVersion}"</span>
           <div class="sentence-speech-toolbar" style="margin: 0;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="Listen to British pronunciation">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishVersion.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
           </div>
@@ -1768,19 +1768,19 @@ function renderAIResponse(mode, data) {
       <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
 
       <div class="ai-section">
-        <h4>British Cultural Context & Usage (הסבר תרבותי ובריטי)</h4>
+        <h4>British Cultural Context & Usage</h4>
         <p style="font-size: 1.05rem; line-height: 1.6;">${data.explanation}</p>
       </div>
 
       <div class="ai-section">
-        <h4>Quintessential British Dialogue (דוגמה מדוברת בסגנון בריטי)</h4>
+        <h4>Quintessential British Dialogue</h4>
         <div class="ai-example-box" style="border-left: 3px solid var(--uk-blue);">
           <div class="example-text">"${data.britishExample}"</div>
           <div class="sentence-speech-toolbar" style="margin-top: 0.75rem;">
             <button class="mini-speak-btn ai-speak-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="Speak British sentence">
               <i class="fa-solid fa-circle-play"></i>
             </button>
-            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="העתק משפט (Copy sentence)">
+            <button class="mini-copy-btn ai-copy-btn" data-text="${data.britishExample.replace(/"/g, '&quot;')}" title="Copy sentence">
               <i class="fa-regular fa-copy"></i>
             </button>
             <span style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">Listen (Pure British Accent)</span>
@@ -1845,12 +1845,12 @@ function renderAIResponse(mode, data) {
         const originalHTML = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success);"></i>';
         btn.classList.add('copied');
-        btn.setAttribute('title', 'הועתק! (Copied!)');
+        btn.setAttribute('title', 'Copied!');
 
         setTimeout(() => {
           btn.innerHTML = originalHTML;
           btn.classList.remove('copied');
-          btn.setAttribute('title', 'העתק משפט (Copy sentence)');
+          btn.setAttribute('title', 'Copy sentence');
         }, 1800);
       } catch (err) {
         console.error('Failed to copy text:', err);
@@ -2147,7 +2147,7 @@ function initGamesEventListeners() {
     });
 
     if (gamesSearchCount) {
-      gamesSearchCount.innerText = `${visibleCount} משחקים`;
+      gamesSearchCount.innerText = `${visibleCount} ${visibleCount === 1 ? 'Game' : 'Games'}`;
     }
 
     if (gamesNoResults) {
@@ -2268,31 +2268,31 @@ function launchGame(gameKey, isDaily = false) {
 
     // Dynamic praise & spoken feedback depending on the user's score
     let feedbackAudio = '';
-    let feedbackHebrew = '';
+    let feedbackSubtitle = '';
     let feedbackBadge = '';
 
     if (percentage === 100) {
       feedbackAudio = "Splendid! Absolutely chuffed with your perfect score! You are a true British English master.";
-      feedbackHebrew = `מושלם! ${correctCount} מתוך ${totalCount}! שליטה מוחלטת באנגלית בריטית!`;
-      feedbackBadge = "👑 ציון מושלם (Perfect Score)";
+      feedbackSubtitle = `Perfect ${correctCount} out of ${totalCount}! Complete mastery of British English!`;
+      feedbackBadge = "👑 Perfect Score";
     } else if (percentage >= 80) {
       feedbackAudio = "Brilliant work! Jolly good effort, you are doing wonderfully!";
-      feedbackHebrew = "עבודה מבריקה! ציון מעולה, המשך כך!";
-      feedbackBadge = "🏆 הצטיינות (Excellent)";
+      feedbackSubtitle = "Outstanding performance! Keep up the great momentum!";
+      feedbackBadge = "🏆 Excellent";
     } else if (percentage >= 60) {
       feedbackAudio = "Good job! Practice makes perfect, keep at it and have another go.";
-      feedbackHebrew = "יפה מאוד! תוצאה טובה, עוד קצת תרגול ותגיע לשלמות.";
-      feedbackBadge = "👍 תוצאה טובה (Good Job)";
+      feedbackSubtitle = "Solid effort! A bit more practice and you will reach perfection.";
+      feedbackBadge = "👍 Good Job";
     } else {
       feedbackAudio = "Chin up! Keep practicing every day and you will master it in no time.";
-      feedbackHebrew = "לא נורא! כל טעות היא שלב בלמידה, שחק שוב ותשתפר!";
-      feedbackBadge = "💪 תרגול מביא להצלחה (Keep Trying)";
+      feedbackSubtitle = "Every mistake is a step toward mastery — play again to improve your score!";
+      feedbackBadge = "💪 Keep Practising";
     }
 
     stageEl.innerHTML = `
       <div class="text-center card game-summary-card" style="position: relative; padding: 2.5rem 1.5rem; max-width: 600px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.08);">
         <!-- Top Corner 'X' Close Button -->
-        <button id="btn-summary-close-x" class="btn-close-x" title="יציאה וחזרה למשחקים (Exit to Games Hub)">
+        <button id="btn-summary-close-x" class="btn-close-x" title="Exit to Games Hub">
           <i class="fa-solid fa-xmark"></i>
         </button>
 
@@ -2300,51 +2300,51 @@ function launchGame(gameKey, isDaily = false) {
           <i class="fa-solid ${percentage >= 90 ? 'fa-crown' : percentage >= 70 ? 'fa-trophy' : 'fa-award'}"></i>
         </div>
         <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.25rem;">${result.title}</h3>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.25rem;">${result.details || `סיימת בהצלחה את כל ${totalCount} השאלות!`}</p>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.25rem;">${result.details || `Successfully completed all ${totalCount} questions!`}</p>
 
         <!-- Spoken Feedback According to Score -->
         <div class="summary-speech-box">
           <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
             <span class="category-pill" style="margin: 0; font-size: 0.8rem;">${feedbackBadge}</span>
-            <button class="mini-speak-btn" id="btn-replay-feedback-audio" title="השמע משוב שוב (Play Voice Feedback)" style="width: 28px; height: 28px; font-size: 0.85rem;">
+            <button class="mini-speak-btn" id="btn-replay-feedback-audio" title="Play Voice Feedback" style="width: 28px; height: 28px; font-size: 0.85rem;">
               <i class="fa-solid fa-volume-high"></i>
             </button>
           </div>
           <div class="summary-speech-quote">"${feedbackAudio}"</div>
-          <div class="summary-speech-hebrew">${feedbackHebrew}</div>
+          <div class="summary-speech-hebrew">${feedbackSubtitle}</div>
         </div>
 
         <!-- 3 Performance Stat Cards -->
         <div class="results-stats-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
           <div class="results-stat-card" style="background: rgba(0, 36, 125, 0.05); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(0, 36, 125, 0.1);">
             <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: var(--uk-blue); display: block;">${correctCount} / ${totalCount}</span>
-            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">תשובות נכונות<br><span style="font-size: 0.75rem; font-weight: normal;">(Correct)</span></span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Correct Answers</span>
           </div>
           <div class="results-stat-card success" style="background: rgba(16, 185, 129, 0.08); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
             <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: #10B981; display: block;">${percentage}%</span>
-            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">אחוז הצלחה<br><span style="font-size: 0.75rem; font-weight: normal;">(Success Rate)</span></span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Success Rate</span>
           </div>
           <div class="results-stat-card" style="background: rgba(212, 175, 55, 0.1); padding: 1rem 0.5rem; border-radius: 12px; border: 1px solid rgba(212, 175, 55, 0.25);">
             <span class="stat-val" style="font-size: 1.7rem; font-weight: 800; color: var(--gold); display: block;">+${xpAward}</span>
-            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">ניקוד סופי<br><span style="font-size: 0.75rem; font-weight: normal;">(Final XP)</span></span>
+            <span class="stat-lbl" style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Final XP</span>
           </div>
         </div>
 
         <div class="reward-tags" style="justify-content: center; margin-bottom: 2rem;">
           <span class="reward-tag" style="background-color: rgba(0, 36, 125, 0.1); color: var(--uk-blue); border-color: rgba(0, 36, 125, 0.2); font-size: 0.95rem; padding: 0.5rem 1rem;">
-            <i class="fa-solid fa-bolt"></i> +${xpAward} XP נצברו
+            <i class="fa-solid fa-bolt"></i> +${xpAward} XP Earned
           </span>
           <span class="reward-tag" style="background-color: rgba(212, 175, 55, 0.15); color: var(--gold); border-color: rgba(212, 175, 55, 0.3); font-size: 0.95rem; padding: 0.5rem 1rem;">
-            <i class="fa-solid fa-coins"></i> +${coinAward} מטבעות
+            <i class="fa-solid fa-coins"></i> +${coinAward} Coins
           </span>
         </div>
 
         <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
           <button class="btn btn-primary" id="btn-play-again" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
-            <i class="fa-solid fa-rotate-right"></i> שחק שוב (Play Again)
+            <i class="fa-solid fa-rotate-right"></i> Play Again
           </button>
           <button class="btn btn-secondary" id="btn-back-hub" style="padding: 0.85rem 1.8rem; font-size: 1rem; border-color: var(--uk-red); color: var(--uk-red);">
-            <i class="fa-solid fa-right-from-bracket"></i> יציאה מהמשחק (Exit Game)
+            <i class="fa-solid fa-right-from-bracket"></i> Exit Game
           </button>
         </div>
       </div>
