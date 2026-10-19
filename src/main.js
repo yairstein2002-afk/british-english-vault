@@ -2077,7 +2077,7 @@ function setupGoalsEventListeners() {
 // ==========================================================================
 // GAMES & GAMIFICATION CONTROLLER
 // ==========================================================================
-function renderGamesUI() {
+function renderGamesUI(resetPanels = true) {
   const stats = getGameStats(vaultData);
   const lvlInfo = calculateUserLevel(stats.xp);
 
@@ -2099,11 +2099,13 @@ function renderGamesUI() {
   if (coinsEl) coinsEl.innerText = stats.coins;
   if (xpEl) xpEl.innerText = stats.xp;
 
-  const hubPanel = document.getElementById('games-hub-panel');
-  const activePanel = document.getElementById('game-active-panel');
+  if (resetPanels) {
+    const hubPanel = document.getElementById('games-hub-panel');
+    const activePanel = document.getElementById('game-active-panel');
 
-  if (hubPanel) hubPanel.style.display = 'block';
-  if (activePanel) activePanel.style.display = 'none';
+    if (hubPanel) hubPanel.style.display = 'block';
+    if (activePanel) activePanel.style.display = 'none';
+  }
 }
 
 function initGamesEventListeners() {
@@ -2114,19 +2116,60 @@ function initGamesEventListeners() {
     });
   });
 
+  const gamesSearchInput = document.getElementById('games-search-input');
+  const gamesSearchClear = document.getElementById('games-search-clear');
+  const gamesNoResults = document.getElementById('games-no-results');
+
+  const filterGamesGrid = () => {
+    const activeChip = document.querySelector('#game-category-chips .chip.active');
+    const cat = activeChip ? activeChip.getAttribute('data-cat') : 'all';
+    const query = (gamesSearchInput ? gamesSearchInput.value : '').trim().toLowerCase();
+
+    if (gamesSearchClear) {
+      gamesSearchClear.style.display = query.length > 0 ? 'flex' : 'none';
+    }
+
+    let visibleCount = 0;
+    document.querySelectorAll('.games-grid .game-card').forEach(card => {
+      const cardCat = card.getAttribute('data-cat') || '';
+      const matchesCat = (cat === 'all' || cardCat === cat);
+      const cardText = (card.innerText || '').toLowerCase();
+      const gameKey = (card.querySelector('.btn-launch-game')?.getAttribute('data-game') || '').toLowerCase();
+      const matchesQuery = !query || cardText.includes(query) || cardCat.toLowerCase().includes(query) || gameKey.includes(query);
+
+      if (matchesCat && matchesQuery) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (gamesNoResults) {
+      gamesNoResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+  };
+
+  if (gamesSearchInput) {
+    gamesSearchInput.addEventListener('input', filterGamesGrid);
+  }
+
+  if (gamesSearchClear) {
+    gamesSearchClear.addEventListener('click', () => {
+      if (gamesSearchInput) {
+        gamesSearchInput.value = '';
+        gamesSearchInput.focus();
+      }
+      filterGamesGrid();
+    });
+  }
+
   // Filter chips in Games Hub
   document.querySelectorAll('#game-category-chips .chip').forEach(chip => {
-    chip.addEventListener('click', (e) => {
+    chip.addEventListener('click', () => {
       document.querySelectorAll('#game-category-chips .chip').forEach(c => c.classList.remove('active'));
       chip.classList.add('active');
-      const cat = chip.getAttribute('data-cat');
-      document.querySelectorAll('.games-grid .game-card').forEach(card => {
-        if (cat === 'all' || card.getAttribute('data-cat') === cat) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+      filterGamesGrid();
     });
   });
 
@@ -2204,7 +2247,7 @@ function launchGame(gameKey, isDaily = false) {
   if (stageEl) stageEl.innerHTML = '';
 
   const handleGameComplete = (result) => {
-    const totalCount = result.total || 10;
+    const totalCount = result.total || 20;
     const correctCount = result.correct !== undefined ? result.correct : (result.isPerfect ? totalCount : Math.round(totalCount * 0.8));
     const percentage = result.percentage !== undefined ? result.percentage : Math.round((correctCount / totalCount) * 100);
 
@@ -2225,7 +2268,7 @@ function launchGame(gameKey, isDaily = false) {
 
     if (percentage === 100) {
       feedbackAudio = "Splendid! Absolutely chuffed with your perfect score! You are a true British English master.";
-      feedbackHebrew = "מושלם! 10 מתוך 10! שליטה מוחלטת באנגלית בריטית!";
+      feedbackHebrew = `מושלם! ${correctCount} מתוך ${totalCount}! שליטה מוחלטת באנגלית בריטית!`;
       feedbackBadge = "👑 ציון מושלם (Perfect Score)";
     } else if (percentage >= 80) {
       feedbackAudio = "Brilliant work! Jolly good effort, you are doing wonderfully!";
@@ -2252,7 +2295,7 @@ function launchGame(gameKey, isDaily = false) {
           <i class="fa-solid ${percentage >= 90 ? 'fa-crown' : percentage >= 70 ? 'fa-trophy' : 'fa-award'}"></i>
         </div>
         <h3 style="font-size: 1.8rem; font-family: 'Playfair Display', serif; margin-bottom: 0.25rem;">${result.title}</h3>
-        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.25rem;">${result.details || 'סיימת בהצלחה את כל 10 השאלות!'}</p>
+        <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 1.25rem;">${result.details || `סיימת בהצלחה את כל ${totalCount} השאלות!`}</p>
 
         <!-- Spoken Feedback According to Score -->
         <div class="summary-speech-box">
@@ -2295,14 +2338,15 @@ function launchGame(gameKey, isDaily = false) {
           <button class="btn btn-primary" id="btn-play-again" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
             <i class="fa-solid fa-rotate-right"></i> שחק שוב (Play Again)
           </button>
-          <button class="btn btn-secondary" id="btn-back-hub" style="padding: 0.85rem 1.8rem; font-size: 1rem;">
-            <i class="fa-solid fa-gamepad"></i> חזרה למשחקים (Games Hub)
+          <button class="btn btn-secondary" id="btn-back-hub" style="padding: 0.85rem 1.8rem; font-size: 1rem; border-color: var(--uk-red); color: var(--uk-red);">
+            <i class="fa-solid fa-right-from-bracket"></i> יציאה מהמשחק (Exit Game)
           </button>
         </div>
       </div>
     `;
 
-    renderGamesUI();
+    // Update XP/Coins/Level header WITHOUT hiding the active game panel!
+    renderGamesUI(false);
 
     // Automatically speak the score feedback phrase out loud with UK accent
     setTimeout(() => {

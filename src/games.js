@@ -78,7 +78,7 @@ export function awardGameRewards(vaultData, xpAmount, coinsAmount, gameKey, isPe
 // SPACED REPETITION & ADAPTIVE ITEM SELECTION
 // ==========================================================================
 
-export function getAdaptiveGameItems(vaultData, count = 10) {
+export function getAdaptiveGameItems(vaultData, count = 20) {
   const allItems = vaultData.items || [];
   const stats = getGameStats(vaultData);
   const weakIds = stats.weakItems || [];
@@ -96,7 +96,7 @@ export function getAdaptiveGameItems(vaultData, count = 10) {
 
   // Fallbacks if vault items are fewer than count
   if (selected.length < count) {
-    const fallbacks = getFallbackVaultItems();
+    const fallbacks = shuffleArray(getFallbackVaultItems());
     for (const fb of fallbacks) {
       if (selected.length >= count) break;
       if (!selected.some(s => s.term.toLowerCase() === fb.term.toLowerCase())) {
@@ -140,7 +140,7 @@ export function getAllVaultItems(vaultData) {
   return Array.from(map.values());
 }
 
-export function makeDynamicMC(vaultData, promptKey, answerKey, count = 10) {
+export function makeDynamicMC(vaultData, promptKey, answerKey, count = 20) {
   const all = getAllVaultItems(vaultData);
   const shuffledItems = shuffleArray(all).slice(0, count);
   
@@ -199,7 +199,22 @@ export function getFallbackVaultItems() {
     { id: 'fb-32', term: 'Wonky', meaning: 'Crooked, unsteady or not working properly', category: 'slangs', example: 'This table leg is a bit wonky.' },
     { id: 'fb-33', term: 'Loo', meaning: 'Toilet or restroom', category: 'slangs', example: 'Could you tell me where the loo is, please?' },
     { id: 'fb-34', term: 'Kerfuffle', meaning: 'A commotion, fuss or mild controversy', category: 'words', example: 'There was a bit of a kerfuffle outside the station.' },
-    { id: 'fb-35', term: 'Brolly', meaning: 'An umbrella', category: 'slangs', example: 'Do not forget your brolly, it is raining cats and dogs!' }
+    { id: 'fb-35', term: 'Brolly', meaning: 'An umbrella', category: 'slangs', example: 'Do not forget your brolly, it is raining cats and dogs!' },
+    { id: 'fb-36', term: 'Chinwag', meaning: 'A friendly, informal chat or gossip', category: 'slangs', example: 'We had a lovely chinwag over a pot of tea.' },
+    { id: 'fb-37', term: 'Faffing', meaning: 'Wasting time or dallying around', category: 'slangs', example: 'Stop faffing about or we will miss the train!' },
+    { id: 'fb-38', term: 'Peculiar', meaning: 'Strange, odd or unusual', category: 'words', example: 'That old clock makes a rather peculiar sound.' },
+    { id: 'fb-39', term: 'Bespoke', meaning: 'Custom-made for a particular customer', category: 'words', example: 'He ordered a bespoke suit on Savile Row.' },
+    { id: 'fb-40', term: 'Tickety-boo', meaning: 'In good order, fine and satisfactory', category: 'phrases', example: 'Everything is tickety-boo with the project plan.' },
+    { id: 'fb-41', term: 'Full of beans', meaning: 'Lively, energetic and in high spirits', category: 'idioms', example: 'The children are full of beans this morning!' },
+    { id: 'fb-42', term: 'Donkey\'s years', meaning: 'A very long time', category: 'idioms', example: 'I have not seen him in donkey\'s years!' },
+    { id: 'fb-43', term: 'Smashing', meaning: 'Wonderful, excellent or terrific', category: 'slangs', example: 'We had a smashing time in Edinburgh.' },
+    { id: 'fb-44', term: 'Gormless', meaning: 'Lacking intelligence or vitality, clueless', category: 'slangs', example: 'He stood there with a gormless expression.' },
+    { id: 'fb-45', term: 'Throw a spanner in the works', meaning: 'Disrupt or cause problems for a plan', category: 'idioms', example: 'The sudden storm threw a spanner in the works.' },
+    { id: 'fb-46', term: 'peckish', meaning: 'Slightly hungry', category: 'slangs', example: 'I am feeling a bit peckish, fancy a biscuit?' },
+    { id: 'fb-47', term: 'Scrummy', meaning: 'Scrumptious, very delicious', category: 'slangs', example: 'Those homemade scones are absolutely scrummy!' },
+    { id: 'fb-48', term: 'Cack-handed', meaning: 'Clumsy or awkward with one\'s hands', category: 'slangs', example: 'Sorry, that was rather cack-handed of me!' },
+    { id: 'fb-49', term: ' Brass monkeys', meaning: 'Extremely cold weather', category: 'phrases', example: 'Put your coat on, it is brass monkeys outside!' },
+    { id: 'fb-50', term: 'Keep your chin up', meaning: 'Stay cheerful in a tough situation', category: 'idioms', example: 'Keep your chin up, things will get better soon!' }
   ];
 }
 
@@ -207,7 +222,7 @@ export function getFallbackVaultItems() {
 // UNIVERSAL GAME HEADER COMPONENT (Live Score & Progress Bar)
 // ==========================================================================
 
-export function renderGameHeader(title, current, total = 10, score = 0) {
+export function renderGameHeader(title, current, total = 20, score = 0) {
   const pct = Math.round(((current - 1) / total) * 100);
   return `
     <div class="game-round-header" style="margin-bottom: 1.25rem;">
@@ -234,11 +249,11 @@ function escapeRegExp(string) {
 }
 
 // ==========================================================================
-// 1. GAME: WORD MATCH 🧩 (10 consecutive matching questions)
+// 1. GAME: WORD MATCH 🧩 (20 consecutive matching questions)
 // ==========================================================================
 
 export function startWordMatchGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   const allVault = getAllVaultItems(vaultData);
   let currentIdx = 0;
   let score = 0;
@@ -334,7 +349,7 @@ export function startWordMatchGame(stageEl, vaultData, onComplete = () => {}) {
 // ==========================================================================
 
 export function startQuickChoiceGame(stageEl, vaultData, onComplete = () => {}) {
-  const questions = getAdaptiveGameItems(vaultData, 10);
+  const questions = getAdaptiveGameItems(vaultData, 20);
   const allVault = getAllVaultItems(vaultData);
   let currentIdx = 0;
   let score = 0;
@@ -465,7 +480,7 @@ export function startQuickChoiceGame(stageEl, vaultData, onComplete = () => {}) 
 // ==========================================================================
 
 export function startFillGapGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   const allVault = getAllVaultItems(vaultData);
   let currentIdx = 0;
   let score = 0;
@@ -553,7 +568,7 @@ export function startFillGapGame(stageEl, vaultData, onComplete = () => {}) {
 // ==========================================================================
 
 export function startWordScrambleGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -668,7 +683,7 @@ export function startWordScrambleGame(stageEl, vaultData, onComplete = () => {})
 // ==========================================================================
 
 export function startListenChooseGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   const allVault = getAllVaultItems(vaultData);
   let currentIdx = 0;
   let score = 0;
@@ -759,7 +774,7 @@ export function startListenChooseGame(stageEl, vaultData, onComplete = () => {})
 // ==========================================================================
 
 export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -877,7 +892,7 @@ export function startSayItGame(stageEl, vaultData, onComplete = () => {}) {
 // ==========================================================================
 
 export function startGuessWordGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = getAdaptiveGameItems(vaultData, 10);
+  const items = getAdaptiveGameItems(vaultData, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1002,10 +1017,20 @@ export function startOddOneOutGame(stageEl, vaultData, onComplete = () => {}) {
     { words: ['Aubergine', 'Courgette', 'Coriander', 'Pram'], oddIndex: 3, reason: '"Pram" is a baby stroller, while the others are British food items.' },
     { words: ['Trainers', 'Trousers', 'Jumper', 'Petrol'], oddIndex: 3, reason: '"Petrol" is fuel, while the rest are British clothing items.' },
     { words: ['Windscreen', 'Number plate', 'Steering wheel', 'Queue'], oddIndex: 3, reason: '"Queue" is waiting in line, while the others are car parts.' },
-    { words: ['Faffing', 'Dawdling', 'Procrastinating', 'Sprint'], oddIndex: 3, reason: '"Sprint" means running fast, while the others mean wasting time.' }
+    { words: ['Faffing', 'Dawdling', 'Procrastinating', 'Sprint'], oddIndex: 3, reason: '"Sprint" means running fast, while the others mean wasting time.' },
+    { words: ['Thames', 'Severn', 'Mersey', 'Ben Nevis'], oddIndex: 3, reason: '"Ben Nevis" is a mountain, while the others are famous British rivers.' },
+    { words: ['Oxford', 'Cambridge', 'Edinburgh', 'Heathrow'], oddIndex: 3, reason: '"Heathrow" is an airport, while the others are historic university cities.' },
+    { words: ['Earl Grey', 'Darjeeling', 'Assam', 'Stilton'], oddIndex: 3, reason: '"Stilton" is a British cheese, while the others are types of tea.' },
+    { words: ['Cheddar', 'Red Leicester', 'Wensleydale', 'Trifle'], oddIndex: 3, reason: '"Trifle" is a sweet dessert, while the others are British cheeses.' },
+    { words: ['Dodgy', 'Fishy', 'Suspicious', 'Reliable'], oddIndex: 3, reason: '"Reliable" means trustworthy, while the others mean questionable or risky.' },
+    { words: ['Cheeky', 'Impudent', 'Saucy', 'Polite'], oddIndex: 3, reason: '"Polite" means respectful, while the others mean playfully rude.' },
+    { words: ['Chinwag', 'Chat', 'Gossip', 'Silence'], oddIndex: 3, reason: '"Silence" is quietness, while the others mean an informal conversation.' },
+    { words: ['Smashing', 'Superb', 'Terrific', 'Dreadful'], oddIndex: 3, reason: '"Dreadful" means terrible, while the others mean wonderful.' },
+    { words: ['Chemist', 'Butcher', 'Greengrocer', 'Solicitor'], oddIndex: 3, reason: '"Solicitor" is a lawyer, while the others are High Street shops.' },
+    { words: ['Double-decker', 'Black cab', 'Tram', 'Postbox'], oddIndex: 3, reason: '"Postbox" is for letters, while the others are forms of British transport.' }
   ];
 
-  const oddSets = shuffleArray(allOddSets).slice(0, 10);
+  const oddSets = shuffleArray(allOddSets).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1079,7 +1104,7 @@ export function startOddOneOutGame(stageEl, vaultData, onComplete = () => {}) {
 }
 
 // ==========================================================================
-// 9. GAME: BUILD THE SENTENCE 💬 (10 consecutive sentence assemblies)
+// 9. GAME: BUILD THE SENTENCE 💬 (20 consecutive sentence assemblies)
 // ==========================================================================
 
 export function startBuildSentenceGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1097,10 +1122,20 @@ export function startBuildSentenceGame(stageEl, vaultData, onComplete = () => {}
     { target: 'Mind the gap between the train and platform.', words: ['Mind', 'the gap', 'between', 'the train', 'and', 'platform.'] },
     { target: 'They decided to bite the bullet and apologize.', words: ['They', 'decided to', 'bite the', 'bullet', 'and', 'apologize.'] },
     { target: 'Could you please give me a quick ring tomorrow?', words: ['Could', 'you please', 'give me', 'a quick', 'ring', 'tomorrow?'] },
-    { target: 'That old cottage in the village looks charming.', words: ['That', 'old cottage', 'in the', 'village', 'looks', 'charming.'] }
+    { target: 'That old cottage in the village looks charming.', words: ['That', 'old cottage', 'in the', 'village', 'looks', 'charming.'] },
+    { target: 'Don\'t forget to bring your brolly today.', words: ['Don\'t', 'forget to', 'bring', 'your brolly', 'today.'] },
+    { target: 'We had a lovely chinwag over a cuppa.', words: ['We had', 'a lovely', 'chinwag', 'over', 'a cuppa.'] },
+    { target: 'The Changing of the Guard starts at eleven.', words: ['The', 'Changing of', 'the Guard', 'starts at', 'eleven.'] },
+    { target: 'She was gobsmacked when she heard the news.', words: ['She was', 'gobsmacked', 'when she', 'heard', 'the news.'] },
+    { target: 'Let us pop down to the local bakery.', words: ['Let us', 'pop down', 'to the', 'local', 'bakery.'] },
+    { target: 'He ordered fish and chips with malt vinegar.', words: ['He ordered', 'fish and', 'chips', 'with malt', 'vinegar.'] },
+    { target: 'We are going away for a whole fortnight.', words: ['We are', 'going away', 'for a', 'whole', 'fortnight.'] },
+    { target: 'I am feeling a bit peckish this afternoon.', words: ['I am', 'feeling', 'a bit', 'peckish', 'this afternoon.'] },
+    { target: 'Could you tell me where the nearest tube is?', words: ['Could you', 'tell me', 'where the', 'nearest', 'tube is?'] },
+    { target: 'Stop faffing about or we will be late.', words: ['Stop', 'faffing about', 'or we', 'will be', 'late.'] }
   ];
 
-  const sentences = shuffleArray(allSentences).slice(0, 10);
+  const sentences = shuffleArray(allSentences).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1211,25 +1246,25 @@ export function startBuildSentenceGame(stageEl, vaultData, onComplete = () => {}
 }
 
 // ==========================================================================
-// 10. GAME: ENGLISH QUIZ 🏆 (10 consecutive mixed questions)
+// 10. GAME: ENGLISH QUIZ 🏆 (20 consecutive mixed questions)
 // ==========================================================================
 
 export function startEnglishQuizGame(stageEl, vaultData, onComplete = () => {}) {
-  const dynamicItems = makeDynamicMC(vaultData, 'term', 'meaning', 10);
+  const dynamicItems = makeDynamicMC(vaultData, 'term', 'meaning', 20);
   runChoiceGame(stageEl, dynamicItems, '🏆 English Quiz', 'Choose the correct answer for each question:', onComplete);
 }
 
 // ==========================================================================
-// 11. GAME: SYNONYM HUNT 🧠 (10 consecutive dynamic questions)
+// 11. GAME: SYNONYM HUNT 🧠 (20 consecutive dynamic questions)
 // ==========================================================================
 
 export function startSynonymHuntGame(stageEl, vaultData, onComplete = () => {}) {
-  const dataset = makeDynamicMC(vaultData, 'term', 'meaning', 10);
+  const dataset = makeDynamicMC(vaultData, 'term', 'meaning', 20);
   runChoiceGame(stageEl, dataset, '🧠 Synonym Hunt', 'Select the word or meaning that matches best:', onComplete);
 }
 
 // ==========================================================================
-// 12. GAME: ANTONYM ATTACK ⚔️ (10 consecutive questions from 18 items)
+// 12. GAME: ANTONYM ATTACK ⚔️ (20 consecutive questions from 26 items)
 // ==========================================================================
 
 export function startAntonymAttackGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1249,24 +1284,34 @@ export function startAntonymAttackGame(stageEl, vaultData, onComplete = () => {}
     { word: 'Permit', target: 'Forbid', choices: ['Forbid', 'Allow', 'Grant', 'Accept'] },
     { word: 'Courageous', target: 'Cowardly', choices: ['Cowardly', 'Brave', 'Bold', 'Valiant'] },
     { word: 'Damp', target: 'Dry', choices: ['Dry', 'Wet', 'Moist', 'Soaked'] },
-    { word: 'Lenient', target: 'Strict', choices: ['Strict', 'Kind', 'Easy', 'Soft'] }
+    { word: 'Lenient', target: 'Strict', choices: ['Strict', 'Kind', 'Easy', 'Soft'] },
+    { word: 'Skint', target: 'Wealthy', choices: ['Wealthy', 'Broke', 'Poor', 'Needy'] },
+    { word: 'Dodgy', target: 'Reliable', choices: ['Reliable', 'Risky', 'Shady', 'Uncertain'] },
+    { word: 'Daft', target: 'Sensible', choices: ['Sensible', 'Silly', 'Foolish', 'Absurd'] },
+    { word: 'Cheeky', target: 'Respectful', choices: ['Respectful', 'Rude', 'Playful', 'Bold'] },
+    { word: 'Miserable', target: 'Cheerful', choices: ['Cheerful', 'Gloomy', 'Sad', 'Upset'] },
+    { word: 'Permanent', target: 'Temporary', choices: ['Temporary', 'Lasting', 'Eternal', 'Fixed'] },
+    { word: 'Vivid', target: 'Dull', choices: ['Dull', 'Bright', 'Clear', 'Colorful'] },
+    { word: 'Polite', target: 'Impolite', choices: ['Impolite', 'Courteous', 'Civil', 'Gentle'] },
+    { word: 'Mandatory', target: 'Optional', choices: ['Optional', 'Required', 'Forced', 'Vital'] },
+    { word: 'Optimistic', target: 'Pessimistic', choices: ['Pessimistic', 'Hopeful', 'Positive', 'Bright'] }
   ];
 
-  const dataset = shuffleArray(allAntonyms).slice(0, 10);
+  const dataset = shuffleArray(allAntonyms).slice(0, 20);
   runChoiceGame(stageEl, dataset, '⚔️ Antonym Attack', 'Select the word with the OPPOSITE meaning:', onComplete);
 }
 
 // ==========================================================================
-// 13. GAME: DEFINITION DUEL 📖 (10 consecutive definition matches)
+// 13. GAME: DEFINITION DUEL 📖 (20 consecutive definition matches)
 // ==========================================================================
 
 export function startDefinitionDuelGame(stageEl, vaultData, onComplete = () => {}) {
-  const dataset = makeDynamicMC(vaultData, 'meaning', 'term', 10);
+  const dataset = makeDynamicMC(vaultData, 'meaning', 'term', 20);
   runChoiceGame(stageEl, dataset, '📖 Definition Duel', 'Which English word or phrase matches this definition?', onComplete);
 }
 
 // ==========================================================================
-// 14. GAME: WORD LADDER 🪜 (10 consecutive word ladder steps)
+// 14. GAME: WORD LADDER 🪜 (20 consecutive word ladder steps)
 // ==========================================================================
 
 export function startWordLadderGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1282,10 +1327,22 @@ export function startWordLadderGame(stageEl, vaultData, onComplete = () => {}) {
     { from: 'SAND', to: 'SEND', options: ['SEND', 'LAND', 'BAND', 'HAND'], correct: 'SEND' },
     { from: 'FIRE', to: 'FINE', options: ['FINE', 'FORE', 'FILE', 'FARE'], correct: 'FINE' },
     { from: 'DARK', to: 'DART', options: ['DART', 'PARK', 'BARK', 'MARK'], correct: 'DART' },
-    { from: 'GOLD', to: 'HOLD', options: ['HOLD', 'BOLD', 'COLD', 'FOLD'], correct: 'HOLD' }
+    { from: 'GOLD', to: 'HOLD', options: ['HOLD', 'BOLD', 'COLD', 'FOLD'], correct: 'HOLD' },
+    { from: 'MIND', to: 'MINT', options: ['MINT', 'FIND', 'KIND', 'WIND'], correct: 'MINT' },
+    { from: 'WORD', to: 'WORK', options: ['WORK', 'WOOD', 'WOOL', 'WORM'], correct: 'WORK' },
+    { from: 'BELL', to: 'BALL', options: ['BALL', 'BELT', 'CELL', 'FELL'], correct: 'BALL' },
+    { from: 'KING', to: 'SING', options: ['SING', 'KIND', 'KITE', 'KICK'], correct: 'SING' },
+    { from: 'CAKE', to: 'LAKE', options: ['LAKE', 'CARE', 'CAME', 'CAGE'], correct: 'LAKE' },
+    { from: 'ROSE', to: 'RISE', options: ['RISE', 'ROPE', 'ROLE', 'RODE'], correct: 'RISE' },
+    { from: 'COAT', to: 'BOAT', options: ['BOAT', 'COST', 'COAL', 'COIN'], correct: 'BOAT' },
+    { from: 'PARK', to: 'PART', options: ['PART', 'PACK', 'PAST', 'PATH'], correct: 'PART' },
+    { from: 'HAND', to: 'BAND', options: ['BAND', 'HARD', 'HALT', 'HALF'], correct: 'BAND' },
+    { from: 'WINE', to: 'LINE', options: ['LINE', 'WIDE', 'WIFE', 'WIRE'], correct: 'LINE' },
+    { from: 'tall', to: 'WALL', options: ['WALL', 'TALK', 'TAIL', 'TANK'], correct: 'WALL' },
+    { from: 'BLUE', to: 'GLUE', options: ['GLUE', 'BLUR', 'CLUB', 'TRUE'], correct: 'GLUE' }
   ];
 
-  const steps = shuffleArray(allSteps).slice(0, 10);
+  const steps = shuffleArray(allSteps).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1340,11 +1397,11 @@ export function startWordLadderGame(stageEl, vaultData, onComplete = () => {}) {
 }
 
 // ==========================================================================
-// 15. GAME: MISSING LETTER 🔤 (10 consecutive word puzzles)
+// 15. GAME: MISSING LETTER 🔤 (20 consecutive word puzzles)
 // ==========================================================================
 
 export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 10);
+  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1409,11 +1466,11 @@ export function startMissingLetterGame(stageEl, vaultData, onComplete = () => {}
 }
 
 // ==========================================================================
-// 16. GAME: SPELL RACE 🏁 (10 consecutive spelling questions)
+// 16. GAME: SPELL RACE 🏁 (20 consecutive spelling questions)
 // ==========================================================================
 
 export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
-  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 10);
+  const items = shuffleArray(getAllVaultItems(vaultData)).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1486,7 +1543,7 @@ export function startSpellRaceGame(stageEl, vaultData, onComplete = () => {}) {
 }
 
 // ==========================================================================
-// 17. GAME: SENTENCE DETECTIVE 🕵️ (10 consecutive sentence error detections)
+// 17. GAME: SENTENCE DETECTIVE 🕵️ (20 consecutive sentence error detections)
 // ==========================================================================
 
 export function startSentenceDetectiveGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1503,10 +1560,21 @@ export function startSentenceDetectiveGame(stageEl, vaultData, onComplete = () =
     { sentence: 'Could you give me an advice about the trip?', error: 'an', correct: 'some' },
     { sentence: 'I have been knowing him for ten years.', error: 'knowing', correct: 'known' },
     { sentence: 'We was very tired after walking all day.', error: 'was', correct: 'were' },
-    { sentence: 'He suggested to go to the British Museum.', error: 'to go', correct: 'going' }
+    { sentence: 'He suggested to go to the British Museum.', error: 'to go', correct: 'going' },
+    { sentence: 'She plays the piano very good.', error: 'good', correct: 'well' },
+    { sentence: 'Each of the students have a notebook.', error: 'have', correct: 'has' },
+    { sentence: 'I have visited Edinburgh last summer.', error: 'have', correct: '(remove "have")' },
+    { sentence: 'The informations you gave me were helpful.', error: 'informations', correct: 'information' },
+    { sentence: 'He is married with a famous doctor.', error: 'with', correct: 'to' },
+    { sentence: 'If I will see him I will tell him.', error: 'will', correct: '(remove first "will")' },
+    { sentence: 'She asked me where was the station.', error: 'was', correct: '(station was)' },
+    { sentence: 'They enjoyed theirselves at the party.', error: 'theirselves', correct: 'themselves' },
+    { sentence: 'This tea is too much hot to drink.', error: 'much', correct: '(remove "much")' },
+    { sentence: 'He hasn\'t got no money left.', error: 'no', correct: 'any' },
+    { sentence: 'You should to practice English every day.', error: 'to', correct: '(remove "to")' }
   ];
 
-  const dataset = shuffleArray(allDataset).slice(0, 10);
+  const dataset = shuffleArray(allDataset).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1564,7 +1632,7 @@ export function startSentenceDetectiveGame(stageEl, vaultData, onComplete = () =
 }
 
 // ==========================================================================
-// 18. GAME: GRAMMAR BATTLE ⚔️ (10 consecutive questions from 16 items)
+// 18. GAME: GRAMMAR BATTLE ⚔️ (20 consecutive questions from 24 items)
 // ==========================================================================
 
 export function startGrammarBattleGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1688,15 +1756,115 @@ export function startGrammarBattleGame(stageEl, vaultData, onComplete = () => {}
         'He is accustom to wake up early.',
         'He has accustomed to waking early.'
       ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'Had I known about the traffic, I would have left earlier.',
+      choices: [
+        'Had I known about the traffic, I would have left earlier.',
+        'If I would have known about the traffic, I left earlier.',
+        'Had I knew about the traffic, I would leave earlier.',
+        'If I had knew about the traffic, I would have left earlier.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'Scarcely had the match started when it began to pour.',
+      choices: [
+        'Scarcely had the match started when it began to pour.',
+        'Scarcely the match had started than it began to pour.',
+        'Scarcely did the match started when it began to pour.',
+        'Scarcely had the match start when it began pouring.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'Each of the participants was given a certificate.',
+      choices: [
+        'Each of the participants was given a certificate.',
+        'Each of the participants were given a certificate.',
+        'Each of the participant was given a certificate.',
+        'Every of the participants were given certificates.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'It is high time we went home.',
+      choices: [
+        'It is high time we went home.',
+        'It is high time we go home.',
+        'It is high time we will go home.',
+        'It is high time for us going home.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'She denied having taken the confidential folder.',
+      choices: [
+        'She denied having taken the confidential folder.',
+        'She denied to take the confidential folder.',
+        'She denied that she has took the confidential folder.',
+        'She denied of taking the confidential folder.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'No sooner had I sat down than the phone rang.',
+      choices: [
+        'No sooner had I sat down than the phone rang.',
+        'No sooner had I sat down when the phone rang.',
+        'No sooner I sat down than the phone rang.',
+        'No sooner did I sat down than the phone rang.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'The news we received this morning is very encouraging.',
+      choices: [
+        'The news we received this morning is very encouraging.',
+        'The news we received this morning are very encouraging.',
+        'Many news we received this morning were encouraging.',
+        'A news we received this morning is encouraging.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'Despite being exhausted, he finished the marathon.',
+      choices: [
+        'Despite being exhausted, he finished the marathon.',
+        'Despite of being exhausted, he finished the marathon.',
+        'Although being exhausted, he finished the marathon.',
+        'In spite being exhausted, he finished the marathon.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'I wish I had brought my umbrella today.',
+      choices: [
+        'I wish I had brought my umbrella today.',
+        'I wish I would bring my umbrella today.',
+        'I wish I have brought my umbrella today.',
+        'I wish I brought my umbrella yesterday.'
+      ]
+    },
+    {
+      word: 'Which sentence is grammatically flawless?',
+      target: 'Few people know the true story behind the castle.',
+      choices: [
+        'Few people know the true story behind the castle.',
+        'Little people know the true story behind the castle.',
+        'Less people knows the true story behind the castle.',
+        'Few person know the true story behind the castle.'
+      ]
     }
   ];
 
-  const dataset = shuffleArray(allBattles).slice(0, 10);
+  const dataset = shuffleArray(allBattles).slice(0, 20);
   runChoiceGame(stageEl, dataset, '⚔️ Grammar Battle', 'Choose the sentence that is grammatically flawless:', onComplete);
 }
 
 // ==========================================================================
-// 19. GAME: TENSE CHALLENGE ⏳ (10 consecutive verb tense questions)
+// 19. GAME: TENSE CHALLENGE ⏳ (20 consecutive verb tense questions)
 // ==========================================================================
 
 export function startTenseChallengeGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1712,15 +1880,27 @@ export function startTenseChallengeGame(stageEl, vaultData, onComplete = () => {
     { word: 'By next year, she ________ her master\'s degree.', target: 'will have completed', choices: ['will have completed', 'completes', 'will complete', 'has completed'] },
     { word: 'I ________ my keys! Could you help me look for them?', target: 'have lost', choices: ['have lost', 'lost', 'was losing', 'am losing'] },
     { word: 'When the telephone rang, I ________ a bath.', target: 'was having', choices: ['was having', 'had', 'have had', 'have'] },
-    { word: 'She ________ in Manchester before moving to London.', target: 'had lived', choices: ['had lived', 'has lived', 'lives', 'is living'] }
+    { word: 'She ________ in Manchester before moving to London.', target: 'had lived', choices: ['had lived', 'has lived', 'lives', 'is living'] },
+    { word: 'Water ________ at 100 degrees Celsius.', target: 'boils', choices: ['boils', 'is boiling', 'boiled', 'has boiled'] },
+    { word: 'We ________ for the bus for twenty minutes when it finally arrived.', target: 'had been waiting', choices: ['had been waiting', 'have waited', 'were waiting', 'waited'] },
+    { word: 'As soon as I ________ home, I will give you a ring.', target: 'get', choices: ['get', 'will get', 'got', 'would get'] },
+    { word: 'Shakespeare ________ more than thirty plays during his lifetime.', target: 'wrote', choices: ['wrote', 'has written', 'was writing', 'writes'] },
+    { word: 'Listen! Someone ________ the violin upstairs.', target: 'is playing', choices: ['is playing', 'plays', 'played', 'has played'] },
+    { word: 'If it rains tomorrow, we ________ the picnic indoors.', target: 'will hold', choices: ['will hold', 'would hold', 'held', 'have held'] },
+    { word: 'She ________ three cups of coffee already this morning.', target: 'has drunk', choices: ['has drunk', 'drank', 'is drinking', 'drinks'] },
+    { word: 'At 8 PM last night, they ________ dinner at the pub.', target: 'were having', choices: ['were having', 'had', 'have had', 'are having'] },
+    { word: 'I ________ to Edinburgh twice so far this year.', target: 'have been', choices: ['have been', 'went', 'was going', 'am going'] },
+    { word: 'By 2030, scientists ________ new clean energy solutions.', target: 'will have discovered', choices: ['will have discovered', 'discover', 'discovered', 'are discovering'] },
+    { word: 'He promised that he ________ us as soon as he landed.', target: 'would call', choices: ['would call', 'will call', 'calls', 'has called'] },
+    { word: 'The train to Oxford ________ from Platform 4 at 9:15 AM every day.', target: 'departs', choices: ['departs', 'is departing', 'departed', 'has departed'] }
   ];
 
-  const dataset = shuffleArray(allTenses).slice(0, 10);
+  const dataset = shuffleArray(allTenses).slice(0, 20);
   runChoiceGame(stageEl, dataset, '⏳ Tense Challenge', 'Complete the sentence with the correct verb tense:', onComplete);
 }
 
 // ==========================================================================
-// 20. GAME: PREPOSITION MASTER 🎯 (10 consecutive preposition questions)
+// 20. GAME: PREPOSITION MASTER 🎯 (20 consecutive preposition questions)
 // ==========================================================================
 
 export function startPrepositionMasterGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1736,15 +1916,27 @@ export function startPrepositionMasterGame(stageEl, vaultData, onComplete = () =
     { word: 'He insists _____ paying for everyone\'s dinner.', target: 'on', choices: ['on', 'in', 'for', 'to'] },
     { word: 'This bespoke coat was made _____ hand.', target: 'by', choices: ['by', 'with', 'in', 'from'] },
     { word: 'We are looking forward _____ seeing you in London.', target: 'to', choices: ['to', 'at', 'for', 'with'] },
-    { word: 'Are you familiar _____ British afternoon tea etiquette?', target: 'with', choices: ['with', 'to', 'of', 'in'] }
+    { word: 'Are you familiar _____ British afternoon tea etiquette?', target: 'with', choices: ['with', 'to', 'of', 'in'] },
+    { word: 'She is very proud _____ her Scottish heritage.', target: 'of', choices: ['of', 'for', 'with', 'in'] },
+    { word: 'The decision depends _____ the weather tomorrow.', target: 'on', choices: ['on', 'of', 'from', 'at'] },
+    { word: 'He is responsible _____ managing the entire department.', target: 'for', choices: ['for', 'of', 'to', 'with'] },
+    { word: 'I completely agree _____ your assessment of the situation.', target: 'with', choices: ['with', 'to', 'on', 'for'] },
+    { word: 'Please refrain _____ smoking on the train platform.', target: 'from', choices: ['from', 'of', 'to', 'by'] },
+    { word: 'She prefers Earl Grey tea _____ coffee.', target: 'to', choices: ['to', 'than', 'over', 'from'] },
+    { word: 'The museum is open _____ Mondays through Saturdays.', target: 'on', choices: ['on', 'in', 'at', 'by'] },
+    { word: 'Our flight leaves _____ 7:30 in the evening.', target: 'at', choices: ['at', 'on', 'in', 'by'] },
+    { word: 'He graduated _____ Oxford University with honours.', target: 'from', choices: ['from', 'of', 'at', 'in'] },
+    { word: 'She divided the scones equally _____ the four guests.', target: 'among', choices: ['among', 'between', 'into', 'with'] },
+    { word: 'Don\'t worry, you can always rely _____ me.', target: 'on', choices: ['on', 'at', 'in', 'to'] },
+    { word: 'The cat hid _____ the sofa during the thunderstorm.', target: 'under', choices: ['under', 'above', 'into', 'between'] }
   ];
 
-  const dataset = shuffleArray(allPrepositions).slice(0, 10);
+  const dataset = shuffleArray(allPrepositions).slice(0, 20);
   runChoiceGame(stageEl, dataset, '🎯 Preposition Master', 'Choose the correct preposition:', onComplete);
 }
 
 // ==========================================================================
-// 21. GAME: ARTICLE CHALLENGE 📝 (10 consecutive article questions)
+// 21. GAME: ARTICLE CHALLENGE 📝 (20 consecutive article questions)
 // ==========================================================================
 
 export function startArticleChallengeGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1760,15 +1952,25 @@ export function startArticleChallengeGame(stageEl, vaultData, onComplete = () =>
     { word: 'She goes to _____ work by train every morning.', target: 'Ø (No article)', choices: ['Ø (No article)', 'the', 'a', 'an'] },
     { word: 'Can you give me _____ honest opinion?', target: 'an', choices: ['an', 'a', 'the', 'Ø (No article)'] },
     { word: '_____ Thames flows right through central London.', target: 'The', choices: ['The', 'A', 'An', 'Ø (No article)'] },
-    { word: 'We usually have _____ breakfast at 8:00 AM.', target: 'Ø (No article)', choices: ['Ø (No article)', 'the', 'a', 'an'] }
+    { word: 'We usually have _____ breakfast at 8:00 AM.', target: 'Ø (No article)', choices: ['Ø (No article)', 'the', 'a', 'an'] },
+    { word: 'He is _____ university professor in Cambridge.', target: 'a', choices: ['a', 'an', 'the', 'Ø (No article)'] },
+    { word: 'It takes about _____ hour to get there by tube.', target: 'an', choices: ['an', 'a', 'the', 'Ø (No article)'] },
+    { word: '_____ sun rises in the east and sets in the west.', target: 'The', choices: ['The', 'A', 'An', 'Ø (No article)'] },
+    { word: 'She speaks _____ fluent English and French.', target: 'Ø (No article)', choices: ['Ø (No article)', 'the', 'a', 'an'] },
+    { word: 'Could you please close _____ door on your way out?', target: 'the', choices: ['the', 'a', 'an', 'Ø (No article)'] },
+    { word: 'That was _____ most exciting match of the season!', target: 'the', choices: ['the', 'a', 'an', 'Ø (No article)'] },
+    { word: 'He bought _____ umbrella because it started drizzling.', target: 'an', choices: ['an', 'a', 'the', 'Ø (No article)'] },
+    { word: '_____ Mount Everest is the highest peak in the world.', target: 'Ø (No article)', choices: ['Ø (No article)', 'The', 'A', 'An'] },
+    { word: 'I saw _____ owl perched on the old oak tree.', target: 'an', choices: ['an', 'a', 'the', 'Ø (No article)'] },
+    { word: '_____ rich should help those who are less fortunate.', target: 'The', choices: ['The', 'A', 'An', 'Ø (No article)'] }
   ];
 
-  const dataset = shuffleArray(allArticles).slice(0, 10);
+  const dataset = shuffleArray(allArticles).slice(0, 20);
   runChoiceGame(stageEl, dataset, '📝 Article Challenge', 'Choose the correct article:', onComplete);
 }
 
 // ==========================================================================
-// 22. GAME: NATURAL ENGLISH 🌍 (10 consecutive British phrasing questions)
+// 22. GAME: NATURAL ENGLISH 🌍 (20 consecutive British phrasing questions)
 // ==========================================================================
 
 export function startNaturalEnglishGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1882,15 +2084,115 @@ export function startNaturalEnglishGame(stageEl, vaultData, onComplete = () => {
         'It stops my lung respiration always.',
         'It takes out my air.'
       ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'Shall we pop round to Sarah\'s house for a cuppa?',
+      choices: [
+        'Shall we pop round to Sarah\'s house for a cuppa?',
+        'Shall we jump circle to Sarah\'s house for tea?',
+        'Will we visit into Sarah\'s building for cup?',
+        'Do we walk roundly to Sarah for drinking?'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'I\'m afraid I won\'t be able to make it tonight.',
+      choices: [
+        'I\'m afraid I won\'t be able to make it tonight.',
+        'I have fear I cannot construct it tonight.',
+        'I am scared I will not do arrival tonight.',
+        'Sorry I cannot fabricate the meeting tonight.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'He always pays close attention to detail.',
+      choices: [
+        'He always pays close attention to detail.',
+        'He always gives near look to details.',
+        'He always spends tight attention on detail.',
+        'He always buys close focus for detail.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'Let\'s play it by ear and see how the weather turns out.',
+      choices: [
+        'Let\'s play it by ear and see how the weather turns out.',
+        'Let\'s listen with ear and see weather.',
+        'Let\'s music the ear until weather shows.',
+        'Let\'s touch ear for weather result.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'She caught a terrible cold last week.',
+      choices: [
+        'She caught a terrible cold last week.',
+        'She grabbed a bad coldness last week.',
+        'She took a freezing sickness last week.',
+        'She hunted a cold virus last week.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'Do you mind if I open the window for some fresh air?',
+      choices: [
+        'Do you mind if I open the window for some fresh air?',
+        'Are you angry if I unclose window for wind?',
+        'Do you brain if I open glass for air?',
+        'Is it bothering to open window for new air?'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'We had a whale of a time at the festival!',
+      choices: [
+        'We had a whale of a time at the festival!',
+        'We had a big fish of time at the festival!',
+        'We owned a shark time at the festival!',
+        'We spent a dolphin hour at the festival!'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'I\'ll keep my fingers crossed for your interview tomorrow.',
+      choices: [
+        'I\'ll keep my fingers crossed for your interview tomorrow.',
+        'I\'ll fold my thumbs for your interview tomorrow.',
+        'I\'ll tie my hands together for your interview.',
+        'I\'ll twist my fingers for your job talk.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'There is no point crying over spilt milk.',
+      choices: [
+        'There is no point crying over spilt milk.',
+        'There is no sense weeping on dropped milk.',
+        'Do not cry above fallen dairy.',
+        'No reason to shout at wet milk.'
+      ]
+    },
+    {
+      word: 'Which sentence sounds most natural to a native British speaker?',
+      target: 'He broke the ice with a witty British joke.',
+      choices: [
+        'He broke the ice with a witty British joke.',
+        'He smashed the snow with a funny British joke.',
+        'He cracked the frost by laughing.',
+        'He melted the ice cube with humor.'
+      ]
     }
   ];
 
-  const dataset = shuffleArray(allNatural).slice(0, 10);
+  const dataset = shuffleArray(allNatural).slice(0, 20);
   runChoiceGame(stageEl, dataset, '🌍 Natural English', 'Select the expression that sounds most natural:', onComplete);
 }
 
 // ==========================================================================
-// 23. GAME: FORMAL OR CASUAL? 🎩 (10 consecutive phrase classifications)
+// 23. GAME: FORMAL OR CASUAL? 🎩 (20 consecutive phrase classifications)
 // ==========================================================================
 
 export function startFormalCasualGame(stageEl, vaultData, onComplete = () => {}) {
@@ -1909,10 +2211,20 @@ export function startFormalCasualGame(stageEl, vaultData, onComplete = () => {})
     { phrase: 'See ya! Take care!', correct: 'Casual' },
     { phrase: 'In accordance with our prior agreement...', correct: 'Formal' },
     { phrase: 'That film was absolute rubbish!', correct: 'Casual' },
-    { phrase: 'Yours faithfully, Mr. H. Smith', correct: 'Formal' }
+    { phrase: 'Yours faithfully, Mr. H. Smith', correct: 'Formal' },
+    { phrase: 'Please find attached the quarterly financial report.', correct: 'Formal' },
+    { phrase: 'Alright mate, how\'s it going?', correct: 'Casual' },
+    { phrase: 'I would appreciate it if you could review this document.', correct: 'Formal' },
+    { phrase: 'I\'m proper chuffed with my new motor!', correct: 'Casual' },
+    { phrase: 'We regret to inform you that your application was unsuccessful.', correct: 'Formal' },
+    { phrase: 'Hang on a sec, I\'ll be right there!', correct: 'Casual' },
+    { phrase: 'Thank you for your prompt attention to this matter.', correct: 'Formal' },
+    { phrase: 'Let\'s have a quick chinwag over a cuppa.', correct: 'Casual' },
+    { phrase: 'I am pleased to accept the invitation to the gala.', correct: 'Formal' },
+    { phrase: 'Blimey, it\'s brass monkeys outside today!', correct: 'Casual' }
   ];
 
-  const dataset = shuffleArray(allPhrases).slice(0, 10);
+  const dataset = shuffleArray(allPhrases).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -1967,7 +2279,7 @@ export function startFormalCasualGame(stageEl, vaultData, onComplete = () => {})
 }
 
 // ==========================================================================
-// 24. GAME: COMPLETE THE CONVERSATION 💬 (10 consecutive dialogues)
+// 24. GAME: COMPLETE THE CONVERSATION 💬 (20 consecutive dialogues)
 // ==========================================================================
 
 export function startCompleteConversationGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2021,15 +2333,70 @@ export function startCompleteConversationGame(stageEl, vaultData, onComplete = (
       word: 'Driver: "Terrible traffic on the M25 motorway today!"\nPassenger: "_______________"',
       target: 'Tell me about it! We have barely moved an inch.',
       choices: ['Tell me about it! We have barely moved an inch.', 'Cars have four wheels.', 'Motorway begins with letter M.', 'I like bicycles.']
+    },
+    {
+      word: 'Conductor: "Tickets and railcards, please!"\nCommuter: "_______________"',
+      target: 'Here you go! I have a return ticket to Oxford.',
+      choices: ['Here you go! I have a return ticket to Oxford.', 'Trains are made of steel.', 'I enjoy reading books.', 'The window is clean.']
+    },
+    {
+      word: 'Friend: "I just passed my driving test on the first attempt!"\nYou: "_______________"',
+      target: 'Congratulations! You must be absolutely chuffed!',
+      choices: ['Congratulations! You must be absolutely chuffed!', 'Cars use petrol or electricity.', 'Roads are grey.', 'Tuesday is after Monday.']
+    },
+    {
+      word: 'Receptionist: "Good morning, how may I help you?"\nGuest: "_______________"',
+      target: 'Hello, I have a reservation under the name Smith.',
+      choices: ['Hello, I have a reservation under the name Smith.', 'Morning is before afternoon.', 'The carpet is red.', 'I have a suitcase.']
+    },
+    {
+      word: 'Caller: "Hello, could I speak to Mrs. Evans, please?"\nSecretary: "_______________"',
+      target: 'Hold the line a moment, I\'ll put you through.',
+      choices: ['Hold the line a moment, I\'ll put you through.', 'Phones ring loudly.', 'Mrs. Evans has brown hair.', 'I am sitting at a desk.']
+    },
+    {
+      word: 'Friend: "Oh no, I left my wallet at home!"\nYou: "_______________"',
+      target: 'Don\'t worry, it\'s my treat today—I\'ll cover you.',
+      choices: ['Don\'t worry, it\'s my treat today—I\'ll cover you.', 'Wallets are made of leather.', 'Home is where the heart is.', 'Coins are round.']
+    },
+    {
+      word: 'Baker: "What can I get for you this morning, love?"\nCustomer: "_______________"',
+      target: 'Two freshly baked scones and a loaf of sourdough, please.',
+      choices: ['Two freshly baked scones and a loaf of sourdough, please.', 'Flour is white powder.', 'Ovens are very hot.', 'I walked here today.']
+    },
+    {
+      word: 'Colleague: "Do you mind if I borrow your pen for a second?"\nYou: "_______________"',
+      target: 'Not at all, help yourself!',
+      choices: ['Not at all, help yourself!', 'Pens contain blue ink.', 'Paper comes from trees.', 'I can write fast.']
+    },
+    {
+      word: 'Guest: "Thank you so much for hosting such a wonderful dinner!"\nHost: "_______________"',
+      target: 'It was our pleasure! Thank you for coming.',
+      choices: ['It was our pleasure! Thank you for coming.', 'Plates are round.', 'Dinner is eaten in the evening.', 'Forks have four prongs.']
+    },
+    {
+      word: 'Sister: "What do you fancy doing this Saturday?"\nBrother: "_______________"',
+      target: 'How about a day trip down to Brighton beach?',
+      choices: ['How about a day trip down to Brighton beach?', 'Saturday is the weekend.', 'Beaches have pebbles.', 'The sea is salty.']
+    },
+    {
+      word: 'Customer: "Excuse me, do you have this trench coat in a medium?"\nAssistant: "_______________"',
+      target: 'Let me check the stockroom for you right away.',
+      choices: ['Let me check the stockroom for you right away.', 'Coats have buttons.', 'Winter is cold.', 'Cotton is soft.']
+    },
+    {
+      word: 'Flatmate: "It\'s pouring with rain outside!"\nYou: "_______________"',
+      target: 'Good thing I packed my brolly and wellies!',
+      choices: ['Good thing I packed my brolly and wellies!', 'Water falls from clouds.', 'Grass is green.', 'Clouds are high up.']
     }
   ];
 
-  const dataset = shuffleArray(allDialogues).slice(0, 10);
+  const dataset = shuffleArray(allDialogues).slice(0, 20);
   runChoiceGame(stageEl, dataset, '💬 Complete Conversation', 'Choose the response that completes the conversation naturally:', onComplete);
 }
 
 // ==========================================================================
-// 25. GAME: STORY BUILDER 📚 (10 consecutive story steps)
+// 25. GAME: STORY BUILDER 📚 (20 consecutive story steps)
 // ==========================================================================
 
 export function startStoryBuilderGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2042,16 +2409,26 @@ export function startStoryBuilderGame(stageEl, vaultData, onComplete = () => {})
     { word: 'The curator led him to a secret archive room and revealed...', target: 'a lost manuscript written by William Shakespeare', choices: ['a lost manuscript written by William Shakespeare', 'a giant rubber duck', 'a box of half-eaten crisps', 'a bowling ball from 2024'] },
     { word: 'To unlock the glass display case, Oliver had to solve...', target: 'a clever British riddle about the River Thames', choices: ['a clever British riddle about the River Thames', 'a video game level on impossible mode', 'a 1000-page tax document', 'a wrestling match with a bear'] },
     { word: 'Recalling his history lessons, Oliver whispered the correct word and...', target: 'the antique case clicked open smoothly', choices: ['the antique case clicked open smoothly', 'the museum alarms exploded', 'the floor opened into lava', 'the curator turned into a frog'] },
-    { word: 'Inside the manuscript was an ancient map showing...', target: 'a hidden garden hidden deep behind Buckingham Palace', choices: ['a hidden garden hidden deep behind Buckingham Palace', 'the location of a lost shoe store', 'a map of the moon in 3000 BC', 'a recipe for soup'] },
-    { word: 'Delighted with the discovery, Oliver and the curator toasted with...', target: 'a proper pot of Earl Grey tea and scones', choices: ['a proper pot of Earl Grey tea and scones', 'a bottle of washing detergent', 'melted ice cubes', 'a glass of seawater'] }
+    { word: 'Inside the manuscript was an ancient map showing...', target: 'a hidden garden deep behind Buckingham Palace', choices: ['a hidden garden deep behind Buckingham Palace', 'the location of a lost shoe store', 'a map of the moon in 3000 BC', 'a recipe for soup'] },
+    { word: 'Delighted with the discovery, Oliver and the curator toasted with...', target: 'a proper pot of Earl Grey tea and scones', choices: ['a proper pot of Earl Grey tea and scones', 'a bottle of washing detergent', 'melted ice cubes', 'a glass of seawater'] },
+    { word: 'The next morning, they took a classic red double-decker bus towards...', target: 'Westminster Abbey to inspect the royal archives', choices: ['Westminster Abbey to inspect the royal archives', 'the bottom of the Pacific Ocean', 'an active volcano in Hawaii', 'a space station'] },
+    { word: 'Outside the abbey, a friendly Beefeater guard handed them...', target: 'an ornate brass key from the Tudor era', choices: ['an ornate brass key from the Tudor era', 'a broken plastic spoon', 'a skateboard with square wheels', 'a snowglobe from Mars'] },
+    { word: 'Using the brass key, they opened a heavy oak door leading to...', target: 'a spiral stone staircase lit by lanterns', choices: ['a spiral stone staircase lit by lanterns', 'a bowling alley', 'a car wash', 'a trampoline park'] },
+    { word: 'At the top of the tower, they looked out the window and admired...', target: 'the panoramic view of Big Ben and the London Eye', choices: ['the panoramic view of Big Ben and the London Eye', 'the Eiffel Tower and Statue of Liberty', 'a desert full of cacti', 'an icy glacier'] },
+    { word: 'On an antique mahogany desk in the corner rested...', target: 'a leather-bound journal signed by Sir Isaac Newton', choices: ['a leather-bound journal signed by Sir Isaac Newton', 'a modern smartphone charger', 'a bag of frozen peas', 'a bicycle tyre'] },
+    { word: 'Flipping carefully through the fragile pages, Oliver discovered...', target: 'notes on an ancient clockwork astrolabe', choices: ['notes on an ancient clockwork astrolabe', 'cheat codes for a computer game', 'a grocery list for crisps', 'lyrics to a pop song'] },
+    { word: 'Suddenly, the bells of Westminster chimed noon, which caused...', target: 'a secret compartment in the desk to slide open', choices: ['a secret compartment in the desk to slide open', 'gravity to stop working', 'rain to fall upwards', 'the walls to turn pink'] },
+    { word: 'Inside the hidden compartment gleamed...', target: 'a golden pocket watch engraved with the Royal Coat of Arms', choices: ['a golden pocket watch engraved with the Royal Coat of Arms', 'a half-eaten cheese sandwich', 'a pair of muddy wellies', 'a tin of baked beans'] },
+    { word: 'The curator gasped with joy and declared that the artifact would...', target: 'be the centrepiece of the royal exhibition', choices: ['be the centrepiece of the royal exhibition', 'be thrown into a skip', 'be traded for a bus ticket', 'be used as a paperweight'] },
+    { word: 'For his brilliant help, Oliver was honoured with...', target: 'a lifetime fellowship at the British Museum', choices: ['a lifetime fellowship at the British Museum', 'a parking ticket', 'a broken umbrella', 'a cold cup of water'] }
   ];
 
-  const dataset = allStorySteps.slice(0, 10);
+  const dataset = allStorySteps.slice(0, 20);
   runChoiceGame(stageEl, dataset, '📚 Story Builder', 'Choose the next logical step in the story:', onComplete);
 }
 
 // ==========================================================================
-// 26. GAME: WORD CATEGORIES 🗂️ (10 consecutive word categorizations)
+// 26. GAME: WORD CATEGORIES 🗂️ (20 consecutive word categorizations)
 // ==========================================================================
 
 export function startWordCategoriesGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2071,10 +2448,20 @@ export function startWordCategoriesGame(stageEl, vaultData, onComplete = () => {
     { word: 'Waistcoat', cat: 'Clothing' },
     { word: 'Gobsmacked', cat: 'Emotions' },
     { word: 'Fish and chips', cat: 'Food & Drink' },
-    { word: 'Brolly (Umbrella)', cat: 'Clothing' }
+    { word: 'Brolly (Umbrella)', cat: 'Clothing' },
+    { word: 'Shepherd\'s pie', cat: 'Food & Drink' },
+    { word: 'Roundabout', cat: 'Travel & Transport' },
+    { word: 'Jumper (Sweater)', cat: 'Clothing' },
+    { word: 'Knackered', cat: 'Emotions' },
+    { word: 'Yorkshire pudding', cat: 'Food & Drink' },
+    { word: 'Motorway', cat: 'Travel & Transport' },
+    { word: 'Trainers (Sneakers)', cat: 'Clothing' },
+    { word: 'Miffed', cat: 'Emotions' },
+    { word: 'Clotted cream', cat: 'Food & Drink' },
+    { word: 'Cardigan', cat: 'Clothing' }
   ];
 
-  const dataset = shuffleArray(allWords).slice(0, 10);
+  const dataset = shuffleArray(allWords).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -2131,7 +2518,7 @@ export function startWordCategoriesGame(stageEl, vaultData, onComplete = () => {
 }
 
 // ==========================================================================
-// 27. GAME: SPEED READING ⚡ (10 consecutive reading questions)
+// 27. GAME: SPEED READING ⚡ (20 consecutive reading questions)
 // ==========================================================================
 
 export function startSpeedReadingGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2185,15 +2572,75 @@ export function startSpeedReadingGame(stageEl, vaultData, onComplete = () => {})
       word: 'Passage: "The British pound sterling is the oldest currency in continuous use in the world today."',
       target: 'Oldest continuous currency',
       choices: ['Oldest continuous currency', 'Newest currency', 'Digital cryptocurrency', 'Only used in Scotland']
+    },
+    {
+      word: 'Passage: "Oxford University is the oldest university in the English-speaking world, with teaching dating back to 1096."',
+      target: '1096',
+      choices: ['1096', '1950', '1800', '1650']
+    },
+    {
+      word: 'Passage: "London\'s iconic black cabs require drivers to pass \'The Knowledge\', memorizing 25,000 streets."',
+      target: '25,000 streets',
+      choices: ['25,000 streets', 'Only 50 streets', '100 motorways', '5 bridges']
+    },
+    {
+      word: 'Passage: "Stonehenge in Wiltshire was built in several stages, with the earliest monument dating back 5,000 years."',
+      target: '5,000 years ago',
+      choices: ['5,000 years ago', '200 years ago', 'In the 1960s', 'During World War II']
+    },
+    {
+      word: 'Passage: "William Shakespeare was born in Stratford-upon-Avon and wrote 37 plays and 154 sonnets."',
+      target: 'Stratford-upon-Avon',
+      choices: ['Stratford-upon-Avon', 'Manchester', 'Edinburgh', 'Liverpool']
+    },
+    {
+      word: 'Passage: "The River Thames flows 215 miles through southern England, making it the longest river entirely in England."',
+      target: '215 miles',
+      choices: ['215 miles', '10 miles', '5,000 miles', '50 yards']
+    },
+    {
+      word: 'Passage: "The British Library in London holds over 170 million items from every age of written civilization."',
+      target: 'Over 170 million items',
+      choices: ['Over 170 million items', 'Only 500 books', '10,000 magazines', 'A few dozen scrolls']
+    },
+    {
+      word: 'Passage: "In the UK, driving on the left side of the road became official law across the country in 1835."',
+      target: 'Left side of the road',
+      choices: ['Left side of the road', 'Right side of the road', 'Middle of the pavement', 'Only on Sundays']
+    },
+    {
+      word: 'Passage: "Edinburgh Castle sits atop Castle Rock, an extinct volcanic plug in the heart of Scotland\'s capital."',
+      target: 'An extinct volcanic plug',
+      choices: ['An extinct volcanic plug', 'A floating island', 'A sandy beach', 'An artificial glass tower']
+    },
+    {
+      word: 'Passage: "A traditional Sunday roast consists of roasted meat, roast potatoes, vegetables, gravy, and Yorkshire pudding."',
+      target: 'Yorkshire pudding and roast meat',
+      choices: ['Yorkshire pudding and roast meat', 'Sushi and miso soup', 'Tacos and salsa', 'Croissants and jam']
+    },
+    {
+      word: 'Passage: "Greenwich Mean Time (GMT) is measured from the Royal Observatory in Greenwich, London."',
+      target: 'Royal Observatory in Greenwich',
+      choices: ['Royal Observatory in Greenwich', 'Cardiff Castle', 'Belfast Harbour', 'Brighton Pier']
+    },
+    {
+      word: 'Passage: "The red telephone box was designed by Sir Giles Gilbert Scott in 1924 to commemorate King George V\'s Silver Jubilee."',
+      target: 'Sir Giles Gilbert Scott',
+      choices: ['Sir Giles Gilbert Scott', 'Winston Churchill', 'Charles Darwin', 'Alexander Fleming']
+    },
+    {
+      word: 'Passage: "The Channel Tunnel, or \'Chunnel\', connects Folkestone in Kent with Coquelles in northern France beneath the sea."',
+      target: 'England and northern France',
+      choices: ['England and northern France', 'London and New York', 'Scotland and Norway', 'Wales and Spain']
     }
   ];
 
-  const dataset = shuffleArray(allPassages).slice(0, 10);
+  const dataset = shuffleArray(allPassages).slice(0, 20);
   runChoiceGame(stageEl, dataset, '⚡ Speed Reading', 'Read the passage and choose the correct answer:', onComplete);
 }
 
 // ==========================================================================
-// 28. GAME: TRUE OR FALSE? ✅❌ (10 consecutive facts)
+// 28. GAME: TRUE OR FALSE? ✅❌ (20 consecutive facts)
 // ==========================================================================
 
 export function startTrueFalseGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2211,10 +2658,20 @@ export function startTrueFalseGame(stageEl, vaultData, onComplete = () => {}) {
     { statement: '"Skint" is a British slang word meaning very wealthy.', target: 'False' },
     { statement: 'Big Ben is the name of the bell inside the clock tower, not the tower itself.', target: 'True' },
     { statement: 'The Tube is the nickname for the London Underground railway.', target: 'True' },
-    { statement: 'In British English, a "flat" is what Americans call an "apartment".', target: 'True' }
+    { statement: 'In British English, a "flat" is what Americans call an "apartment".', target: 'True' },
+    { statement: 'In British English, the "boot" of a car is the front engine cover.', target: 'False' },
+    { statement: '"Crisps" in the UK are thin, crunchy potato chips sold in bags.', target: 'True' },
+    { statement: '"Gobsmacked" means being utterly astonished or amazed.', target: 'True' },
+    { statement: 'In British English, a "jumper" is a warm knitted sweater.', target: 'True' },
+    { statement: 'A "lorry" in British English means a small bicycle.', target: 'False' },
+    { statement: '"Cheeky" often describes someone who is playfully bold or slightly impudent.', target: 'True' },
+    { statement: 'The River Seine flows through the centre of London.', target: 'False' },
+    { statement: '"Ta" is an informal British way of saying "thank you".', target: 'True' },
+    { statement: 'In the UK, the "ground floor" is the same as the 10th floor.', target: 'False' },
+    { statement: 'A "quid" is British slang for one pound sterling (£1).', target: 'True' }
   ];
 
-  const questions = shuffleArray(allStatements).slice(0, 10);
+  const questions = shuffleArray(allStatements).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -2267,12 +2724,12 @@ export function startTrueFalseGame(stageEl, vaultData, onComplete = () => {}) {
 }
 
 // ==========================================================================
-// 29. GAME: MEMORY CHALLENGE 🧠 (10 consecutive fast-recall rounds)
+// 29. GAME: MEMORY CHALLENGE 🧠 (20 consecutive fast-recall rounds)
 // ==========================================================================
 
 export function startMemoryChallengeGame(stageEl, vaultData, onComplete = () => {}) {
   const allVault = getAllVaultItems(vaultData);
-  const rounds = shuffleArray(allVault).slice(0, 10);
+  const rounds = shuffleArray(allVault).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -2364,7 +2821,7 @@ export function startMemoryChallengeGame(stageEl, vaultData, onComplete = () => 
 }
 
 // ==========================================================================
-// 30. GAME: WORD CHAIN 🔗 (10 consecutive word chain links)
+// 30. GAME: WORD CHAIN 🔗 (20 consecutive word chain links)
 // ==========================================================================
 
 export function startWordChainGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2380,10 +2837,20 @@ export function startWordChainGame(stageEl, vaultData, onComplete = () => {}) {
     { start: 'THAMES', lastLetter: 'S', choices: ['Splendid', 'Dull', 'Boring', 'Sad'], correct: 'Splendid' },
     { start: 'SPLENDID', lastLetter: 'D', choices: ['Delightful', 'Awful', 'Bad', 'Poor'], correct: 'Delightful' },
     { start: 'CHUFFED', lastLetter: 'D', choices: ['Dapper', 'Scared', 'Rough', 'Plain'], correct: 'Dapper' },
-    { start: 'DAPPER', lastLetter: 'R', choices: ['Royal', 'Common', 'Cheap', 'Wild'], correct: 'Royal' }
+    { start: 'DAPPER', lastLetter: 'R', choices: ['Royal', 'Common', 'Cheap', 'Wild'], correct: 'Royal' },
+    { start: 'ROYAL', lastLetter: 'L', choices: ['Lorry', 'Bus', 'Train', 'Cab'], correct: 'Lorry' },
+    { start: 'LORRY', lastLetter: 'Y', choices: ['Yorkshire', 'Cornwall', 'Devon', 'Kent'], correct: 'Yorkshire' },
+    { start: 'YORKSHIRE', lastLetter: 'E', choices: ['Empire', 'Kingdom', 'Crown', 'Palace'], correct: 'Empire' },
+    { start: 'EMPIRE', lastLetter: 'E', choices: ['Earl', 'Duke', 'Baron', 'Knight'], correct: 'Earl' },
+    { start: 'EARL', lastLetter: 'L', choices: ['Lovely', 'Jolly', 'Cheeky', 'Posh'], correct: 'Lovely' },
+    { start: 'LOVELY', lastLetter: 'Y', choices: ['Yeoman', 'Guard', 'Soldier', 'Watchman'], correct: 'Yeoman' },
+    { start: 'YEOMAN', lastLetter: 'N', choices: ['Natter', 'Chat', 'Gossip', 'Whisper'], correct: 'Natter' },
+    { start: 'NATTER', lastLetter: 'R', choices: ['Rubbish', 'Trash', 'Litter', 'Waste'], correct: 'Rubbish' },
+    { start: 'RUBBISH', lastLetter: 'H', choices: ['Hamlet', 'Macbeth', 'Othello', 'Tempest'], correct: 'Hamlet' },
+    { start: 'HAMLET', lastLetter: 'T', choices: ['Teapot', 'Kettle', 'Saucer', 'Mug'], correct: 'Teapot' }
   ];
 
-  const chain = shuffleArray(allChain).slice(0, 10);
+  const chain = shuffleArray(allChain).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -2437,7 +2904,7 @@ export function startWordChainGame(stageEl, vaultData, onComplete = () => {}) {
 }
 
 // ==========================================================================
-// 31. GAME: CATEGORY RUSH 🚀 (10 consecutive rapid identification questions)
+// 31. GAME: CATEGORY RUSH 🚀 (20 consecutive rapid identification questions)
 // ==========================================================================
 
 export function startCategoryRushGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2453,10 +2920,20 @@ export function startCategoryRushGame(stageEl, vaultData, onComplete = () => {})
     { targetCat: 'British Slang', correct: 'Gobsmacked', options: ['Gobsmacked', 'Goldfish', 'Goalkeeper', 'Garden'] },
     { targetCat: 'British Weather', correct: 'Drizzle', options: ['Drizzle', 'Desert', 'Dune', 'Canyon'] },
     { targetCat: 'British Slang', correct: 'Brolly', options: ['Brolly', 'Broccoli', 'Brother', 'Bronze'] },
-    { targetCat: 'Transport', correct: 'Black cab', options: ['Black cab', 'Black tea', 'Blackberry', 'Blackboard'] }
+    { targetCat: 'Transport', correct: 'Black cab', options: ['Black cab', 'Black tea', 'Blackberry', 'Blackboard'] },
+    { targetCat: 'Food & Drink', correct: 'Bangers and mash', options: ['Bangers and mash', 'Bonnet and boot', 'Bricks and mortar', 'Bowler and cane'] },
+    { targetCat: 'London Landmarks', correct: 'Tower Bridge', options: ['Tower Bridge', 'Golden Gate', 'Brooklyn Bridge', 'Sydney Harbour'] },
+    { targetCat: 'Clothing', correct: 'Wellies', options: ['Wellies', 'Waffles', 'Walnuts', 'Whistles'] },
+    { targetCat: 'Transport', correct: 'Roundabout', options: ['Roundabout', 'Roast beef', 'Raincoat', 'Rucksack'] },
+    { targetCat: 'British Currency', correct: 'Quid', options: ['Quid', 'Quarter', 'Quiche', 'Quarry'] },
+    { targetCat: 'London Landmarks', correct: 'Buckingham Palace', options: ['Buckingham Palace', 'Versailles', 'White House', 'Taj Mahal'] },
+    { targetCat: 'Food & Drink', correct: 'Yorkshire Pudding', options: ['Yorkshire Pudding', 'Piccadilly Circus', 'Paddington Station', 'Sherwood Forest'] },
+    { targetCat: 'British Slang', correct: 'Dodgy', options: ['Dodgy', 'Dolphin', 'Domino', 'Doctor'] },
+    { targetCat: 'Clothing', correct: 'Jumper', options: ['Jumper', 'Junction', 'Journal', 'Jubilee'] },
+    { targetCat: 'British Currency', correct: 'Tenner', options: ['Tenner', 'Tennis', 'Terrace', 'Thistle'] }
   ];
 
-  const dataset = shuffleArray(allRush).slice(0, 10);
+  const dataset = shuffleArray(allRush).slice(0, 20);
   let currentIdx = 0;
   let score = 0;
 
@@ -2510,7 +2987,7 @@ export function startCategoryRushGame(stageEl, vaultData, onComplete = () => {})
 }
 
 // ==========================================================================
-// 32. GAME: FORBIDDEN WORD 🚫 (10 consecutive taboo word puzzles)
+// 32. GAME: FORBIDDEN WORD 🚫 (20 consecutive taboo word puzzles)
 // ==========================================================================
 
 export function startForbiddenWordGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2524,15 +3001,27 @@ export function startForbiddenWordGame(stageEl, vaultData, onComplete = () => {}
     { word: 'Clue: British slang for being extremely pleased or proud.\nForbidden words: [happy, glad, smile]', target: 'Chuffed', choices: ['Chuffed', 'Angry', 'Sad', 'Bored'] },
     { word: 'Clue: Traditional British pub dish with fried potato strips.\nForbidden words: [potato, fry, grease]', target: 'Fish and Chips', choices: ['Fish and Chips', 'Pasta', 'Steak', 'Salad'] },
     { word: 'Clue: A period of fourteen consecutive days.\nForbidden words: [two, weeks, fourteen]', target: 'Fortnight', choices: ['Fortnight', 'Month', 'Decade', 'Century'] },
-    { word: 'Clue: Official London residence of the British Monarch.\nForbidden words: [queen, king, palace]', target: 'Buckingham Palace', choices: ['Buckingham Palace', 'Windsor', 'Westminster', 'Whitehall'] }
+    { word: 'Clue: Official London residence of the British Monarch.\nForbidden words: [queen, king, palace]', target: 'Buckingham Palace', choices: ['Buckingham Palace', 'Windsor', 'Westminster', 'Whitehall'] },
+    { word: 'Clue: Iconic two-storey red vehicle that drives along London streets.\nForbidden words: [bus, red, wheels]', target: 'Double-decker', choices: ['Double-decker', 'Helicopter', 'Submarine', 'Scooter'] },
+    { word: 'Clue: Waterproof rubber boots worn in muddy British fields.\nForbidden words: [boots, rain, shoes]', target: 'Wellies', choices: ['Wellies', 'Sandals', 'Slippers', 'Flip-flops'] },
+    { word: 'Clue: British slang term for having no money at all.\nForbidden words: [poor, money, broke]', target: 'Skint', choices: ['Skint', 'Wealthy', 'Generous', 'Greedy'] },
+    { word: 'Clue: Giant Ferris wheel on the South Bank of the River Thames.\nForbidden words: [wheel, circle, ride]', target: 'London Eye', choices: ['London Eye', 'Tower of London', 'Hyde Park', 'Trafalgar Square'] },
+    { word: 'Clue: British word for a warm knitted garment worn over a shirt.\nForbidden words: [sweater, wool, warm]', target: 'Jumper', choices: ['Jumper', 'Trousers', 'Socks', 'Gloves'] },
+    { word: 'Clue: British slang for being completely shocked or astonished.\nForbidden words: [surprised, shocked, mouth]', target: 'Gobsmacked', choices: ['Gobsmacked', 'Sleepy', 'Calm', 'Careless'] },
+    { word: 'Clue: Circular traffic junction where cars drive around a central island.\nForbidden words: [circle, traffic, turn]', target: 'Roundabout', choices: ['Roundabout', 'Crosswalk', 'Bridge', 'Tunnel'] },
+    { word: 'Clue: The rear storage compartment of a car in British English.\nForbidden words: [trunk, car, back]', target: 'Boot', choices: ['Boot', 'Bonnet', 'Steering wheel', 'Exhaust'] },
+    { word: 'Clue: A polite line of people waiting patiently for their turn.\nForbidden words: [line, wait, stand]', target: 'Queue', choices: ['Queue', 'Crowd', 'Mob', 'Parade'] },
+    { word: 'Clue: Informal British slang for a five-pound banknote (£5).\nForbidden words: [five, pounds, money]', target: 'Fiver', choices: ['Fiver', 'Tenner', 'Penny', 'Shilling'] },
+    { word: 'Clue: Traditional British dish of sausages served with mashed potatoes.\nForbidden words: [sausage, potato, onion]', target: 'Bangers and Mash', choices: ['Bangers and Mash', 'Roast Chicken', 'Beef Wellington', 'Cornish Pasty'] },
+    { word: 'Clue: Ancient prehistoric ring of standing stones in Wiltshire.\nForbidden words: [stones, rocks, circle]', target: 'Stonehenge', choices: ['Stonehenge', 'Hadrian\'s Wall', 'Roman Baths', 'Edinburgh Castle'] }
   ];
 
-  const dataset = shuffleArray(allForbidden).slice(0, 10);
+  const dataset = shuffleArray(allForbidden).slice(0, 20);
   runChoiceGame(stageEl, dataset, '🚫 Forbidden Word', 'Guess the target word from the clue (without the forbidden words):', onComplete);
 }
 
 // ==========================================================================
-// 33. GAME: ENGLISH TRIVIA 🌎 (10 consecutive British trivia questions)
+// 33. GAME: ENGLISH TRIVIA 🌎 (20 consecutive British trivia questions)
 // ==========================================================================
 
 export function startEnglishTriviaGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2548,15 +3037,25 @@ export function startEnglishTriviaGame(stageEl, vaultData, onComplete = () => {}
     { word: 'Which prehistoric stone circle monument is located in Wiltshire, England?', target: 'Stonehenge', choices: ['Stonehenge', 'Colosseum', 'Parthenon', 'Pyramids'] },
     { word: 'What is the official London home of the Prime Minister of the UK?', target: '10 Downing Street', choices: ['10 Downing Street', 'Buckingham Palace', 'Tower of London', 'Kensington Palace'] },
     { word: 'What is the traditional accompaniment to scones in British cream tea?', target: 'Clotted cream and jam', choices: ['Clotted cream and jam', 'Butter and mustard', 'Chocolate syrup', 'Olive oil'] },
-    { word: 'How many weeks are in a British "fortnight"?', target: 'Two weeks', choices: ['Two weeks', 'Four weeks', 'One week', 'Three weeks'] }
+    { word: 'How many weeks are in a British "fortnight"?', target: 'Two weeks', choices: ['Two weeks', 'Four weeks', 'One week', 'Three weeks'] },
+    { word: 'Which Scottish loch is famous for legends of a mythical underwater monster?', target: 'Loch Ness', choices: ['Loch Ness', 'Loch Lomond', 'Lake Windermere', 'Serpentine Lake'] },
+    { word: 'What is the capital city of Scotland?', target: 'Edinburgh', choices: ['Edinburgh', 'Glasgow', 'Aberdeen', 'Inverness'] },
+    { word: 'What is the capital city of Wales?', target: 'Cardiff', choices: ['Cardiff', 'Swansea', 'Newport', 'Bangor'] },
+    { word: 'Which English city is world-famous as the birthplace of The Beatles?', target: 'Liverpool', choices: ['Liverpool', 'Manchester', 'Birmingham', 'Bristol'] },
+    { word: 'What is the name of the ceremonial guards at the Tower of London?', target: 'Yeoman Warders (Beefeaters)', choices: ['Yeoman Warders (Beefeaters)', 'Swiss Guards', 'Royal Marines', 'Highlanders'] },
+    { word: 'Which British author wrote "Pride and Prejudice" and "Sense and Sensibility"?', target: 'Jane Austen', choices: ['Jane Austen', 'Charlotte Brontë', 'Agatha Christie', 'Virginia Woolf'] },
+    { word: 'Which British detective created by Sir Arthur Conan Doyle lived at 221B Baker Street?', target: 'Sherlock Holmes', choices: ['Sherlock Holmes', 'Hercule Poirot', 'Miss Marple', 'Inspector Morse'] },
+    { word: 'What flower is the national emblem of England?', target: 'The Tudor Rose', choices: ['The Tudor Rose', 'The Thistle', 'The Daffodil', 'The Shamrock'] },
+    { word: 'What is the name of the flag of the United Kingdom?', target: 'The Union Jack', choices: ['The Union Jack', 'The Stars and Stripes', 'The Tricolour', 'The Southern Cross'] },
+    { word: 'Which London square features Nelson\'s Column and four giant bronze lions?', target: 'Trafalgar Square', choices: ['Trafalgar Square', 'Parliament Square', 'Russell Square', 'Soho Square'] }
   ];
 
-  const dataset = shuffleArray(allTrivia).slice(0, 10);
+  const dataset = shuffleArray(allTrivia).slice(0, 20);
   runChoiceGame(stageEl, dataset, '🌎 English Trivia', 'Answer the British English trivia question:', onComplete);
 }
 
 // ==========================================================================
-// 34. GAME: WORD CONNECTIONS 🧩 (10 consecutive word connection groups)
+// 34. GAME: WORD CONNECTIONS 🧩 (20 consecutive word connection groups)
 // ==========================================================================
 
 export function startWordConnectionsGame(stageEl, vaultData, onComplete = () => {}) {
@@ -2572,21 +3071,31 @@ export function startWordConnectionsGame(stageEl, vaultData, onComplete = () => 
     { word: 'Words: [Fish & Chips, Shepherd\'s Pie, Sunday Roast, Bangers & Mash]', target: 'Traditional British Dishes', choices: ['Traditional British Dishes', 'Breakfast Cereals', 'Supermarkets', 'Fast Foods'] },
     { word: 'Words: [Wimbledon, Wembley, Lord\'s, Twickenham]', target: 'Famous British Sports Venues', choices: ['Famous British Sports Venues', 'Royal Palaces', 'Universities', 'Cathedrals'] },
     { word: 'Words: [Brolly, Mac, Trench Coat, Wellies]', target: 'British Rain Gear', choices: ['British Rain Gear', 'Summer Beachwear', 'Winter Sports', 'Formal Suits'] },
-    { word: 'Words: [Oxford, Cambridge, Imperial, UCL]', target: 'Top British Universities', choices: ['Top British Universities', 'London Hospitals', 'Museums', 'Bookstores'] }
+    { word: 'Words: [Oxford, Cambridge, Imperial, UCL]', target: 'Top British Universities', choices: ['Top British Universities', 'London Hospitals', 'Museums', 'Bookstores'] },
+    { word: 'Words: [England, Scotland, Wales, Northern Ireland]', target: 'Countries of the United Kingdom', choices: ['Countries of the United Kingdom', 'Channel Islands', 'London Boroughs', 'Counties of Kent'] },
+    { word: 'Words: [Hamlet, Macbeth, Othello, King Lear]', target: 'Shakespearean Tragedies', choices: ['Shakespearean Tragedies', 'Charles Dickens Novels', 'British Operas', 'Modern Films'] },
+    { word: 'Words: [Heathrow, Gatwick, Stansted, Luton]', target: 'London Airports', choices: ['London Airports', 'Seaports', 'Underground Depots', 'Royal Castles'] },
+    { word: 'Words: [Paddington, King\'s Cross, Waterloo, Victoria]', target: 'Major London Train Termini', choices: ['Major London Train Termini', 'British Prime Ministers', 'Famous Poets', 'Tennis Champions'] },
+    { word: 'Words: [Cheddar, Stilton, Red Leicester, Wensleydale]', target: 'British Cheeses', choices: ['British Cheeses', 'Apple Varieties', 'Tea Brands', 'Wool Fabrics'] },
+    { word: 'Words: [Drizzle, Downpour, Mizzle, Overcast]', target: 'British Weather Terms', choices: ['British Weather Terms', 'Cooking Methods', 'Gardening Tools', 'Sailing Terms'] },
+    { word: 'Words: [Jumper, Waistcoat, Cardigan, Trousers]', target: 'British Clothing Terms', choices: ['British Clothing Terms', 'Shoe Brands', 'Bedding Items', 'Curtain Styles'] },
+    { word: 'Words: [Thames, Severn, Trent, Mersey]', target: 'Major British Rivers', choices: ['Major British Rivers', 'Mountain Ranges', 'Coastal Towns', 'Ancient Forests'] },
+    { word: 'Words: [Tudor, Stuart, Georgian, Victorian]', target: 'British Historical Eras', choices: ['British Historical Eras', 'Architectural Columns', 'Football Leagues', 'Newspaper Titles'] },
+    { word: 'Words: [Ta, Cheers, Brill, Ace]', target: 'Casual British Exclamations', choices: ['Casual British Exclamations', 'Card Games', 'Pub Drinks', 'Postcodes'] }
   ];
 
-  const dataset = shuffleArray(allConnections).slice(0, 10);
+  const dataset = shuffleArray(allConnections).slice(0, 20);
   runChoiceGame(stageEl, dataset, '🧩 Word Connections', 'What is the common connection between these 4 items?', onComplete);
 }
 
 // ==========================================================================
-// HELPER CHOICE RUNNER FOR MULTIPLE CHOICE GAMES (10 questions, audio, progress)
+// HELPER CHOICE RUNNER FOR MULTIPLE CHOICE GAMES (20 questions, audio, progress)
 // ==========================================================================
 
 function runChoiceGame(stageEl, dataset, title, promptText, onComplete) {
   let currentIdx = 0;
   let score = 0;
-  const questions = dataset.slice(0, 10);
+  const questions = dataset.slice(0, 20);
 
   const render = () => {
     if (currentIdx >= questions.length) {
