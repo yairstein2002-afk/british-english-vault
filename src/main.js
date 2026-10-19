@@ -2118,6 +2118,7 @@ function initGamesEventListeners() {
 
   const gamesSearchInput = document.getElementById('games-search-input');
   const gamesSearchClear = document.getElementById('games-search-clear');
+  const gamesSearchCount = document.getElementById('games-search-count');
   const gamesNoResults = document.getElementById('games-no-results');
 
   const filterGamesGrid = () => {
@@ -2144,6 +2145,10 @@ function initGamesEventListeners() {
         card.style.display = 'none';
       }
     });
+
+    if (gamesSearchCount) {
+      gamesSearchCount.innerText = `${visibleCount} משחקים`;
+    }
 
     if (gamesNoResults) {
       gamesNoResults.style.display = visibleCount === 0 ? 'block' : 'none';

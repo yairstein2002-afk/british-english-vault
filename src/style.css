@@ -3318,4 +3318,154 @@ button, input, select, textarea {
   font-weight: 500;
 }
 
+/* ==========================================================================
+   GAMES HUB SEARCH BAR (PREMIUM DESIGN)
+   ========================================================================== */
+.games-search-wrapper {
+  margin-bottom: 1.35rem;
+  width: 100%;
+}
 
+.games-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem 0.55rem 0.65rem;
+  background: var(--card-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 36, 125, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.games-search-bar:hover {
+  border-color: rgba(0, 36, 125, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 36, 125, 0.1);
+}
+
+.games-search-bar:focus-within {
+  border-color: var(--uk-blue);
+  box-shadow: 0 0 0 4px rgba(0, 36, 125, 0.12), 0 10px 28px rgba(0, 36, 125, 0.12);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .games-search-bar {
+  background: rgba(30, 41, 59, 0.85);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .games-search-bar:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+}
+
+[data-theme="dark"] .games-search-bar:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15), 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.games-search-icon-wrap {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 36, 125, 0.1), rgba(207, 20, 43, 0.08));
+  color: var(--uk-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.games-search-bar:focus-within .games-search-icon-wrap {
+  background: linear-gradient(135deg, var(--uk-blue), #1e40af);
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 36, 125, 0.25);
+}
+
+[data-theme="dark"] .games-search-icon-wrap {
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--gold);
+}
+
+[data-theme="dark"] .games-search-bar:focus-within .games-search-icon-wrap {
+  background: linear-gradient(135deg, var(--gold), #b48a1e);
+  color: #0f172a;
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.games-search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  padding: 0.4rem 0.25rem;
+  min-width: 0;
+  font-family: inherit;
+}
+
+.games-search-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-weight: 400;
+}
+
+.games-search-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.games-search-clear-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.games-search-clear-btn:hover {
+  background: var(--danger-light);
+  color: var(--danger);
+  border-color: var(--danger);
+  transform: scale(1.08);
+}
+
+.games-search-count-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(0, 36, 125, 0.08);
+  color: var(--uk-blue);
+  border: 1px solid rgba(0, 36, 125, 0.15);
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .games-search-count-badge {
+  background: rgba(212, 175, 55, 0.14);
+  color: var(--gold);
+  border-color: rgba(212, 175, 55, 0.28);
+}
+
+@media (max-width: 600px) {
+  .games-search-count-badge {
+    display: none;
+  }
+}

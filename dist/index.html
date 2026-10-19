@@ -20,8 +20,8 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="/assets/index-QmFq5l5U.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BhGFajjW.css">
+  <script type="module" crossorigin src="/assets/index-Dq1stouQ.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CTy2vrN1.css">
 </head>
 <body>
   <!-- App Container -->
@@ -476,12 +476,25 @@
             </div>
 
             <!-- Games Search Bar -->
-            <div class="search-bar" style="margin-bottom: 1.15rem; max-width: 100%; position: relative;">
-              <i class="fa-solid fa-magnifying-glass search-icon"></i>
-              <input type="text" id="games-search-input" placeholder="חיפוש משחק לפי שם, נושא או קטגוריה... (Search 34 mini-games...)" autocomplete="off">
-              <button id="games-search-clear" class="btn-close-x" style="display: none; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; font-size: 0.8rem;" title="נקה חיפוש (Clear search)">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
+            <div class="games-search-wrapper">
+              <div class="games-search-bar" id="games-search-container">
+                <div class="games-search-icon-wrap">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <input
+                  type="text"
+                  id="games-search-input"
+                  class="games-search-input"
+                  placeholder="חיפוש משחק לפי שם, נושא או קטגוריה... (Search 34 mini-games...)"
+                  autocomplete="off"
+                >
+                <div class="games-search-actions">
+                  <button id="games-search-clear" class="games-search-clear-btn" style="display: none;" title="נקה חיפוש (Clear search)">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                  <span id="games-search-count" class="games-search-count-badge">34 משחקים</span>
+                </div>
+              </div>
             </div>
             
             <!-- Game Category Filter Chips -->
