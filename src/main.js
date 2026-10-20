@@ -1138,9 +1138,6 @@ function showDictationWord() {
   playWordBtn.parentNode.replaceChild(newPlayWordBtn, playWordBtn);
   newPlayWordBtn.addEventListener('click', playCurrentWordAudio);
 
-  // Play word with a short delay on question reveal
-  setTimeout(playCurrentWordAudio, 250);
-
   // Dictation Check Logic with 3 Attempts
   const handleCheckAnswer = () => {
     const typedValue = (inputEl.value || '').trim();

@@ -2,9 +2,11 @@
  * British English Vault - Text-to-Speech (TTS) Engine
  */
 
-// Cached list of available voices
+// Cached list of available voices and active utterance reference (prevents Chrome Garbage Collection bug)
 let voices = [];
 let selectedVoice = null;
+let currentUtterance = null;
+let audioFallbackInstance = null;
 
 // Initialize voices
 export function initSpeech() {
@@ -188,77 +190,124 @@ export function sanitizeTextForTTS(text) {
 }
 
 /**
- * Standard Speech Playback
+ * Standard Speech Playback (Dual-Engine: Native SpeechSynthesis with Chrome-Windows bugfixes + British Audio Fallback)
  */
 export function speakText(text, options = {}) {
   return new Promise((resolve) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      resolve();
-      return;
-    }
-
     const cleanText = sanitizeTextForTTS(text);
     if (!cleanText) {
       resolve();
       return;
     }
 
-    // Resume speech synthesis if browser paused it
-    try {
-      if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume();
-      }
-    } catch (e) {}
+    // Fallback British audio via HTML5 Audio
+    const playFallbackAudio = () => {
+      try {
+        if (audioFallbackInstance) {
+          audioFallbackInstance.pause();
+          audioFallbackInstance = null;
+        }
+        const encoded = encodeURIComponent(cleanText);
+        // High quality British English pronunciation CDN
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=en-GB&client=tw-ob`;
+        const audio = new Audio(audioUrl);
+        audioFallbackInstance = audio;
+        audio.playbackRate = options.rate || 1.0;
+        
+        let done = false;
+        const finishAudio = () => {
+          if (!done) {
+            done = true;
+            audioFallbackInstance = null;
+            resolve();
+          }
+        };
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    
-    // Always default to English
-    utterance.lang = 'en-GB';
+        audio.onended = finishAudio;
+        audio.onerror = finishAudio;
+        setTimeout(finishAudio, 4000);
 
-    // Pick best available voice dynamically if selectedVoice not set
-    const allVoices = window.speechSynthesis.getVoices() || [];
-    let voiceToUse = selectedVoice;
-    if (!voiceToUse && allVoices.length > 0) {
-      voiceToUse = allVoices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB')) ||
-                   allVoices.find(v => v.lang.startsWith('en')) ||
-                   allVoices[0];
-    }
-
-    if (voiceToUse) {
-      utterance.voice = voiceToUse;
-      utterance.lang = voiceToUse.lang || 'en-GB';
-    }
-    
-    utterance.rate = options.rate || 1.0;
-    utterance.pitch = options.pitch || 1.0;
-    utterance.volume = options.volume || 1.0;
-
-    let hasEnded = false;
-    const onComplete = () => {
-      if (!hasEnded) {
-        hasEnded = true;
+        const p = audio.play();
+        if (p) {
+          p.catch(() => finishAudio());
+        }
+      } catch (err) {
         resolve();
       }
     };
 
-    utterance.onend = onComplete;
-    utterance.onerror = (e) => {
-      console.warn("TTS Notice:", e);
-      onComplete();
-    };
-
-    // Safety timeout: Chrome on Windows sometimes drops onend for short words
-    setTimeout(onComplete, 4500);
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      playFallbackAudio();
+      return;
+    }
 
     try {
-      // Cancel prior speech only if currently speaking
-      if (window.speechSynthesis.speaking) {
-        window.speechSynthesis.cancel();
+      // 1. Resume speech synthesis if browser paused it
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
       }
+
+      // 2. Clear stuck queue (Chrome Windows cancel bugfix)
+      window.speechSynthesis.cancel();
+
+      // 3. Create utterance and keep global reference (prevents Chrome GC bug)
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      currentUtterance = utterance;
+
+      // 4. Determine best voice
+      const allVoices = window.speechSynthesis.getVoices() || [];
+      let voiceToUse = selectedVoice;
+      if (!voiceToUse && allVoices.length > 0) {
+        voiceToUse = allVoices.find(v => (v.lang === 'en-GB' || v.lang.startsWith('en-GB')) && v.localService) ||
+                     allVoices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB')) ||
+                     allVoices.find(v => v.lang.startsWith('en') && v.localService) ||
+                     allVoices.find(v => v.lang.startsWith('en')) ||
+                     allVoices[0];
+      }
+
+      utterance.lang = 'en-GB';
+      if (voiceToUse) {
+        utterance.voice = voiceToUse;
+        utterance.lang = voiceToUse.lang || 'en-GB';
+      }
+
+      utterance.rate = options.rate || 1.0;
+      utterance.pitch = options.pitch || 1.0;
+      utterance.volume = options.volume || 1.0;
+
+      let hasFinished = false;
+      let safetyTimer = null;
+
+      const finishSpeech = (usedFallback = false) => {
+        if (!hasFinished) {
+          hasFinished = true;
+          if (safetyTimer) clearTimeout(safetyTimer);
+          currentUtterance = null;
+          if (!usedFallback) {
+            resolve();
+          }
+        }
+      };
+
+      utterance.onend = () => finishSpeech(false);
+      utterance.onerror = (e) => {
+        console.warn("SpeechSynthesis error, falling back to audio:", e?.error || e);
+        finishSpeech(true);
+        playFallbackAudio();
+      };
+
+      // Safety timeout: if neither onend nor onerror fires within 3.5s, trigger fallback
+      safetyTimer = setTimeout(() => {
+        if (!hasFinished) {
+          finishSpeech(true);
+          playFallbackAudio();
+        }
+      }, 3500);
+
       window.speechSynthesis.speak(utterance);
     } catch (err) {
-      console.error("SpeechSynthesis error:", err);
-      onComplete();
+      console.warn("Speech error, using fallback audio:", err);
+      playFallbackAudio();
     }
   });
 }
