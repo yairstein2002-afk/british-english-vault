@@ -978,7 +978,16 @@ function showQuizQuestion() {
   const speakBtn = document.getElementById('quiz-speak-btn');
   const newSpeakBtn = speakBtn.cloneNode(true);
   speakBtn.parentNode.replaceChild(newSpeakBtn, speakBtn);
-  bindLongPressSpeak(newSpeakBtn, item.term);
+  newSpeakBtn.addEventListener('click', async () => {
+    newSpeakBtn.classList.add('speaking');
+    const rateSelect = document.getElementById('quiz-word-rate');
+    const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+    try {
+      await speakText(item.term, { rate });
+    } finally {
+      newSpeakBtn.classList.remove('speaking');
+    }
+  });
 
   const sentenceToolbar = document.getElementById('quiz-sentence-toolbar');
   sentenceToolbar.innerHTML = `
@@ -1116,20 +1125,21 @@ function showDictationWord() {
 
   const playCurrentWordAudio = async () => {
     const rate = parseFloat(rateSelect?.value || 1.0);
-    playWordBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Playing...</span>';
+    const btn = document.getElementById('dictation-play-word-btn');
+    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Playing...</span>';
     try {
       await speakText(item.term, { rate });
     } finally {
-      playWordBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Play Word</span>';
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Play Word</span>';
     }
   };
-
-  // Automatically pronounce the word upon showing
-  playCurrentWordAudio();
 
   const newPlayWordBtn = playWordBtn.cloneNode(true);
   playWordBtn.parentNode.replaceChild(newPlayWordBtn, playWordBtn);
   newPlayWordBtn.addEventListener('click', playCurrentWordAudio);
+
+  // Play word with a short delay on question reveal
+  setTimeout(playCurrentWordAudio, 250);
 
   // Dictation Check Logic with 3 Attempts
   const handleCheckAnswer = () => {

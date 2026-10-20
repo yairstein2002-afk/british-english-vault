@@ -29,9 +29,12 @@ export function initSpeech() {
       // Fallback: choose the first British voice (en-GB) if possible
       if (!selectedVoice && brVoices.length > 0) {
         selectedVoice = brVoices[0];
+      } else if (!selectedVoice && voices.length > 0) {
+        // Fallback to any English voice (en-US, en-AU, etc.) so speech is never muted
+        selectedVoice = voices.find(v => v.lang.startsWith('en')) || voices[0];
       }
 
-      resolve(brVoices);
+      resolve(brVoices.length > 0 ? brVoices : (selectedVoice ? [selectedVoice] : []));
     };
 
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
@@ -171,6 +174,8 @@ export function splitIntoSyllables(word) {
 export function sanitizeTextForTTS(text) {
   if (!text) return '';
   return text
+    // Remove outer and inner typographic quotes so TTS speaks the pure word
+    .replace(/[“”"']/g, '')
     // Replace sequences of 2 or more underscores, hyphens or dots used as fill-in-the-blank gaps with a pause
     .replace(/[_.\-]{2,}/g, ', ')
     // Replace explicit placeholder terms like [blank], (blank), "space blank", "blank", "underscore", "underscores"
@@ -186,37 +191,75 @@ export function sanitizeTextForTTS(text) {
  * Standard Speech Playback
  */
 export function speakText(text, options = {}) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
-      reject("Speech synthesis not supported");
+      resolve();
       return;
     }
 
     const cleanText = sanitizeTextForTTS(text);
+    if (!cleanText) {
+      resolve();
+      return;
+    }
 
-    // Cancel ongoing speech
-    window.speechSynthesis.cancel();
+    // Resume speech synthesis if browser paused it
+    try {
+      if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume();
+      }
+    } catch (e) {}
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     
-    if (selectedVoice) {
-      utterance.voice = selectedVoice;
+    // Always default to English
+    utterance.lang = 'en-GB';
+
+    // Pick best available voice dynamically if selectedVoice not set
+    const allVoices = window.speechSynthesis.getVoices() || [];
+    let voiceToUse = selectedVoice;
+    if (!voiceToUse && allVoices.length > 0) {
+      voiceToUse = allVoices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB')) ||
+                   allVoices.find(v => v.lang.startsWith('en')) ||
+                   allVoices[0];
+    }
+
+    if (voiceToUse) {
+      utterance.voice = voiceToUse;
+      utterance.lang = voiceToUse.lang || 'en-GB';
     }
     
     utterance.rate = options.rate || 1.0;
     utterance.pitch = options.pitch || 1.0;
     utterance.volume = options.volume || 1.0;
 
-    utterance.onend = () => resolve();
-    utterance.onerror = (e) => {
-      if (e.error !== 'interrupted') {
-        reject(e.error);
-      } else {
-        resolve(); // Interrupted is normal when user clicks again
+    let hasEnded = false;
+    const onComplete = () => {
+      if (!hasEnded) {
+        hasEnded = true;
+        resolve();
       }
     };
 
-    window.speechSynthesis.speak(utterance);
+    utterance.onend = onComplete;
+    utterance.onerror = (e) => {
+      console.warn("TTS Notice:", e);
+      onComplete();
+    };
+
+    // Safety timeout: Chrome on Windows sometimes drops onend for short words
+    setTimeout(onComplete, 4500);
+
+    try {
+      // Cancel prior speech only if currently speaking
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+      }
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error("SpeechSynthesis error:", err);
+      onComplete();
+    }
   });
 }
 
