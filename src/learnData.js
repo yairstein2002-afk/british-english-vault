@@ -6610,175 +6610,175 @@ export const GRAMMAR_CHECKLIST = [
     title: "Parts of Speech",
     desc: "Nouns, verbs, adjectives, adverbs, pronouns, prepositions, conjunctions, determiners, interjections",
     topicId: "parts-of-speech-overview",
-    example: "She reads a book."
+    example: "The stationmaster promptly blew his silver whistle at Paddington Station."
   },
   {
     num: 2,
     title: "Nouns",
     desc: "Common, proper, countable, uncountable, singular and plural nouns",
     topicId: "nouns-plural",
-    example: "She reads a book."
+    example: "London boasts historic palaces, tranquil royal parks, and bustling markets."
   },
   {
     num: 3,
     title: "Verbs",
     desc: "Action verbs, state verbs, regular and irregular verbs",
     topicId: "stative-verbs",
-    example: "She reads a book."
+    example: "The classic steam locomotive chugged gracefully across the Highland viaduct."
   },
   {
     num: 4,
     title: "Adjectives",
     desc: "Describing words, adjective order, comparative and superlative adjectives",
     topicId: "adjectives-adverbs",
-    example: "She reads an interesting book."
+    example: "It was a delightfully brisk and foggy November morning in Edinburgh."
   },
   {
     num: 5,
     title: "Adverbs",
     desc: "Adverbs of manner, time, place, frequency and degree",
     topicId: "adverbs-types",
-    example: "She reads quickly."
+    example: "He thoroughly enjoyed a traditional Sunday roast with Yorkshire pudding."
   },
   {
     num: 6,
     title: "Pronouns",
     desc: "Personal, possessive, reflexive, relative and demonstrative pronouns",
     topicId: "pronouns",
-    example: "She reads a book."
+    example: "Everyone took their seats before the curtain rose at the Royal National Theatre."
   },
   {
     num: 7,
     title: "Determiners",
     desc: "A, an, the, this, that, some, any, much, many, few, little",
     topicId: "determiners-quantifiers",
-    example: "She reads a book."
+    example: "Several vintage red telephone kiosks remain preserved throughout the village."
   },
   {
     num: 8,
     title: "Prepositions",
     desc: "In, on, at, by, for, from, to, with, about",
     topicId: "prepositions",
-    example: "The book is on the table."
+    example: "We arranged to meet outside the British Museum between noon and one o'clock."
   },
   {
     num: 9,
     title: "Conjunctions",
     desc: "And, but, or, because, although, while",
     topicId: "conjunctions-types",
-    example: "She reads and writes."
+    example: "We fancied a stroll along the South Bank, although a light drizzle had begun."
   },
   {
     num: 10,
     title: "Articles",
     desc: "A, an and the",
     topicId: "articles-quantifiers",
-    example: "She reads a book."
+    example: "An exquisite Victorian pocket watch was presented to the university chancellor."
   },
   {
     num: 11,
     title: "Verb Tenses",
     desc: "Present simple, present continuous, past simple, past continuous, present perfect, future forms",
     topicId: "present-simple",
-    example: "She reads every day."
+    example: "The morning express departs from Kings Cross for Edinburgh every half hour."
   },
   {
     num: 12,
     title: "Auxiliary Verbs",
     desc: "Be, do and have",
     topicId: "auxiliary-verbs",
-    example: "Do you have the tickets?"
+    example: "Have you ever tasted warm homemade scones served with Cornish clotted cream?"
   },
   {
     num: 13,
     title: "Modal Verbs",
     desc: "Can, could, may, might, must, should, would",
     topicId: "modals",
-    example: "You should visit London."
+    example: "Passengers must mind the gap when boarding the London Underground train."
   },
   {
     num: 14,
     title: "Questions",
     desc: "Question words, word order, auxiliary verbs and question tags",
     topicId: "negation-questions",
-    example: "Where is the station?"
+    example: "Could you kindly advise which platform the train to Cambridge departs from?"
   },
   {
     num: 15,
     title: "Negatives",
     desc: "Don't, doesn't, didn't, isn't, aren't, can't, won't",
     topicId: "negatives-system",
-    example: "He doesn't mind waiting."
+    example: "He hasn't yet visited the Crown Jewels housed within the Tower of London."
   },
   {
     num: 16,
     title: "Subject and Object",
     desc: "Who performs the action and who receives it",
     topicId: "syntax-svo",
-    example: "The conductor checked the ticket."
+    example: "The royal guard diligently inspected the ornate iron palace gates."
   },
   {
     num: 17,
     title: "Gerunds and Infinitives",
     desc: "Doing, to do, enjoy doing, want to do",
     topicId: "gerunds-infinitives",
-    example: "She enjoys reading."
+    example: "We fancy exploring Windsor Castle, but we intend to travel by coach."
   },
   {
     num: 18,
     title: "Passive Voice",
     desc: "The cake was made; the letter was sent",
     topicId: "passive-voice",
-    example: "The cake was made; the letter was sent."
+    example: "The Magna Carta was solemnly signed in Runnymede in the summer of 1215."
   },
   {
     num: 19,
     title: "Conditionals",
     desc: "If sentences: zero, first, second and third conditionals",
     topicId: "conditionals",
-    example: "If it rains, we take an umbrella."
+    example: "If you visit the Lake District, you will be enchanted by its poetic beauty."
   },
   {
     num: 20,
     title: "Reported Speech",
     desc: "She said that she was tired",
     topicId: "reported-speech",
-    example: "She said that she was tired."
+    example: "The conductor announced that the scheduled morning service had been delayed by fog."
   },
   {
     num: 21,
     title: "Relative Clauses",
     desc: "Who, which, that, whose, where",
     topicId: "relative-clauses",
-    example: "The author who wrote this novel."
+    example: "The Oxford scholar who penned this historical monograph gave a riveting lecture."
   },
   {
     num: 22,
     title: "Comparisons",
     desc: "As...as, more than, less than, the most",
     topicId: "comparisons",
-    example: "London is as vibrant as ever."
+    example: "The Cotswolds are considerably more picturesque than typical suburban towns."
   },
   {
     num: 23,
     title: "Phrasal Verbs",
     desc: "Give up, find out, look after, get along",
     topicId: "phrasal-verbs",
-    example: "She looked after the children."
+    example: "Please mind the gap, watch your step, and carry on towards the Piccadilly line."
   },
   {
     num: 24,
     title: "Word Formation",
     desc: "Prefixes, suffixes, nouns from verbs, adjectives from nouns",
     topicId: "word-formation",
-    example: "Decide -> Decision; Kind -> Kindness."
+    example: "His exceptional punctuality and kindness earned the respect of the entire department."
   },
   {
     num: 25,
     title: "Sentence Structure",
     desc: "Simple, compound and complex sentences",
     topicId: "sentence-structure",
-    example: "Although it was late, we continued walking."
+    example: "Although the British weather proved rather dreary, our spirits remained high."
   }
 ];
 
@@ -6786,14 +6786,16 @@ export const WHERE_TO_START_GUIDE = {
   title: "Where should you start?",
   intro: "I'd recommend starting with Parts of Speech, because understanding the role of each word makes the rest of English grammar much easier.",
   examples: [
-    { part: "Noun", sentence: "She reads a book.", highlight: "book", role: "Names a person, place, thing, or idea." },
-    { part: "Verb", sentence: "She reads a book.", highlight: "reads", role: "Expresses action or state of being." },
-    { part: "Adjective", sentence: "She reads an interesting book.", highlight: "interesting", role: "Describes or modifies a noun." },
-    { part: "Adverb", sentence: "She reads quickly.", highlight: "quickly", role: "Modifies a verb, adjective, or adverb." },
-    { part: "Pronoun", sentence: "She reads a book.", highlight: "She", role: "Substitutes for a noun or noun phrase." },
-    { part: "Preposition", sentence: "The book is on the table.", highlight: "on", role: "Shows direction, location, or time relationship." },
-    { part: "Conjunction", sentence: "She reads and writes.", highlight: "and", role: "Connects words, phrases, or clauses." },
-    { part: "Determiner", sentence: "She reads a book.", highlight: "a", role: "Specifies, quantifies, or limits a noun." }
+    { part: "Noun", sentence: "The historic clock tower of Big Ben overlooks the River Thames.", highlight: "Big Ben", role: "Names a person, place, thing, or concept." },
+    { part: "Verb", sentence: "We strolled leisurely across Hyde Park in the crisp autumn sunshine.", highlight: "strolled", role: "Expresses an action, occurrence, or state of existence." },
+    { part: "Adjective", sentence: "A splendid cup of freshly brewed Earl Grey tea was served.", highlight: "splendid", role: "Modifies or qualifies a noun, providing descriptive detail." },
+    { part: "Adverb", sentence: "She spoke cheerfully to the bus conductor aboard the double-decker.", highlight: "cheerfully", role: "Modifies a verb, adjective, or clause describing manner, time, or degree." },
+    { part: "Pronoun", sentence: "They queued politely outside the Royal Opera House in Covent Garden.", highlight: "They", role: "Takes the place of a noun to avoid needless repetition." },
+    { part: "Preposition", sentence: "The express train departs from Platform 9 at precisely quarter past three.", highlight: "from", role: "Links nouns or pronouns to other words indicating time, place, or direction." },
+    { part: "Conjunction", sentence: "We fancied seeing a West End musical, but the tickets were fully booked.", highlight: "but", role: "Connects independent clauses, sentences, or coordinated terms." },
+    { part: "Determiner", sentence: "Every commuter tapped their Oyster card at the underground barrier.", highlight: "Every", role: "Precedes a noun to introduce, quantify, or clarify reference." },
+    { part: "Interjection", sentence: "Blimey! That torrential London downpour arrived out of nowhere.", highlight: "Blimey", role: "An abrupt exclamation expressing sudden emotion or surprise." },
+    { part: "Modal Verb", sentence: "You ought to bring a sturdy brolly when venturing out in Manchester.", highlight: "ought to", role: "Expresses advice, necessity, obligation, or possibility." }
   ],
   conclusion: "Once you understand these categories, you can move on to tenses, sentence structure and more advanced grammar."
 };

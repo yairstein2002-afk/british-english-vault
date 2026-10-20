@@ -1529,121 +1529,164 @@
           </div>
         </section>
         
-                <!-- LEARN & PRACTICE VIEW -->
+                <!-- LEARN & PRACTICE VIEW (UNIFIED SINGLE-PAGE HUB) -->
         <section id="view-learn" class="view-section">
-          <!-- Summary Banner -->
-          <div class="card goals-summary-card">
-            <div class="goals-summary-main">
-              <div class="summary-trophy-badge" style="background: linear-gradient(135deg, #00247D 0%, #00123e 100%); color: #FFF;">
-                <i class="fa-solid fa-graduation-cap" style="font-size: 1.8rem;"></i>
+          <!-- Premium Hero Banner with Quick Stats -->
+          <div class="card learn-hero-banner">
+            <div class="learn-hero-content">
+              <div class="learn-hero-badge">
+                <i class="fa-solid fa-graduation-cap"></i>
               </div>
-              <div class="summary-info">
-                <h3>Grammar Learn & Practice</h3>
-                <p>Master English grammar rules, tenses, syntax, and parts of speech with interactive UK lessons & practice quizzes.</p>
+              <div class="learn-hero-text">
+                <div class="learn-hero-tag"><i class="fa-solid fa-crown"></i> British English Curriculum</div>
+                <h2>Grammar Learn & Practice Hub</h2>
+                <p>Master English grammar rules, word classes, sentence syntax, and UK tenses on a single cohesive page with authentic British audio examples.</p>
+              </div>
+            </div>
+
+            <div class="learn-hero-metrics">
+              <div class="metric-pill">
+                <i class="fa-solid fa-book-open"></i>
+                <div>
+                  <span class="metric-val">52</span>
+                  <span class="metric-lbl">Master Lessons</span>
+                </div>
+              </div>
+              <div class="metric-pill">
+                <i class="fa-solid fa-list-check"></i>
+                <div>
+                  <span class="metric-val" id="hero-checklist-count">0 / 25</span>
+                  <span class="metric-lbl">Checklist Done</span>
+                </div>
+              </div>
+              <div class="metric-pill">
+                <i class="fa-solid fa-volume-high"></i>
+                <div>
+                  <span class="metric-val">100%</span>
+                  <span class="metric-lbl">UK Speech</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Learn View Top Switcher Tabs -->
-          <div class="card quiz-nav-switcher-card" style="margin-bottom: 1.25rem;">
-            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-              <button type="button" id="learn-tab-btn-checklist" class="btn btn-primary active-mode-btn" style="flex: 1; min-width: 200px; font-weight: 700; padding: 0.85rem 1.25rem; font-size: 1rem; box-shadow: 0 4px 15px rgba(0,36,125,0.25);">
-                <i class="fa-solid fa-list-check"></i> 25-Topic Grammar Checklist & Guide
-              </button>
-              <button type="button" id="learn-tab-btn-lessons" class="btn btn-secondary" style="flex: 1; min-width: 200px; font-weight: 700; padding: 0.85rem 1.25rem; font-size: 1rem;">
-                <i class="fa-solid fa-book-open"></i> All Grammar Lessons (52 Topics)
+          <!-- Quick-Jump Section Navigator -->
+          <nav class="learn-quick-nav card" aria-label="Learn sections navigation">
+            <span class="quick-nav-label"><i class="fa-solid fa-compass"></i> Jump To:</span>
+            <div class="quick-nav-links">
+              <a href="#learn-section-guide" class="quick-nav-btn active">
+                <i class="fa-solid fa-lightbulb"></i> 1. Foundations Guide
+              </a>
+              <a href="#learn-section-checklist" class="quick-nav-btn">
+                <i class="fa-solid fa-list-check"></i> 2. 25-Topic Checklist
+              </a>
+              <a href="#learn-section-lessons" class="quick-nav-btn">
+                <i class="fa-solid fa-book-bookmark"></i> 3. All 52 Lessons
+              </a>
+            </div>
+          </nav>
+
+          <!-- SECTION 1: WHERE SHOULD YOU START? GUIDE -->
+          <div id="learn-section-guide" class="card grammar-start-guide-card learn-section-card">
+            <div class="guide-header">
+              <div class="guide-icon-badge">
+                <i class="fa-solid fa-compass"></i>
+              </div>
+              <div style="flex: 1;">
+                <div class="section-badge-small"><i class="fa-solid fa-star"></i> Foundation Level</div>
+                <h3 style="margin: 0.15rem 0 0; font-size: 1.25rem;">Where Should You Start?</h3>
+                <p style="margin: 0.35rem 0 0; font-size: 0.95rem; color: var(--text-color); line-height: 1.5;">
+                  We recommend starting with <strong>Parts of Speech (Word Classes)</strong>. Understanding the role, position, and function of each word makes mastering tenses and complex structures much easier.
+                </p>
+              </div>
+            </div>
+
+            <!-- Dynamic Guide Cards with Audio Pronunciation & Rich Examples -->
+            <div class="guide-examples-grid" id="guide-examples-container">
+              <!-- Rendered from WHERE_TO_START_GUIDE with audio buttons in src/learn.js -->
+            </div>
+
+            <div class="guide-footer-callout">
+              <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
+                <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> Once you understand these building blocks, explore the 25-topic study checklist and 52 in-depth lessons below.
+              </p>
+              <button type="button" id="btn-start-parts-of-speech" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-book-open"></i> Start with Parts of Speech Lesson
               </button>
             </div>
           </div>
 
-          <!-- TAB 1: 25-TOPIC GRAMMAR CHECKLIST & GUIDE -->
-          <div id="learn-tab-checklist" class="learn-tab-panel">
-            <!-- English Grammar Learning Checklist Card -->
-            <div id="grammar-checklist-card" class="card grammar-checklist-card" style="margin-bottom: 1.5rem;">
-              <div class="checklist-header-row">
-                <div class="checklist-header-title">
-                  <div class="checklist-icon-badge">
-                    <i class="fa-solid fa-list-check"></i>
-                  </div>
-                  <div>
-                    <h3 style="margin: 0; font-size: 1.25rem;">English Grammar Learning Checklist</h3>
-                    <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted);">
-                      These topics are called Parts of Speech or Word Classes. If you want to study English grammar, here is a list of the main topics to learn, in a good order.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="checklist-tracker-bar">
-                <div class="checklist-tracker-info">
-                  <span class="checklist-study-label">Your study list:</span>
-                  <span id="checklist-progress-text" class="checklist-progress-badge">0 of 25 completed</span>
-                  <div class="checklist-progress-bar-bg">
-                    <div id="checklist-progress-fill" style="width: 0%;"></div>
-                  </div>
-                </div>
-                
-                <div class="checklist-actions-group">
-                  <!-- Quick Status Filter Pills -->
-                  <div class="checklist-filter-pills" style="display: flex; gap: 0.35rem;">
-                    <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn active" data-filter="all">All (25)</button>
-                    <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="remaining">Remaining</button>
-                    <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="completed">Completed</button>
-                  </div>
-
-                  <button type="button" id="btn-copy-checklist" class="btn btn-secondary btn-sm" title="Copy formatted checklist to clipboard">
-                    <i class="fa-solid fa-copy"></i> <span>Copy study checklist</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- The 25 Items List Container -->
-              <div id="checklist-items-container" class="checklist-items-grid">
-                <!-- Dynamically rendered in src/learn.js -->
-              </div>
-            </div>
-
-            <!-- Where Should You Start? Guide Card -->
-            <div id="grammar-start-guide-card" class="card grammar-start-guide-card" style="margin-bottom: 1.5rem;">
-              <div class="guide-header">
-                <div class="guide-icon-badge">
-                  <i class="fa-solid fa-compass"></i>
+          <!-- SECTION 2: 25-TOPIC GRAMMAR LEARNING CHECKLIST & ROADMAP -->
+          <div id="learn-section-checklist" class="card grammar-checklist-card learn-section-card">
+            <div class="checklist-header-row">
+              <div class="checklist-header-title">
+                <div class="checklist-icon-badge">
+                  <i class="fa-solid fa-list-check"></i>
                 </div>
                 <div>
-                  <h3 style="margin: 0; font-size: 1.2rem;">Where should you start?</h3>
-                  <p style="margin: 0.35rem 0 0; font-size: 0.95rem; color: var(--text-color); line-height: 1.5;">
-                    I'd recommend starting with <strong>Parts of Speech</strong>, because understanding the role of each word makes the rest of English grammar much easier.
+                  <div class="section-badge-small"><i class="fa-solid fa-route"></i> Study Roadmap</div>
+                  <h3 style="margin: 0.15rem 0 0; font-size: 1.25rem;">English Grammar Learning Checklist</h3>
+                  <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted);">
+                    The 25 essential grammar milestones in optimal study order. Listen to authentic British examples and track your progress.
                   </p>
                 </div>
               </div>
+            </div>
 
-              <div class="guide-examples-grid" id="guide-examples-container">
-                <!-- Rendered from WHERE_TO_START_GUIDE with audio buttons in src/learn.js -->
+            <div class="checklist-tracker-bar">
+              <div class="checklist-tracker-info">
+                <span class="checklist-study-label">Your Study List:</span>
+                <span id="checklist-progress-text" class="checklist-progress-badge">0 of 25 completed</span>
+                <div class="checklist-progress-bar-bg">
+                  <div id="checklist-progress-fill" style="width: 0%;"></div>
+                </div>
               </div>
+              
+              <div class="checklist-actions-group">
+                <div class="checklist-filter-pills" style="display: flex; gap: 0.35rem;">
+                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn active" data-filter="all">All (25)</button>
+                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="remaining">Remaining</button>
+                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="completed">Completed</button>
+                </div>
 
-              <div class="guide-footer-callout">
-                <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
-                  <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> Once you understand these categories, you can move on to tenses, sentence structure and more advanced grammar.
-                </p>
-                <button type="button" id="btn-start-parts-of-speech" class="btn btn-primary btn-sm">
-                  <i class="fa-solid fa-book-open"></i> Start with Parts of Speech
+                <button type="button" id="btn-copy-checklist" class="btn btn-secondary btn-sm" title="Copy formatted checklist to clipboard">
+                  <i class="fa-solid fa-copy"></i> <span>Copy Checklist</span>
                 </button>
               </div>
             </div>
+
+            <!-- The 25 Items List Container -->
+            <div id="checklist-items-container" class="checklist-items-grid">
+              <!-- Dynamically rendered in src/learn.js with rich British examples & audio -->
+            </div>
           </div>
 
-          <!-- TAB 2: ALL GRAMMAR LESSONS (52 Topics with Search & Filter) -->
-          <div id="learn-tab-lessons" class="learn-tab-panel" style="display: none;">
+          <!-- SECTION 3: ALL 52 MASTER GRAMMAR LESSONS -->
+          <div id="learn-section-lessons" class="card learn-lessons-section learn-section-card">
+            <div class="lessons-header-row" style="margin-bottom: 1.25rem;">
+              <div class="checklist-header-title">
+                <div class="checklist-icon-badge" style="background: linear-gradient(135deg, #00247D 0%, #7d0024 100%);">
+                  <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div>
+                  <div class="section-badge-small"><i class="fa-solid fa-graduation-cap"></i> Comprehensive Curriculum</div>
+                  <h3 style="margin: 0.15rem 0 0; font-size: 1.25rem;">All 52 Grammar Master Lessons</h3>
+                  <p style="margin: 0.25rem 0 0; font-size: 0.9rem; color: var(--text-muted);">
+                    Explore in-depth grammar rules, keywords, authentic UK examples, and interactive practice tests.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <!-- Search Box -->
-            <div class="control-panel" style="margin-bottom: 1.25rem;">
+            <div class="control-panel" style="margin-bottom: 1.25rem; width: 100%;">
               <div class="search-box" style="width: 100%;">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="learn-search-input" placeholder="Search grammar rules, tenses, topics...">
+                <input type="text" id="learn-search-input" placeholder="Search grammar rules, tenses, topics (e.g. 'conditionals', 'passive voice')...">
               </div>
             </div>
 
             <!-- Category Filter Chips -->
-            <div class="domain-filter-chips" id="learn-chips-container">
+            <div class="domain-filter-chips" id="learn-chips-container" style="margin-bottom: 1.5rem;">
               <!-- Loaded dynamically from src/learn.js -->
             </div>
 

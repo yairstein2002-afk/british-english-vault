@@ -10,10 +10,9 @@ let activeTopicId = null;
 let currentTopicTab = 'rules'; // 'rules' or 'practice'
 let practiceAnswers = {}; // { questionIndex: selectedOptionIndex }
 let checklistFilter = 'all'; // 'all', 'remaining', 'completed'
-let activeLearnTab = 'checklist'; // 'checklist' or 'lessons'
 
 export function initLearnUI() {
-  setupLearnTabSwitcher();
+  setupQuickNav();
   initGrammarChecklist();
   initWhereToStartGuide();
   renderCategoryChips();
@@ -22,39 +21,54 @@ export function initLearnUI() {
 }
 
 /**
- * Setup Tab Switcher between 25-Topic Checklist and All 52 Lessons
+ * Setup Single-Page Quick Jump Navigation
  */
-function setupLearnTabSwitcher() {
+function setupQuickNav() {
+  const quickNavLinks = document.querySelectorAll('.quick-nav-btn');
+  quickNavLinks.forEach(btn => {
+    if (!btn.dataset.bound) {
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        quickNavLinks.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetSelector = btn.getAttribute('href');
+        const targetEl = document.querySelector(targetSelector);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+  });
+
+  // Support legacy tab buttons if present in DOM for safety
   const btnChecklist = document.getElementById('learn-tab-btn-checklist');
   const btnLessons = document.getElementById('learn-tab-btn-lessons');
   const panelChecklist = document.getElementById('learn-tab-checklist');
   const panelLessons = document.getElementById('learn-tab-lessons');
 
-  if (!btnChecklist || !btnLessons || !panelChecklist || !panelLessons) return;
-
-  const switchTo = (tab) => {
-    activeLearnTab = tab;
-    if (tab === 'checklist') {
-      btnChecklist.className = 'btn btn-primary active-mode-btn';
-      btnLessons.className = 'btn btn-secondary';
-      panelChecklist.style.display = 'block';
-      panelLessons.style.display = 'none';
-    } else {
-      btnChecklist.className = 'btn btn-secondary';
-      btnLessons.className = 'btn btn-primary active-mode-btn';
-      panelChecklist.style.display = 'none';
-      panelLessons.style.display = 'block';
+  if (btnChecklist && btnLessons && panelChecklist && panelLessons) {
+    const switchTo = (tab) => {
+      if (tab === 'checklist') {
+        btnChecklist.className = 'btn btn-primary active-mode-btn';
+        btnLessons.className = 'btn btn-secondary';
+        panelChecklist.style.display = 'block';
+        panelLessons.style.display = 'none';
+      } else {
+        btnChecklist.className = 'btn btn-secondary';
+        btnLessons.className = 'btn btn-primary active-mode-btn';
+        panelChecklist.style.display = 'none';
+        panelLessons.style.display = 'block';
+      }
+    };
+    if (!btnChecklist.dataset.bound) {
+      btnChecklist.dataset.bound = 'true';
+      btnChecklist.addEventListener('click', () => switchTo('checklist'));
     }
-  };
-
-  if (!btnChecklist.dataset.bound) {
-    btnChecklist.dataset.bound = 'true';
-    btnChecklist.addEventListener('click', () => switchTo('checklist'));
-  }
-
-  if (!btnLessons.dataset.bound) {
-    btnLessons.dataset.bound = 'true';
-    btnLessons.addEventListener('click', () => switchTo('lessons'));
+    if (!btnLessons.dataset.bound) {
+      btnLessons.dataset.bound = 'true';
+      btnLessons.addEventListener('click', () => switchTo('lessons'));
+    }
   }
 }
 
@@ -82,7 +96,7 @@ function saveCompletedChecklist(completed) {
 }
 
 /**
- * Initialize 25-topic English Grammar Checklist
+ * Initialize 25-topic English Grammar Checklist with Rich Examples & Modern Audio
  */
 function initGrammarChecklist() {
   const container = document.getElementById('checklist-items-container');
@@ -102,9 +116,10 @@ function initGrammarChecklist() {
 
   if (filteredList.length === 0) {
     container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
-        <i class="fa-solid fa-circle-check" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem; display: block;"></i>
-        <h4>${checklistFilter === 'remaining' ? 'Splendid! You have completed all 25 topics!' : 'No topics found for this filter.'}</h4>
+      <div style="grid-column: 1/-1; text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--success, #28a745); margin-bottom: 0.75rem; display: block;"></i>
+        <h4 style="font-size: 1.15rem; margin-bottom: 0.25rem;">${checklistFilter === 'remaining' ? 'Splendid! You have completed all 25 topics!' : 'No topics found for this filter.'}</h4>
+        <p style="font-size: 0.88rem;">Select "All" to view the complete curriculum.</p>
       </div>
     `;
     return;
@@ -112,9 +127,11 @@ function initGrammarChecklist() {
 
   container.innerHTML = filteredList.map(item => {
     const isChecked = completed.includes(item.num);
+    const escapedEx = (item.example || '').replace(/"/g, '&quot;');
+
     return `
       <div class="checklist-item-row ${isChecked ? 'completed' : ''}" data-item-num="${item.num}">
-        <label class="checklist-item-check-label">
+        <label class="checklist-item-check-label" title="${isChecked ? 'Mark as incomplete' : 'Mark as completed'}">
           <input type="checkbox" class="checklist-checkbox" data-num="${item.num}" ${isChecked ? 'checked' : ''}>
           <span class="checklist-num-badge">${item.num}</span>
         </label>
@@ -123,11 +140,26 @@ function initGrammarChecklist() {
             <h4 class="checklist-item-title">${item.title}</h4>
             ${item.topicId ? `
               <button type="button" class="btn-open-topic-link" data-topic-id="${item.topicId}" title="Open ${item.title} Lesson">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> Lesson
+                <i class="fa-solid fa-book-open"></i> <span>Lesson</span>
               </button>
             ` : ''}
           </div>
           <p class="checklist-item-desc">${item.desc}</p>
+          
+          ${item.example ? `
+            <div class="checklist-example-box">
+              <div class="checklist-example-text">
+                <i class="fa-solid fa-quote-left quote-icon"></i>
+                <span>${item.example}</span>
+              </div>
+              <button type="button" class="audio-btn-modern checklist-speak-btn" data-text="${escapedEx}" title="Listen in British English">
+                <span class="audio-wave-anim">
+                  <span></span><span></span><span></span>
+                </span>
+                <i class="fa-solid fa-volume-high audio-icon"></i>
+              </button>
+            </div>
+          ` : ''}
         </div>
       </div>
     `;
@@ -167,6 +199,22 @@ function initGrammarChecklist() {
     });
   });
 
+  // Bind audio speak buttons on each checklist item
+  container.querySelectorAll('.checklist-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const text = btn.getAttribute('data-text');
+      btn.classList.add('speaking');
+      try {
+        await speakText(text, { rate: 0.9 });
+      } catch (err) {
+        console.error('Audio play error:', err);
+      } finally {
+        btn.classList.remove('speaking');
+      }
+    });
+  });
+
   // Bind Copy study checklist button
   const copyBtn = document.getElementById('btn-copy-checklist');
   if (copyBtn && !copyBtn.dataset.bound) {
@@ -174,30 +222,29 @@ function initGrammarChecklist() {
     copyBtn.addEventListener('click', () => {
       const currentCompleted = getCompletedChecklist();
       const lines = [
-        '### English grammar learning checklist',
+        '### English Grammar Learning Checklist & Study Roadmap',
         '',
-        '### Your study list',
-        '',
-        `${currentCompleted.length} of 25 completed`,
+        '### Your Study Progress',
+        `${currentCompleted.length} of 25 completed (${Math.round((currentCompleted.length / 25) * 100)}%)`,
         ''
       ];
 
       (GRAMMAR_CHECKLIST || []).forEach(item => {
         const check = currentCompleted.includes(item.num) ? '[x]' : '[ ]';
         lines.push(`${item.num}. ${item.title} ${check}`);
-        lines.push(`${item.desc}`);
+        lines.push(`   Description: ${item.desc}`);
+        if (item.example) lines.push(`   UK Example: "${item.example}"`);
         lines.push('');
       });
 
-      lines.push('### Where should you start?');
-      lines.push("I'd recommend starting with Parts of Speech, because understanding the role of each word makes the rest of English grammar much easier.");
+      lines.push('### Where Should You Start?');
+      lines.push(WHERE_TO_START_GUIDE?.intro || "I'd recommend starting with Parts of Speech...");
       lines.push('');
-      lines.push('For example:');
-      (WHERE_TO_START_GUIDE.examples || []).forEach(ex => {
-        lines.push(`* ${ex.part}: ${ex.sentence}`);
+      (WHERE_TO_START_GUIDE?.examples || []).forEach(ex => {
+        lines.push(`* ${ex.part}: "${ex.sentence}" (${ex.role})`);
       });
       lines.push('');
-      lines.push('Once you understand these categories, you can move on to tenses, sentence structure and more advanced grammar.');
+      lines.push('Once you understand these categories, move on to tenses, sentence structure and more advanced British English grammar.');
 
       const fullText = lines.join('\n');
       navigator.clipboard.writeText(fullText).then(() => {
@@ -224,13 +271,8 @@ function setupChecklistFilterPills() {
       btn.addEventListener('click', (e) => {
         filterBtns.forEach(b => {
           b.classList.remove('active');
-          b.style.background = 'transparent';
-          b.style.fontWeight = '500';
         });
         e.currentTarget.classList.add('active');
-        e.currentTarget.style.background = 'rgba(0,36,125,0.1)';
-        e.currentTarget.style.fontWeight = '700';
-
         checklistFilter = e.currentTarget.getAttribute('data-filter') || 'all';
         initGrammarChecklist();
       });
@@ -244,16 +286,18 @@ function setupChecklistFilterPills() {
 function updateChecklistProgress(completedCount) {
   const textEl = document.getElementById('checklist-progress-text');
   const fillEl = document.getElementById('checklist-progress-fill');
+  const heroCountEl = document.getElementById('hero-checklist-count');
 
   const total = (GRAMMAR_CHECKLIST || []).length || 25;
   const pct = Math.round((completedCount / total) * 100);
 
   if (textEl) textEl.innerText = `${completedCount} of ${total} completed (${pct}%)`;
   if (fillEl) fillEl.style.width = `${pct}%`;
+  if (heroCountEl) heroCountEl.innerText = `${completedCount} / ${total}`;
 }
 
 /**
- * Initialize "Where should you start?" Guide
+ * Initialize "Where should you start?" Guide with 10 Parts of Speech & Modern Audio
  */
 function initWhereToStartGuide() {
   const container = document.getElementById('guide-examples-container');
@@ -261,7 +305,8 @@ function initWhereToStartGuide() {
 
   const examples = WHERE_TO_START_GUIDE?.examples || [];
 
-  container.innerHTML = examples.map((ex, idx) => {
+  container.innerHTML = examples.map((ex) => {
+    const escapedSentence = (ex.sentence || '').replace(/"/g, '&quot;');
     const parts = ex.sentence.split(new RegExp(`(${ex.highlight})`, 'i'));
     const formattedSentence = parts.map(part => {
       if (part.toLowerCase() === ex.highlight.toLowerCase()) {
@@ -274,8 +319,11 @@ function initWhereToStartGuide() {
       <div class="guide-example-card">
         <div class="guide-card-top">
           <span class="guide-part-badge">${ex.part}</span>
-          <button type="button" class="mini-speak-btn guide-speak-btn" data-text="${ex.sentence}" title="Listen (UK Pronunciation)">
-            <i class="fa-solid fa-volume-high"></i>
+          <button type="button" class="audio-btn-modern guide-speak-btn" data-text="${escapedSentence}" title="Listen with authentic UK accent">
+            <span class="audio-wave-anim">
+              <span></span><span></span><span></span>
+            </span>
+            <i class="fa-solid fa-volume-high audio-icon"></i>
           </button>
         </div>
         <div class="guide-sentence-text">${formattedSentence}</div>
@@ -289,11 +337,13 @@ function initWhereToStartGuide() {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+      btn.classList.add('speaking');
       try {
         await speakText(text, { rate: 0.9 });
+      } catch (err) {
+        console.error('Audio play error:', err);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        btn.classList.remove('speaking');
       }
     });
   });
@@ -314,7 +364,7 @@ function renderCategoryChips() {
 
   container.innerHTML = `
     <button class="chip ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
-      🌐 All Topics
+      🌐 All Topics (52)
     </button>
     ${LEARN_CATEGORIES.map(cat => `
       <button class="chip ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">
@@ -367,8 +417,8 @@ export function renderTopicsList() {
     container.innerHTML = `
       <div class="card text-center" style="grid-column: 1/-1; padding: 3rem 1.5rem; color: var(--text-muted);">
         <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--uk-blue);"></i>
-        <h4>No grammar topics found matching your query.</h4>
-        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Try adjusting your search term or category filter.</p>
+        <h4>No grammar topics found matching "${searchQuery}".</h4>
+        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Try adjusting your search term or select "All Topics".</p>
       </div>
     `;
     return;
@@ -464,8 +514,10 @@ function renderTopicDetailContent(topic) {
           <h2 class="topic-modal-title">${topic.title}</h2>
           <p class="topic-modal-summary">${topic.summary}</p>
         </div>
-        <button class="btn btn-secondary topic-speak-btn" id="btn-speak-lesson" style="margin-top: 0.5rem;" title="Listen to entire lesson out loud (UK Accent)">
-          <i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>
+        <button class="audio-pill-btn topic-speak-btn" id="btn-speak-lesson" style="margin-top: 0.5rem;" title="Listen to entire lesson out loud (UK Accent)">
+          <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+          <i class="fa-solid fa-volume-high audio-icon"></i>
+          <span class="btn-text">Listen Lesson</span>
         </button>
       </div>
 
@@ -487,8 +539,9 @@ function renderTopicDetailContent(topic) {
           <div class="rule-card">
             <div class="rule-card-header" style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
               <h4><i class="fa-solid fa-circle-info" style="color: var(--uk-blue);"></i> ${rule.title}</h4>
-              <button class="mini-speak-btn rule-speak-btn" data-text="${rule.title}. ${rule.details}" title="Listen Rule (UK Accent)">
-                <i class="fa-solid fa-volume-high"></i> Listen
+              <button class="audio-btn-modern rule-speak-btn" data-text="${(rule.title + '. ' + rule.details).replace(/"/g, '&quot;')}" title="Listen Rule (UK Accent)">
+                <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+                <i class="fa-solid fa-volume-high audio-icon"></i>
               </button>
             </div>
             <p>${rule.details}</p>
@@ -516,8 +569,9 @@ function renderTopicDetailContent(topic) {
                 <i class="fa-solid fa-circle-check" style="color: var(--success, #28a745); margin-right: 0.5rem; font-size: 0.85rem;"></i>
                 <span>${sentence}</span>
               </div>
-              <button class="mini-speak-btn sentence-speak-btn" data-text="${sentence}" title="Listen in British English">
-                <i class="fa-solid fa-volume-high"></i>
+              <button class="audio-btn-modern sentence-speak-btn" data-text="${sentence.replace(/"/g, '&quot;')}" title="Listen in British English">
+                <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+                <i class="fa-solid fa-volume-high audio-icon"></i>
               </button>
             </div>
           `).join('')}
@@ -543,30 +597,39 @@ function renderTopicDetailContent(topic) {
   });
 
   // Bind Lesson Narrator
-  document.getElementById('btn-speak-lesson').addEventListener('click', async () => {
-    const btn = document.getElementById('btn-speak-lesson');
-    const lessonNarrative = `${topic.title}. ${topic.summary}. Rules: ` +
-      (topic.rules || []).map(r => `${r.title}: ${r.details}`).join('. ') +
-      '. Examples: ' + (topic.examples || []).join('. ');
+  const speakLessonBtn = document.getElementById('btn-speak-lesson');
+  if (speakLessonBtn) {
+    speakLessonBtn.addEventListener('click', async () => {
+      const lessonNarrative = `${topic.title}. ${topic.summary}. Rules: ` +
+        (topic.rules || []).map(r => `${r.title}: ${r.details}`).join('. ') +
+        '. Examples: ' + (topic.examples || []).join('. ');
 
-    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Reading Lesson...';
-    try {
-      await speakText(lessonNarrative);
-    } finally {
-      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>';
-    }
-  });
+      speakLessonBtn.classList.add('speaking');
+      const textSpan = speakLessonBtn.querySelector('.btn-text');
+      if (textSpan) textSpan.textContent = 'Reading Lesson...';
+      try {
+        await speakText(lessonNarrative);
+      } catch (err) {
+        console.error('Audio play error:', err);
+      } finally {
+        speakLessonBtn.classList.remove('speaking');
+        if (textSpan) textSpan.textContent = 'Listen Lesson';
+      }
+    });
+  }
 
   // Bind Rule Audio Buttons
   modalBody.querySelectorAll('.rule-speak-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      btn.classList.add('speaking');
       try {
         await speakText(text);
+      } catch (err) {
+        console.error('Audio play error:', err);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        btn.classList.remove('speaking');
       }
     });
   });
@@ -576,11 +639,13 @@ function renderTopicDetailContent(topic) {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+      btn.classList.add('speaking');
       try {
         await speakText(text);
+      } catch (err) {
+        console.error('Audio play error:', err);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+        btn.classList.remove('speaking');
       }
     });
   });
@@ -590,11 +655,13 @@ function renderTopicDetailContent(topic) {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      btn.classList.add('speaking');
       try {
         await speakText(text);
+      } catch (err) {
+        console.error('Audio play error:', err);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        btn.classList.remove('speaking');
       }
     });
   });
@@ -604,11 +671,13 @@ function renderTopicDetailContent(topic) {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      btn.classList.add('speaking');
       try {
         await speakText(text);
+      } catch (err) {
+        console.error('Audio play error:', err);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        btn.classList.remove('speaking');
       }
     });
   });
@@ -654,8 +723,9 @@ function renderPracticeQuestions(topic) {
         <div class="q-header">
           <span class="q-number">Question ${qIdx + 1} of ${questions.length}</span>
           <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button class="mini-speak-btn q-speak-btn" data-text="${q.question.replace(/"/g, '&quot;')}" title="Listen Question (UK Accent)">
-              <i class="fa-solid fa-volume-high"></i> Listen
+            <button class="audio-btn-modern q-speak-btn" data-text="${q.question.replace(/"/g, '&quot;')}" title="Listen Question (UK Accent)">
+              <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+              <i class="fa-solid fa-volume-high audio-icon"></i>
             </button>
             ${hasAnswered ? `
               <span class="q-badge ${isCorrect ? 'correct' : 'incorrect'}">
@@ -687,8 +757,9 @@ function renderPracticeQuestions(topic) {
           <div class="q-explanation-box">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
               <strong><i class="fa-solid fa-lightbulb"></i> Explanation:</strong>
-              <button class="mini-speak-btn explanation-speak-btn" type="button" data-text="${q.explanation.replace(/"/g, '&quot;')}" title="Listen Explanation (UK Accent)">
-                <i class="fa-solid fa-volume-high"></i> Listen
+              <button class="audio-btn-modern explanation-speak-btn" type="button" data-text="${q.explanation.replace(/"/g, '&quot;')}" title="Listen Explanation (UK Accent)">
+                <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+                <i class="fa-solid fa-volume-high audio-icon"></i>
               </button>
             </div>
             <span>${q.explanation}</span>
