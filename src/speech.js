@@ -6,7 +6,7 @@
 let voices = [];
 let selectedVoice = null;
 let currentUtterance = null;
-let audioFallbackInstance = null;
+let speechTimer = null;
 
 // Initialize voices
 export function initSpeech() {
@@ -17,15 +17,15 @@ export function initSpeech() {
     }
 
     const loadVoices = () => {
-      voices = window.speechSynthesis.getVoices();
+      voices = window.speechSynthesis.getVoices() || [];
       
       // Filter for British English (en-GB) voices
-      const brVoices = voices.filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB'));
+      const brVoices = voices.filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB') || (v.name && v.name.includes('Great Britain')));
 
       // Try to load saved voice preference
       const savedVoiceURI = localStorage.getItem('bev_selected_voice');
       if (savedVoiceURI) {
-        selectedVoice = brVoices.find(v => v.voiceURI === savedVoiceURI) || null;
+        selectedVoice = voices.find(v => v.voiceURI === savedVoiceURI) || null;
       }
 
       // Fallback: choose the first British voice (en-GB) if possible
@@ -48,11 +48,15 @@ export function initSpeech() {
 }
 
 /**
- * Returns all available British voices
+ * Returns all available British voices (with English fallback)
  */
 export function getBritishVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return [];
-  return window.speechSynthesis.getVoices().filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB'));
+  const all = window.speechSynthesis.getVoices() || [];
+  const br = all.filter(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB') || (v.name && v.name.includes('Great Britain')));
+  if (br.length > 0) return br;
+  // If no pure en-GB voice is installed on Windows, return all English voices
+  return all.filter(v => v.lang.startsWith('en'));
 }
 
 /**
@@ -190,7 +194,7 @@ export function sanitizeTextForTTS(text) {
 }
 
 /**
- * Standard Speech Playback (Dual-Engine: Native SpeechSynthesis with Chrome-Windows bugfixes + British Audio Fallback)
+ * Standard Speech Playback (Native SpeechSynthesis with Chrome-Windows queue reset and GC protection)
  */
 export function speakText(text, options = {}) {
   return new Promise((resolve) => {
@@ -200,44 +204,8 @@ export function speakText(text, options = {}) {
       return;
     }
 
-    // Fallback British audio via HTML5 Audio
-    const playFallbackAudio = () => {
-      try {
-        if (audioFallbackInstance) {
-          audioFallbackInstance.pause();
-          audioFallbackInstance = null;
-        }
-        const encoded = encodeURIComponent(cleanText);
-        // High quality British English pronunciation CDN
-        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encoded}&tl=en-GB&client=tw-ob`;
-        const audio = new Audio(audioUrl);
-        audioFallbackInstance = audio;
-        audio.playbackRate = options.rate || 1.0;
-        
-        let done = false;
-        const finishAudio = () => {
-          if (!done) {
-            done = true;
-            audioFallbackInstance = null;
-            resolve();
-          }
-        };
-
-        audio.onended = finishAudio;
-        audio.onerror = finishAudio;
-        setTimeout(finishAudio, 4000);
-
-        const p = audio.play();
-        if (p) {
-          p.catch(() => finishAudio());
-        }
-      } catch (err) {
-        resolve();
-      }
-    };
-
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
-      playFallbackAudio();
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+      resolve();
       return;
     }
 
@@ -247,67 +215,71 @@ export function speakText(text, options = {}) {
         window.speechSynthesis.resume();
       }
 
-      // 2. Clear stuck queue (Chrome Windows cancel bugfix)
+      // 2. Clear any active speech hardware queue
       window.speechSynthesis.cancel();
 
-      // 3. Create utterance and keep global reference (prevents Chrome GC bug)
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      currentUtterance = utterance;
-
-      // 4. Determine best voice
-      const allVoices = window.speechSynthesis.getVoices() || [];
-      let voiceToUse = selectedVoice;
-      if (!voiceToUse && allVoices.length > 0) {
-        voiceToUse = allVoices.find(v => (v.lang === 'en-GB' || v.lang.startsWith('en-GB')) && v.localService) ||
-                     allVoices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB')) ||
-                     allVoices.find(v => v.lang.startsWith('en') && v.localService) ||
-                     allVoices.find(v => v.lang.startsWith('en')) ||
-                     allVoices[0];
+      if (speechTimer) {
+        clearTimeout(speechTimer);
+        speechTimer = null;
       }
 
-      utterance.lang = 'en-GB';
-      if (voiceToUse) {
-        utterance.voice = voiceToUse;
-        utterance.lang = voiceToUse.lang || 'en-GB';
-      }
+      // 3. Critical Chromium fix: Wait 120ms for the browser C++ speech queue to completely reset!
+      speechTimer = setTimeout(() => {
+        try {
+          const utterance = new SpeechSynthesisUtterance(cleanText);
+          currentUtterance = utterance; // Keep global reference so garbage collection doesn't kill it!
 
-      utterance.rate = options.rate || 1.0;
-      utterance.pitch = options.pitch || 1.0;
-      utterance.volume = options.volume || 1.0;
-
-      let hasFinished = false;
-      let safetyTimer = null;
-
-      const finishSpeech = (usedFallback = false) => {
-        if (!hasFinished) {
-          hasFinished = true;
-          if (safetyTimer) clearTimeout(safetyTimer);
-          currentUtterance = null;
-          if (!usedFallback) {
-            resolve();
+          // 4. Select the best English / British voice
+          const allVoices = window.speechSynthesis.getVoices() || [];
+          let voiceToUse = selectedVoice;
+          if (!voiceToUse && allVoices.length > 0) {
+            voiceToUse = allVoices.find(v => (v.lang === 'en-GB' || v.lang.startsWith('en-GB') || (v.name && v.name.includes('Great Britain'))) && v.localService) ||
+                         allVoices.find(v => v.lang === 'en-GB' || v.lang.startsWith('en-GB') || (v.name && v.name.includes('Great Britain'))) ||
+                         allVoices.find(v => v.lang.startsWith('en') && v.localService) ||
+                         allVoices.find(v => v.lang.startsWith('en')) ||
+                         allVoices[0];
           }
+
+          utterance.lang = 'en-GB';
+          if (voiceToUse) {
+            utterance.voice = voiceToUse;
+            utterance.lang = voiceToUse.lang || 'en-GB';
+          }
+
+          utterance.rate = options.rate || 1.0;
+          utterance.pitch = options.pitch || 1.0;
+          utterance.volume = options.volume || 1.0;
+
+          let hasFinished = false;
+          let safetyTimer = null;
+
+          const finishSpeech = () => {
+            if (!hasFinished) {
+              hasFinished = true;
+              if (safetyTimer) clearTimeout(safetyTimer);
+              currentUtterance = null;
+              resolve();
+            }
+          };
+
+          utterance.onend = finishSpeech;
+          utterance.onerror = (e) => {
+            console.warn("SpeechSynthesis notice:", e?.error || e);
+            finishSpeech();
+          };
+
+          // Safety timeout in case onend drops
+          safetyTimer = setTimeout(finishSpeech, 5000);
+
+          window.speechSynthesis.speak(utterance);
+        } catch (err) {
+          console.error("Speak error:", err);
+          resolve();
         }
-      };
-
-      utterance.onend = () => finishSpeech(false);
-      utterance.onerror = (e) => {
-        console.warn("SpeechSynthesis error, falling back to audio:", e?.error || e);
-        finishSpeech(true);
-        playFallbackAudio();
-      };
-
-      // Safety timeout: if neither onend nor onerror fires within 3.5s, trigger fallback
-      safetyTimer = setTimeout(() => {
-        if (!hasFinished) {
-          finishSpeech(true);
-          playFallbackAudio();
-        }
-      }, 3500);
-
-      window.speechSynthesis.speak(utterance);
+      }, 120);
     } catch (err) {
-      console.warn("Speech error, using fallback audio:", err);
-      playFallbackAudio();
+      console.error("Speech init error:", err);
+      resolve();
     }
   });
 }

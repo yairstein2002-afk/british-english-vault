@@ -6,6 +6,15 @@ import {
   testGitHubConnection, 
   getLocalFallbackData 
 } from './github.js';
+import {
+  initSpeech,
+  getBritishVoices,
+  getSelectedVoice,
+  setSelectedVoice,
+  speakText,
+  speakMultipleTimes,
+  speakSlowSyllables
+} from './speech.js';
 import { 
   startQuiz, 
   getCurrentQuestion, 
