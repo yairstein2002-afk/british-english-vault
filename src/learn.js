@@ -9,13 +9,53 @@ let activeCategory = 'all';
 let activeTopicId = null;
 let currentTopicTab = 'rules'; // 'rules' or 'practice'
 let practiceAnswers = {}; // { questionIndex: selectedOptionIndex }
+let checklistFilter = 'all'; // 'all', 'remaining', 'completed'
+let activeLearnTab = 'checklist'; // 'checklist' or 'lessons'
 
 export function initLearnUI() {
+  setupLearnTabSwitcher();
   initGrammarChecklist();
   initWhereToStartGuide();
   renderCategoryChips();
   renderTopicsList();
   setupSearchHandler();
+}
+
+/**
+ * Setup Tab Switcher between 25-Topic Checklist and All 52 Lessons
+ */
+function setupLearnTabSwitcher() {
+  const btnChecklist = document.getElementById('learn-tab-btn-checklist');
+  const btnLessons = document.getElementById('learn-tab-btn-lessons');
+  const panelChecklist = document.getElementById('learn-tab-checklist');
+  const panelLessons = document.getElementById('learn-tab-lessons');
+
+  if (!btnChecklist || !btnLessons || !panelChecklist || !panelLessons) return;
+
+  const switchTo = (tab) => {
+    activeLearnTab = tab;
+    if (tab === 'checklist') {
+      btnChecklist.className = 'btn btn-primary active-mode-btn';
+      btnLessons.className = 'btn btn-secondary';
+      panelChecklist.style.display = 'block';
+      panelLessons.style.display = 'none';
+    } else {
+      btnChecklist.className = 'btn btn-secondary';
+      btnLessons.className = 'btn btn-primary active-mode-btn';
+      panelChecklist.style.display = 'none';
+      panelLessons.style.display = 'block';
+    }
+  };
+
+  if (!btnChecklist.dataset.bound) {
+    btnChecklist.dataset.bound = 'true';
+    btnChecklist.addEventListener('click', () => switchTo('checklist'));
+  }
+
+  if (!btnLessons.dataset.bound) {
+    btnLessons.dataset.bound = 'true';
+    btnLessons.addEventListener('click', () => switchTo('lessons'));
+  }
 }
 
 /**
@@ -50,14 +90,32 @@ function initGrammarChecklist() {
 
   const completed = getCompletedChecklist();
   updateChecklistProgress(completed.length);
+  setupChecklistFilterPills();
 
-  container.innerHTML = (GRAMMAR_CHECKLIST || []).map(item => {
+  // Filter items based on checklistFilter
+  const filteredList = (GRAMMAR_CHECKLIST || []).filter(item => {
+    const isCompleted = completed.includes(item.num);
+    if (checklistFilter === 'completed') return isCompleted;
+    if (checklistFilter === 'remaining') return !isCompleted;
+    return true;
+  });
+
+  if (filteredList.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem 1rem; color: var(--text-muted);">
+        <i class="fa-solid fa-circle-check" style="font-size: 2rem; color: var(--success); margin-bottom: 0.5rem; display: block;"></i>
+        <h4>${checklistFilter === 'remaining' ? 'Splendid! You have completed all 25 topics!' : 'No topics found for this filter.'}</h4>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filteredList.map(item => {
     const isChecked = completed.includes(item.num);
     return `
       <div class="checklist-item-row ${isChecked ? 'completed' : ''}" data-item-num="${item.num}">
         <label class="checklist-item-check-label">
           <input type="checkbox" class="checklist-checkbox" data-num="${item.num}" ${isChecked ? 'checked' : ''}>
-          <span class="checklist-custom-check"></span>
           <span class="checklist-num-badge">${item.num}</span>
         </label>
         <div class="checklist-item-text">
@@ -92,6 +150,11 @@ function initGrammarChecklist() {
 
       saveCompletedChecklist(currentCompleted);
       updateChecklistProgress(currentCompleted.length);
+
+      // Re-render if in filtered mode
+      if (checklistFilter !== 'all') {
+        initGrammarChecklist();
+      }
     });
   });
 
@@ -148,19 +211,31 @@ function initGrammarChecklist() {
       });
     });
   }
+}
 
-  // Bind Toggle Expand / Collapse button
-  const toggleBtn = document.getElementById('btn-toggle-checklist');
-  if (toggleBtn && !toggleBtn.dataset.bound) {
-    toggleBtn.dataset.bound = 'true';
-    toggleBtn.addEventListener('click', () => {
-      const isHidden = container.style.display === 'none';
-      container.style.display = isHidden ? 'grid' : 'none';
-      toggleBtn.innerHTML = isHidden
-        ? '<i class="fa-solid fa-chevron-up"></i> <span>Hide List</span>'
-        : '<i class="fa-solid fa-chevron-down"></i> <span>Show 25 Topics</span>';
-    });
-  }
+/**
+ * Setup Status Filter Pills for Checklist (All, Remaining, Completed)
+ */
+function setupChecklistFilterPills() {
+  const filterBtns = document.querySelectorAll('.checklist-filter-btn');
+  filterBtns.forEach(btn => {
+    if (!btn.dataset.bound) {
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', (e) => {
+        filterBtns.forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.fontWeight = '500';
+        });
+        e.currentTarget.classList.add('active');
+        e.currentTarget.style.background = 'rgba(0,36,125,0.1)';
+        e.currentTarget.style.fontWeight = '700';
+
+        checklistFilter = e.currentTarget.getAttribute('data-filter') || 'all';
+        initGrammarChecklist();
+      });
+    }
+  });
 }
 
 /**
@@ -173,7 +248,7 @@ function updateChecklistProgress(completedCount) {
   const total = (GRAMMAR_CHECKLIST || []).length || 25;
   const pct = Math.round((completedCount / total) * 100);
 
-  if (textEl) textEl.innerText = `${completedCount} of ${total} completed`;
+  if (textEl) textEl.innerText = `${completedCount} of ${total} completed (${pct}%)`;
   if (fillEl) fillEl.style.width = `${pct}%`;
 }
 
@@ -187,7 +262,6 @@ function initWhereToStartGuide() {
   const examples = WHERE_TO_START_GUIDE?.examples || [];
 
   container.innerHTML = examples.map((ex, idx) => {
-    // Format sentence with highlight
     const parts = ex.sentence.split(new RegExp(`(${ex.highlight})`, 'i'));
     const formattedSentence = parts.map(part => {
       if (part.toLowerCase() === ex.highlight.toLowerCase()) {

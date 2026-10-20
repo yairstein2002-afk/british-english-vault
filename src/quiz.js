@@ -1,15 +1,25 @@
 /**
- * British English Vault - Quiz Engine
+ * British English Vault - Quiz & Dictation Engine
  */
 
 let quizSession = {
   category: 'all',
-  mode: 'mc', // 'mc' (multiple choice) or 'dictation' (listen and write)
+  mode: 'mc', // 'mc' (multiple choice)
   questions: [],
   currentIndex: 0,
   correctCount: 0,
   incorrectCount: 0,
-  answersRecord: [] // list of { item, isCorrect }
+  answersRecord: []
+};
+
+let dictationSession = {
+  category: 'words',
+  questions: [],
+  currentIndex: 0,
+  attemptsLeft: 3,
+  correctCount: 0,
+  incorrectCount: 0,
+  answersRecord: []
 };
 
 /**
@@ -35,17 +45,13 @@ export function normalizeAnswer(str) {
     .replace(/\s+/g, ' ');
 }
 
-/**
- * Start a new Quiz session
- * @param {string} category - 'all', 'all-vocab', 'grammar', 'words', 'slangs', 'phrases', 'idioms'
- * @param {Array} allItems - Vocabulary items array
- * @param {Array} grammarTopics - Grammar topics array from learnData.js
- * @param {string} mode - 'mc' or 'dictation'
- */
+/* ==========================================================================
+   1. STANDARD QUIZ ENGINE (Multiple Choice)
+   ========================================================================== */
+
 export function startQuiz(category = 'all', allItems = [], grammarTopics = [], mode = 'mc') {
   let pool = [];
 
-  // Helper to extract grammar practice questions as quiz items
   const getGrammarQuestions = () => {
     return (grammarTopics || []).flatMap(topic =>
       (topic.practice || []).map((p, idx) => ({
@@ -65,29 +71,22 @@ export function startQuiz(category = 'all', allItems = [], grammarTopics = [], m
   if (category === 'grammar') {
     pool = getGrammarQuestions();
   } else if (category === 'all-vocab') {
-    // Select all 4 vocabulary types: words, slangs, phrases, idioms
     pool = allItems.filter(item => ['words', 'slangs', 'phrases', 'idioms'].includes(item.category));
   } else if (category === 'all') {
-    // Mixed: combine vocabulary items and grammar questions
     const vocab = allItems.filter(item => ['words', 'slangs', 'phrases', 'idioms'].includes(item.category));
     const grammarQs = getGrammarQuestions();
     pool = [...vocab, ...grammarQs];
   } else {
-    // Specific single category (words, slangs, phrases, idioms)
     pool = allItems.filter(item => item.category === category);
   }
 
-  // If in dictation mode and pool only has grammar questions, filter to those whose answers can be dictated,
-  // or for vocabulary items where term can be spoken
   if (pool.length === 0) {
     return false;
   }
 
-  // Shuffle and pick up to 10 questions
   const shuffled = shuffleArray(pool);
   const quizItems = shuffled.slice(0, 10);
 
-  // Initialize session
   quizSession = {
     category,
     mode: mode || 'mc',
@@ -101,9 +100,6 @@ export function startQuiz(category = 'all', allItems = [], grammarTopics = [], m
   return true;
 }
 
-/**
- * Get active question
- */
 export function getCurrentQuestion() {
   if (quizSession.questions.length === 0 || quizSession.currentIndex >= quizSession.questions.length) {
     return null;
@@ -111,16 +107,10 @@ export function getCurrentQuestion() {
   return quizSession.questions[quizSession.currentIndex];
 }
 
-/**
- * Get current quiz mode ('mc' or 'dictation')
- */
 export function getQuizMode() {
   return quizSession.mode || 'mc';
 }
 
-/**
- * Get session progress
- */
 export function getQuizProgress() {
   return {
     current: quizSession.currentIndex + 1,
@@ -129,33 +119,6 @@ export function getQuizProgress() {
   };
 }
 
-/**
- * Check user dictation input against target
- */
-export function checkDictationAnswer(userInput) {
-  const currentItem = getCurrentQuestion();
-  if (!currentItem) {
-    return { isCorrect: false, correctTerm: '', userAnswer: userInput };
-  }
-
-  const targetTerm = currentItem.isGrammar ? currentItem.meaning : currentItem.term;
-  const normalizedTarget = normalizeAnswer(targetTerm);
-  const normalizedInput = normalizeAnswer(userInput);
-
-  // Exact match or tolerant match
-  const isCorrect = (normalizedInput === normalizedTarget) ||
-                    (normalizedTarget.length > 2 && normalizedTarget.replace(/^(to |a |an |the )/, '') === normalizedInput);
-
-  return {
-    isCorrect,
-    correctTerm: targetTerm,
-    userAnswer: userInput.trim()
-  };
-}
-
-/**
- * Grade current question
- */
 export function gradeQuestion(isCorrect) {
   const currentItem = getCurrentQuestion();
   if (!currentItem) return;
@@ -172,18 +135,11 @@ export function gradeQuestion(isCorrect) {
   }
 }
 
-/**
- * Advance to next question
- * Returns true if there is a next question, false if quiz is completed
- */
 export function nextQuestion() {
   quizSession.currentIndex++;
   return quizSession.currentIndex < quizSession.questions.length;
 }
 
-/**
- * Return results summary
- */
 export function getQuizSummary() {
   const total = quizSession.questions.length;
   const correct = quizSession.correctCount;
@@ -199,12 +155,7 @@ export function getQuizSummary() {
   };
 }
 
-/**
- * Generate 4 multiple-choice options for the quiz card
- * Includes 1 correct answer and 3 randomized distractors
- */
 export function getQuizChoices(currentItem, allItems) {
-  // If this is a grammar item with pre-defined multiple-choice options
   if (currentItem.isGrammar && Array.isArray(currentItem.options) && currentItem.options.length > 0) {
     return currentItem.options.map((optText, idx) => ({
       text: optText,
@@ -213,22 +164,17 @@ export function getQuizChoices(currentItem, allItems) {
   }
 
   const correctMeaning = currentItem.meaning;
-  
-  // 1. Gather all potential distractors (excluding current meaning)
   let distractors = allItems
     .filter(item => item.meaning.trim() !== correctMeaning.trim())
     .map(item => item.meaning);
 
-  // De-duplicate distractors
   distractors = [...new Set(distractors)];
 
-  // 2. Select 3 distractors
   let chosenDistractors = [];
   if (distractors.length >= 3) {
     const shuffledDistractors = shuffleArray(distractors);
     chosenDistractors = shuffledDistractors.slice(0, 3);
   } else {
-    // Fallback static distractors if the user database is too small
     const staticFillers = [
       "Very tired, completely exhausted (Knackered)",
       "Extremely happy, delighted (Chuffed)",
@@ -238,19 +184,202 @@ export function getQuizChoices(currentItem, allItems) {
       "A pound sterling (British currency slang)",
       "Broke, having no money (Skint)"
     ];
-    
-    // Filter out correct meaning if it overlaps
     const filteredFillers = staticFillers.filter(f => f.trim() !== correctMeaning.trim());
-    const shuffledFillers = shuffleArray(filteredFillers);
-    
-    chosenDistractors = [...distractors, ...shuffledFillers].slice(0, 3);
+    chosenDistractors = [...distractors, ...shuffleArray(filteredFillers)].slice(0, 3);
   }
 
-  // 3. Assemble and shuffle choices
   const choices = [
     { text: correctMeaning, isCorrect: true },
     ...chosenDistractors.map(text => ({ text, isCorrect: false }))
   ];
 
   return shuffleArray(choices);
+}
+
+/* ==========================================================================
+   2. DICTATION ENGINE (10 Words, 3 Attempts per Word, Sunday Routine)
+   ========================================================================== */
+
+/**
+ * Start a 10-Word Dictation session
+ * @param {string} category - 'words', 'slangs', 'phrases', 'idioms', or 'all' (all together)
+ * @param {Array} allItems - Vocabulary items array from database
+ */
+export function startDictationSession(category = 'words', allItems = []) {
+  let pool = [];
+
+  if (category === 'words') {
+    pool = allItems.filter(i => i.category === 'words');
+  } else if (category === 'slangs') {
+    pool = allItems.filter(i => i.category === 'slangs');
+  } else if (category === 'phrases') {
+    pool = allItems.filter(i => i.category === 'phrases');
+  } else if (category === 'idioms') {
+    pool = allItems.filter(i => i.category === 'idioms');
+  } else {
+    // 'all' / All Together
+    pool = allItems.filter(i => ['words', 'slangs', 'phrases', 'idioms'].includes(i.category));
+  }
+
+  if (pool.length === 0) {
+    return false;
+  }
+
+  // Exactly 10 words per session (or all if fewer than 10)
+  const shuffled = shuffleArray(pool);
+  const selectedItems = shuffled.slice(0, 10);
+
+  dictationSession = {
+    category,
+    questions: selectedItems,
+    currentIndex: 0,
+    attemptsLeft: 3,
+    correctCount: 0,
+    incorrectCount: 0,
+    answersRecord: []
+  };
+
+  return true;
+}
+
+export function getCurrentDictationWord() {
+  if (!dictationSession.questions.length || dictationSession.currentIndex >= dictationSession.questions.length) {
+    return null;
+  }
+  return dictationSession.questions[dictationSession.currentIndex];
+}
+
+export function getDictationProgress() {
+  return {
+    current: dictationSession.currentIndex + 1,
+    total: dictationSession.questions.length,
+    percentage: Math.round(((dictationSession.currentIndex) / dictationSession.questions.length) * 100),
+    attemptsLeft: dictationSession.attemptsLeft
+  };
+}
+
+export function resetDictationAttempts() {
+  dictationSession.attemptsLeft = 3;
+  return dictationSession.attemptsLeft;
+}
+
+/**
+ * Check user dictation attempt
+ * Returns: { isCorrect, attemptsLeft, exhausted, correctTerm, userInput }
+ */
+export function checkDictationAttempt(userInput) {
+  const currentItem = getCurrentDictationWord();
+  if (!currentItem) {
+    return { isCorrect: false, attemptsLeft: 0, exhausted: true, correctTerm: '', userInput: '' };
+  }
+
+  const target = normalizeAnswer(currentItem.term);
+  const input = normalizeAnswer(userInput);
+
+  const isCorrect = (input === target) ||
+                    (target.length > 2 && target.replace(/^(to |a |an |the )/, '') === input);
+
+  if (isCorrect) {
+    dictationSession.correctCount++;
+    dictationSession.answersRecord.push({
+      item: currentItem,
+      isCorrect: true,
+      attemptsUsed: 4 - dictationSession.attemptsLeft
+    });
+
+    return {
+      isCorrect: true,
+      attemptsLeft: dictationSession.attemptsLeft,
+      exhausted: false,
+      correctTerm: currentItem.term,
+      userInput: userInput.trim()
+    };
+  } else {
+    dictationSession.attemptsLeft = Math.max(0, dictationSession.attemptsLeft - 1);
+    const exhausted = dictationSession.attemptsLeft === 0;
+
+    if (exhausted) {
+      dictationSession.incorrectCount++;
+      dictationSession.answersRecord.push({
+        item: currentItem,
+        isCorrect: false,
+        attemptsUsed: 3
+      });
+    }
+
+    return {
+      isCorrect: false,
+      attemptsLeft: dictationSession.attemptsLeft,
+      exhausted,
+      correctTerm: currentItem.term,
+      userInput: userInput.trim()
+    };
+  }
+}
+
+export function nextDictationWord() {
+  dictationSession.currentIndex++;
+  dictationSession.attemptsLeft = 3;
+  return dictationSession.currentIndex < dictationSession.questions.length;
+}
+
+export function getDictationSummary() {
+  const total = dictationSession.questions.length;
+  const correct = dictationSession.correctCount;
+  const incorrect = dictationSession.incorrectCount;
+  const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+
+  return {
+    total,
+    correct,
+    incorrect,
+    percentage: pct,
+    answers: dictationSession.answersRecord
+  };
+}
+
+/* ==========================================================================
+   3. SUNDAY ROUTINE TRACKER
+   ========================================================================== */
+
+export function getSundayRoutineStats() {
+  const storage = typeof localStorage !== 'undefined' ? localStorage : null;
+  const lastCompleted = storage ? storage.getItem('sunday_dictation_last_completed') : null;
+  const streak = storage ? parseInt(storage.getItem('sunday_dictation_streak') || '0', 10) : 0;
+  const today = new Date();
+  const isSunday = today.getDay() === 0;
+
+  let completedThisSunday = false;
+  if (lastCompleted) {
+    const lastDate = new Date(parseInt(lastCompleted, 10));
+    const isSameDay = today.toDateString() === lastDate.toDateString();
+    if (isSameDay) {
+      completedThisSunday = true;
+    }
+  }
+
+  return {
+    isSunday,
+    streak,
+    completedThisSunday,
+    lastCompletedFormatted: lastCompleted ? new Date(parseInt(lastCompleted, 10)).toLocaleDateString() : 'Never'
+  };
+}
+
+export function recordSundayRoutineCompleted() {
+  const storage = typeof localStorage !== 'undefined' ? localStorage : null;
+  const now = Date.now();
+  const today = new Date();
+  const currentStreak = storage ? parseInt(storage.getItem('sunday_dictation_streak') || '0', 10) : 0;
+  
+  const newStreak = currentStreak + 1;
+  if (storage) {
+    storage.setItem('sunday_dictation_streak', newStreak.toString());
+    storage.setItem('sunday_dictation_last_completed', now.toString());
+  }
+
+  return {
+    newStreak,
+    isSunday: today.getDay() === 0
+  };
 }

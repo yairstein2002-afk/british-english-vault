@@ -1,29 +1,21 @@
 import { 
-  fetchVaultData, 
-  saveVaultData, 
-  getGitHubConfig, 
-  saveGitHubConfig, 
-  testGitHubConnection,
-  clearAllLocalData
-} from './github.js';
-import { 
-  initSpeech, 
-  speakText, 
-  speakMultipleTimes, 
-  speakSlowSyllables, 
-  setSelectedVoice, 
-  getSelectedVoice,
-  getBritishVoices
-} from './speech.js';
-import { 
   startQuiz, 
   getCurrentQuestion, 
   getQuizProgress, 
   gradeQuestion, 
   nextQuestion, 
   getQuizSummary,
-  getQuizChoices
+  getQuizChoices,
+  startDictationSession,
+  getCurrentDictationWord,
+  getDictationProgress,
+  checkDictationAttempt,
+  nextDictationWord,
+  getDictationSummary,
+  getSundayRoutineStats,
+  recordSundayRoutineCompleted
 } from './quiz.js';
+import { LEARN_TOPICS } from './learnData.js';
 import { renderStatsUI } from './stats.js';
 import { getGeminiApiKey, saveGeminiApiKey, askGeminiTutor } from './ai.js';
 import { 
@@ -772,50 +764,84 @@ itemModal.addEventListener('click', (e) => {
 });
 
 // ==========================================================================
-// QUIZ SECTION VIEW LOGIC
+// QUIZ & DICTATION SECTION VIEW LOGIC
 // ==========================================================================
 const quizSetupPanel = document.getElementById('quiz-setup');
 const quizActivePanel = document.getElementById('quiz-active');
 const quizResultsPanel = document.getElementById('quiz-results');
 
-function setupQuizUI() {
-  quizSetupPanel.style.display = 'block';
-  quizActivePanel.style.display = 'none';
-  quizResultsPanel.style.display = 'none';
+const dictationSetupPanel = document.getElementById('dictation-setup');
+const dictationActivePanel = document.getElementById('dictation-active');
+const dictationResultsPanel = document.getElementById('dictation-results');
 
-  // Toggle active styling on custom quiz category radio cards
+const tabBtnOpenQuiz = document.getElementById('tab-btn-open-quiz');
+const tabBtnOpenDictation = document.getElementById('tab-btn-open-dictation');
+
+let activeQuizViewMode = 'quiz'; // 'quiz' or 'dictation'
+
+function setupQuizUI() {
+  if (activeQuizViewMode === 'dictation') {
+    openDictationSetup();
+  } else {
+    openQuizSetup();
+  }
+
+  // Setup tab switcher event listeners
+  if (tabBtnOpenQuiz && !tabBtnOpenQuiz.dataset.bound) {
+    tabBtnOpenQuiz.dataset.bound = 'true';
+    tabBtnOpenQuiz.addEventListener('click', () => {
+      activeQuizViewMode = 'quiz';
+      openQuizSetup();
+    });
+  }
+
+  if (tabBtnOpenDictation && !tabBtnOpenDictation.dataset.bound) {
+    tabBtnOpenDictation.dataset.bound = 'true';
+    tabBtnOpenDictation.addEventListener('click', () => {
+      activeQuizViewMode = 'dictation';
+      openDictationSetup();
+    });
+  }
+}
+
+function openQuizSetup() {
+  activeQuizViewMode = 'quiz';
+  if (tabBtnOpenQuiz) {
+    tabBtnOpenQuiz.className = 'btn btn-primary active-mode-btn';
+  }
+  if (tabBtnOpenDictation) {
+    tabBtnOpenDictation.className = 'btn btn-secondary';
+  }
+
+  if (quizSetupPanel) quizSetupPanel.style.display = 'block';
+  if (quizActivePanel) quizActivePanel.style.display = 'none';
+  if (quizResultsPanel) quizResultsPanel.style.display = 'none';
+
+  if (dictationSetupPanel) dictationSetupPanel.style.display = 'none';
+  if (dictationActivePanel) dictationActivePanel.style.display = 'none';
+  if (dictationResultsPanel) dictationResultsPanel.style.display = 'none';
+
+  // Category selection in quiz
   const categoryCards = quizSetupPanel.querySelectorAll('#quiz-category-grid .cat-radio-card');
   categoryCards.forEach(card => {
     const input = card.querySelector('input[type="radio"]');
     
-    card.addEventListener('click', () => {
+    card.onclick = () => {
       categoryCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       input.checked = true;
-    });
+
+      // If Grammar is selected, user requested it leads to Dictation!
+      if (input.value === 'grammar') {
+        openDictationSetup();
+      }
+    };
 
     if (input.checked) {
       card.classList.add('active');
     }
   });
 
-  // Toggle active styling on custom quiz mode radio cards
-  const modeCards = quizSetupPanel.querySelectorAll('.mode-radio-card');
-  modeCards.forEach(card => {
-    const input = card.querySelector('input[type="radio"]');
-    
-    card.addEventListener('click', () => {
-      modeCards.forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-      input.checked = true;
-    });
-
-    if (input.checked) {
-      card.classList.add('active');
-    }
-  });
-
-  // Helper to programmatically select category card
   const selectCat = (catValue) => {
     categoryCards.forEach(c => {
       const inp = c.querySelector('input[type="radio"]');
@@ -829,7 +855,6 @@ function setupQuizUI() {
     });
   };
 
-  // Quick Action Buttons
   const btnAll4 = document.getElementById('btn-quiz-quick-all4');
   if (btnAll4 && !btnAll4.dataset.bound) {
     btnAll4.dataset.bound = 'true';
@@ -839,7 +864,9 @@ function setupQuizUI() {
   const btnGrammar = document.getElementById('btn-quiz-quick-grammar');
   if (btnGrammar && !btnGrammar.dataset.bound) {
     btnGrammar.dataset.bound = 'true';
-    btnGrammar.addEventListener('click', () => selectCat('grammar'));
+    btnGrammar.addEventListener('click', () => {
+      openDictationSetup();
+    });
   }
 
   const btnMixed = document.getElementById('btn-quiz-quick-mixed');
@@ -849,13 +876,59 @@ function setupQuizUI() {
   }
 }
 
+function openDictationSetup() {
+  activeQuizViewMode = 'dictation';
+  if (tabBtnOpenQuiz) {
+    tabBtnOpenQuiz.className = 'btn btn-secondary';
+  }
+  if (tabBtnOpenDictation) {
+    tabBtnOpenDictation.className = 'btn btn-primary active-mode-btn';
+  }
+
+  if (quizSetupPanel) quizSetupPanel.style.display = 'none';
+  if (quizActivePanel) quizActivePanel.style.display = 'none';
+  if (quizResultsPanel) quizResultsPanel.style.display = 'none';
+
+  if (dictationSetupPanel) dictationSetupPanel.style.display = 'block';
+  if (dictationActivePanel) dictationActivePanel.style.display = 'none';
+  if (dictationResultsPanel) dictationResultsPanel.style.display = 'none';
+
+  // Update Sunday Streak Badge
+  const sundayStats = getSundayRoutineStats();
+  const streakPill = document.getElementById('sunday-streak-pill');
+  if (streakPill) {
+    streakPill.innerHTML = `<i class="fa-solid fa-fire" style="color: var(--gold);"></i> Sunday Streak: ${sundayStats.streak}`;
+  }
+
+  // Setup the 5 Dictation Category options
+  const dictationCards = dictationSetupPanel.querySelectorAll('#dictation-category-grid .cat-radio-card');
+  dictationCards.forEach(card => {
+    const input = card.querySelector('input[type="radio"]');
+    card.onclick = () => {
+      dictationCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      input.checked = true;
+    };
+    if (input.checked) {
+      card.classList.add('active');
+    }
+  });
+}
+
+// --------------------------------------------------------------------------
+// MULTIPLE CHOICE QUIZ FLOW
+// --------------------------------------------------------------------------
 document.getElementById('start-quiz-btn').addEventListener('click', () => {
   const selectedCat = quizSetupPanel.querySelector('input[name="quiz-cat"]:checked')?.value || 'all';
-  const selectedMode = quizSetupPanel.querySelector('input[name="quiz-mode"]:checked')?.value || 'mc';
 
-  const success = startQuiz(selectedCat, vaultData.items || [], LEARN_TOPICS, selectedMode);
+  if (selectedCat === 'grammar') {
+    openDictationSetup();
+    return;
+  }
+
+  const success = startQuiz(selectedCat, vaultData.items || [], LEARN_TOPICS, 'mc');
   if (!success) {
-    alert("Insufficient questions in this category. Please add items or choose another category to start the quiz.");
+    alert("Insufficient vocabulary in this category. Please add items before starting the quiz.");
     return;
   }
 
@@ -869,20 +942,18 @@ function showQuizQuestion() {
 
   const item = getCurrentQuestion();
   const progress = getQuizProgress();
-  const mode = getQuizMode();
 
-  // Reset display states and next question buttons
   document.getElementById('quiz-answer-block').style.display = 'none';
   document.getElementById('quiz-next-btn').style.display = 'none';
 
-  // Set card data
   document.getElementById('quiz-progress-text').innerText = `Question ${progress.current} of ${progress.total}`;
   document.getElementById('quiz-progress-fill').style.width = `${progress.percentage}%`;
   
   const categoryPill = document.getElementById('quiz-card-category');
-  categoryPill.innerText = item.category === 'grammar' ? (item.subgroup || 'Grammar') : item.category;
+  categoryPill.innerText = item.category;
   
   const cardWordEl = document.getElementById('quiz-card-word');
+  cardWordEl.innerText = item.term;
   
   const containsHebrew = /[\u0590-\u05FF]/.test(item.meaning);
   const meaningEl = document.getElementById('quiz-card-meaning');
@@ -891,16 +962,11 @@ function showQuizQuestion() {
 
   document.getElementById('quiz-card-example').innerText = item.example;
 
-  // Word speech target
-  const spokenText = item.isGrammar ? (item.meaning || item.term) : item.term;
-
-  // Bind Speak Word handlers in Quiz Card
   const speakBtn = document.getElementById('quiz-speak-btn');
   const newSpeakBtn = speakBtn.cloneNode(true);
   speakBtn.parentNode.replaceChild(newSpeakBtn, speakBtn);
-  bindLongPressSpeak(newSpeakBtn, spokenText);
+  bindLongPressSpeak(newSpeakBtn, item.term);
 
-  // Setup Sentence Toolbar in Quiz Card
   const sentenceToolbar = document.getElementById('quiz-sentence-toolbar');
   sentenceToolbar.innerHTML = `
     <button class="mini-speak-btn speak-quiz-sentence-btn" title="Speak sentence">
@@ -935,7 +1001,6 @@ function showQuizQuestion() {
     }
   });
 
-  // Bind Meaning Speech Handler in Quiz Card
   const meaningSpeakBtn = document.getElementById('quiz-meaning-speak-btn');
   if (meaningSpeakBtn) {
     const newMeaningSpeakBtn = meaningSpeakBtn.cloneNode(true);
@@ -955,295 +1020,301 @@ function showQuizQuestion() {
   }
 
   const optionsContainer = document.getElementById('quiz-options');
-  const dictationContainer = document.getElementById('quiz-dictation-container');
+  optionsContainer.innerHTML = '';
 
-  // MODE BRANCHING: Multiple Choice vs Audio Dictation (Listen & Write)
-  if (mode === 'dictation') {
-    if (optionsContainer) optionsContainer.style.display = 'none';
-    if (dictationContainer) dictationContainer.style.display = 'block';
-
-    // Mask card term so user listens first
-    if (item.isGrammar) {
-      cardWordEl.innerHTML = `<span style="font-size: 1.15rem; font-weight: 600;">${item.term}</span>`;
+  const choices = getQuizChoices(item, vaultData.items || []);
+  
+  choices.forEach(choice => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option-btn';
+    
+    const optionContainsHebrew = /[\u0590-\u05FF]/.test(choice.text);
+    if (optionContainsHebrew) {
+      btn.style.direction = 'rtl';
+      btn.style.textAlign = 'right';
     } else {
-      cardWordEl.innerHTML = `<span style="color: var(--text-muted); font-size: 1.15rem; font-style: italic;"><i class="fa-solid fa-headphones"></i> Listen &amp; Spell</span>`;
+      btn.style.direction = 'ltr';
+      btn.style.textAlign = 'left';
     }
 
-    const dictationInput = document.getElementById('quiz-dictation-input');
-    const dictationCheckBtn = document.getElementById('quiz-dictation-check-btn');
-    const dictationPlayBtn = document.getElementById('quiz-dictation-play-btn');
+    btn.innerText = choice.text;
 
-    if (dictationInput) {
-      dictationInput.value = '';
-      dictationInput.disabled = false;
+    btn.addEventListener('click', () => {
+      handleQuizChoiceSelected(choice, btn, choices);
+    });
+
+    optionsContainer.appendChild(btn);
+  });
+}
+
+// --------------------------------------------------------------------------
+// GRAMMAR DICTATION FLOW (10 Words, 3 Attempts, Play Word Button)
+// --------------------------------------------------------------------------
+document.getElementById('start-dictation-btn').addEventListener('click', () => {
+  const selectedCat = dictationSetupPanel.querySelector('input[name="dictation-cat"]:checked')?.value || 'words';
+  
+  const success = startDictationSession(selectedCat, vaultData.items || []);
+  if (!success) {
+    alert("Insufficient vocabulary in this category. Please add items or choose 'All Together (Mixed)'.");
+    return;
+  }
+
+  showDictationWord();
+});
+
+function showDictationWord() {
+  dictationSetupPanel.style.display = 'none';
+  dictationActivePanel.style.display = 'block';
+  dictationResultsPanel.style.display = 'none';
+
+  const item = getCurrentDictationWord();
+  const progress = getDictationProgress();
+
+  // Reset panels and next button
+  document.getElementById('dictation-answer-block').style.display = 'none';
+  document.getElementById('dictation-next-btn').style.display = 'none';
+  const feedbackBanner = document.getElementById('dictation-feedback-banner');
+  feedbackBanner.style.display = 'none';
+
+  // Update progress header
+  document.getElementById('dictation-progress-text').innerText = `Word ${progress.current} of ${progress.total}`;
+  document.getElementById('dictation-progress-fill').style.width = `${progress.percentage}%`;
+
+  // Update category pill
+  document.getElementById('dictation-card-category').innerText = item.category;
+
+  // Render 3 Hearts (Attempts)
+  renderDictationHearts(3);
+
+  // Setup input field
+  const inputEl = document.getElementById('dictation-user-input');
+  inputEl.value = '';
+  inputEl.disabled = false;
+  inputEl.className = 'form-control';
+  setTimeout(() => inputEl.focus(), 150);
+
+  // Setup Check button
+  const checkBtn = document.getElementById('dictation-check-btn');
+  checkBtn.disabled = false;
+
+  // Speak word handler (English Play Word button)
+  const rateSelect = document.getElementById('dictation-word-rate');
+  const playWordBtn = document.getElementById('dictation-play-word-btn');
+
+  const playCurrentWordAudio = async () => {
+    const rate = parseFloat(rateSelect?.value || 1.0);
+    playWordBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Playing...</span>';
+    try {
+      await speakText(item.term, { rate });
+    } finally {
+      playWordBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Play Word</span>';
     }
-    if (dictationCheckBtn) {
-      dictationCheckBtn.disabled = false;
+  };
+
+  // Automatically pronounce the word upon showing
+  playCurrentWordAudio();
+
+  const newPlayWordBtn = playWordBtn.cloneNode(true);
+  playWordBtn.parentNode.replaceChild(newPlayWordBtn, playWordBtn);
+  newPlayWordBtn.addEventListener('click', playCurrentWordAudio);
+
+  // Dictation Check Logic with 3 Attempts
+  const handleCheckAnswer = () => {
+    const typedValue = (inputEl.value || '').trim();
+    if (!typedValue) {
+      inputEl.focus();
+      return;
     }
 
-    // Auto-play audio with UK accent
-    const playCurrentAudio = async () => {
-      if (dictationPlayBtn) dictationPlayBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Playing...';
-      try {
-        const rateSelect = document.getElementById('quiz-word-rate');
-        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
-        await speakText(spokenText, { rate });
-      } finally {
-        if (dictationPlayBtn) dictationPlayBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen (UK Pronunciation)</span>';
-      }
-    };
+    const result = checkDictationAttempt(typedValue);
 
-    // Auto-play pronunciation
-    playCurrentAudio();
+    if (result.isCorrect) {
+      // SUCCESS!
+      renderDictationHearts(result.attemptsLeft);
+      inputEl.disabled = true;
+      checkBtn.disabled = true;
 
-    if (dictationPlayBtn) {
-      const newPlayBtn = dictationPlayBtn.cloneNode(true);
-      dictationPlayBtn.parentNode.replaceChild(newPlayBtn, dictationPlayBtn);
-      newPlayBtn.addEventListener('click', playCurrentAudio);
-    }
+      feedbackBanner.className = 'quiz-feedback-banner correct';
+      feedbackBanner.style.display = 'block';
+      feedbackBanner.innerHTML = `<i class="fa-solid fa-circle-check"></i> Splendid! Exactly correct: <strong>"${result.correctTerm}"</strong>`;
 
-    // Dictation Check Handler
-    const runDictationCheck = () => {
-      const userInput = (dictationInput?.value || '').trim();
-      if (!userInput) {
-        if (dictationInput) dictationInput.focus();
-        return;
-      }
+      revealDictationAnswer(item, result.correctTerm);
+      document.getElementById('dictation-next-btn').style.display = 'block';
 
-      if (dictationInput) dictationInput.disabled = true;
-      if (dictationCheckBtn) dictationCheckBtn.disabled = true;
+    } else {
+      // INCORRECT ATTEMPT
+      renderDictationHearts(result.attemptsLeft);
 
-      const result = checkDictationAnswer(userInput);
-      const isCorrect = result.isCorrect;
-
-      // Unmask the word
-      if (item.isGrammar) {
-        cardWordEl.innerHTML = `<span style="font-size: 1.15rem; font-weight: 600;">${item.term}</span><br><strong style="color: var(--success, #28a745); font-size: 1.3rem;">Answer: ${result.correctTerm}</strong>`;
-      } else {
-        cardWordEl.innerText = result.correctTerm;
-      }
-
-      const feedbackBanner = document.getElementById('quiz-feedback-banner');
-      if (isCorrect) {
-        feedbackBanner.className = 'quiz-feedback-banner correct';
-        feedbackBanner.innerText = `Splendid! Correct spelling: "${result.correctTerm}"`;
-      } else {
+      if (result.attemptsLeft === 2) {
         feedbackBanner.className = 'quiz-feedback-banner incorrect';
-        feedbackBanner.innerText = `Incorrect. You typed: "${result.userAnswer}" — Correct spelling: "${result.correctTerm}"`;
-      }
+        feedbackBanner.style.display = 'block';
+        feedbackBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Incorrect ("${result.userInput}"). Try again! <strong>2 attempts remaining.</strong>`;
+        inputEl.select();
+        inputEl.focus();
+        // Play word again to assist
+        playCurrentWordAudio();
 
-      gradeQuestion(isCorrect);
+      } else if (result.attemptsLeft === 1) {
+        feedbackBanner.className = 'quiz-feedback-banner incorrect';
+        feedbackBanner.style.display = 'block';
+        feedbackBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Incorrect. Final attempt! <strong>1 attempt remaining.</strong>`;
+        inputEl.select();
+        inputEl.focus();
+        // Play word again to assist
+        playCurrentWordAudio();
 
-      if (!isCorrect && !item.isGrammar) {
+      } else {
+        // 3 ATTEMPTS EXHAUSTED! Move to next word
+        inputEl.disabled = true;
+        checkBtn.disabled = true;
+
+        feedbackBanner.className = 'quiz-feedback-banner incorrect';
+        feedbackBanner.style.display = 'block';
+        feedbackBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> 3 attempts used! The correct spelling is: <strong>"${result.correctTerm}"</strong>`;
+
+        // Record mistake in database
         const index = vaultData.items.findIndex(i => i.id === item.id);
         if (index !== -1) {
           vaultData.items[index].mistakeCount = (vaultData.items[index].mistakeCount || 0) + 1;
         }
+
+        revealDictationAnswer(item, result.correctTerm);
+        document.getElementById('dictation-next-btn').style.display = 'block';
       }
-
-      document.getElementById('quiz-answer-block').style.display = 'block';
-      document.getElementById('quiz-next-btn').style.display = 'block';
-    };
-
-    if (dictationCheckBtn) {
-      const newCheckBtn = dictationCheckBtn.cloneNode(true);
-      dictationCheckBtn.parentNode.replaceChild(newCheckBtn, dictationCheckBtn);
-      newCheckBtn.addEventListener('click', runDictationCheck);
     }
-
-    if (dictationInput) {
-      const newInput = dictationInput.cloneNode(true);
-      dictationInput.parentNode.replaceChild(newInput, dictationInput);
-      newInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          runDictationCheck();
-        }
-      });
-      setTimeout(() => newInput.focus(), 150);
-    }
-
-  } else {
-    // MULTIPLE CHOICE MODE
-    if (optionsContainer) optionsContainer.style.display = 'grid';
-    if (dictationContainer) dictationContainer.style.display = 'none';
-
-    cardWordEl.innerText = item.term;
-    optionsContainer.innerHTML = '';
-
-    const choices = getQuizChoices(item, vaultData.items || []);
-    
-    choices.forEach(choice => {
-      const btn = document.createElement('button');
-      btn.className = 'quiz-option-btn';
-      
-      const optionContainsHebrew = /[\u0590-\u05FF]/.test(choice.text);
-      if (optionContainsHebrew) {
-        btn.style.direction = 'rtl';
-        btn.style.textAlign = 'right';
-      } else {
-        btn.style.direction = 'ltr';
-        btn.style.textAlign = 'left';
-      }
-
-      btn.innerText = choice.text;
-
-      btn.addEventListener('click', () => {
-        handleQuizChoiceSelected(choice, btn, choices);
-      });
-
-      optionsContainer.appendChild(btn);
-    });
-  }
-}
-
-async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
-  // 1. Disable option buttons from submitting duplicate answers
-  const optionButtons = document.querySelectorAll('.quiz-option-btn');
-  optionButtons.forEach(btn => {
-    btn.disabled = true;
-    btn.classList.add('disabled');
-  });
-
-  const isCorrect = choice.isCorrect;
-  const currentItem = getCurrentQuestion();
-
-  const appendStatusBadge = (buttonEl, isCheck) => {
-    const icon = document.createElement('i');
-    icon.className = isCheck ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark';
-    icon.style.marginLeft = '0.5rem';
-    buttonEl.appendChild(icon);
   };
 
-  // 2. Add visual success/danger feedback
-  const feedbackBanner = document.getElementById('quiz-feedback-banner');
-  if (isCorrect) {
-    selectedBtn.classList.remove('disabled');
-    selectedBtn.classList.add('correct');
-    appendStatusBadge(selectedBtn, true);
-    
-    feedbackBanner.className = 'quiz-feedback-banner correct';
-    feedbackBanner.innerText = 'Splendid! Correct.';
-  } else {
-    selectedBtn.classList.remove('disabled');
-    selectedBtn.classList.add('incorrect');
-    appendStatusBadge(selectedBtn, false);
+  const newCheckBtn = checkBtn.cloneNode(true);
+  checkBtn.parentNode.replaceChild(newCheckBtn, checkBtn);
+  newCheckBtn.addEventListener('click', handleCheckAnswer);
 
-    // Find and highlight correct answer
-    optionButtons.forEach(btn => {
-      const textToMatch = btn.innerText.trim();
-      const match = choices.find(c => c.text.trim() === textToMatch && c.isCorrect);
-      if (match) {
-        btn.classList.remove('disabled');
-        btn.classList.add('correct');
-        appendStatusBadge(btn, true);
-      }
-    });
-
-    feedbackBanner.className = 'quiz-feedback-banner incorrect';
-    feedbackBanner.innerText = 'Incorrect. Let\'s review this word.';
-  }
-
-  // 3. Grade question internally
-  gradeQuestion(isCorrect);
-
-  // 4. Update mistake count in database if incorrect
-  if (!isCorrect) {
-    const index = vaultData.items.findIndex(i => i.id === currentItem.id);
-    if (index !== -1) {
-      vaultData.items[index].mistakeCount = (vaultData.items[index].mistakeCount || 0) + 1;
+  const newInputEl = inputEl.cloneNode(true);
+  inputEl.parentNode.replaceChild(newInputEl, inputEl);
+  newInputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleCheckAnswer();
     }
-  }
-
-  // 5. Reveal explanation and Next button
-  document.getElementById('quiz-answer-block').style.display = 'block';
-  document.getElementById('quiz-next-btn').style.display = 'block';
+  });
+  setTimeout(() => newInputEl.focus(), 150);
 }
 
-// Quiz Next Button Click handler
-document.getElementById('quiz-next-btn').addEventListener('click', async () => {
-  if (nextQuestion()) {
-    showQuizQuestion();
+function renderDictationHearts(attemptsLeft) {
+  const heartsContainer = document.getElementById('dictation-hearts');
+  const attemptsLabel = document.getElementById('dictation-attempts-label');
+  if (!heartsContainer || !attemptsLabel) return;
+
+  let heartsHTML = '';
+  for (let i = 1; i <= 3; i++) {
+    if (i <= attemptsLeft) {
+      heartsHTML += '<i class="fa-solid fa-heart attempt-heart active" style="color: var(--danger, #EF4444);"></i> ';
+    } else {
+      heartsHTML += '<i class="fa-solid fa-heart attempt-heart spent" style="color: #CBD5E1; opacity: 0.45;"></i> ';
+    }
+  }
+  heartsContainer.innerHTML = heartsHTML;
+  attemptsLabel.innerText = `${attemptsLeft} attempt${attemptsLeft === 1 ? '' : 's'} left`;
+}
+
+function revealDictationAnswer(item, correctTerm) {
+  document.getElementById('dictation-revealed-word').innerText = correctTerm;
+  document.getElementById('dictation-revealed-meaning').innerText = item.meaning;
+  document.getElementById('dictation-revealed-example').innerText = item.example;
+
+  // Bind Meaning audio button in Dictation
+  const meaningBtn = document.getElementById('dictation-meaning-speak-btn');
+  if (meaningBtn) {
+    const newMeaningBtn = meaningBtn.cloneNode(true);
+    meaningBtn.parentNode.replaceChild(newMeaningBtn, meaningBtn);
+    newMeaningBtn.addEventListener('click', async () => {
+      newMeaningBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
+      try {
+        await speakText(item.meaning, { rate: 1.0 });
+      } finally {
+        newMeaningBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+      }
+    });
+  }
+
+  // Setup Sentence Toolbar in Dictation
+  const sentenceToolbar = document.getElementById('dictation-sentence-toolbar');
+  sentenceToolbar.innerHTML = `
+    <button class="mini-speak-btn speak-dictation-sentence-btn" title="Speak sentence">
+      <i class="fa-solid fa-circle-play"></i>
+    </button>
+    <select class="dictation-sentence-rate" title="Speed">
+      <option value="1">1.0x</option>
+      <option value="0.75">0.75x</option>
+      <option value="0.5">0.5x</option>
+    </select>
+  `;
+
+  const speakSentenceBtn = sentenceToolbar.querySelector('.speak-dictation-sentence-btn');
+  const rateSelect = sentenceToolbar.querySelector('.dictation-sentence-rate');
+  speakSentenceBtn.addEventListener('click', async () => {
+    const rate = parseFloat(rateSelect.value);
+    speakSentenceBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+    try {
+      await speakText(item.example, { rate });
+    } finally {
+      speakSentenceBtn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
+    }
+  });
+
+  document.getElementById('dictation-answer-block').style.display = 'block';
+}
+
+// Dictation Next Button
+document.getElementById('dictation-next-btn').addEventListener('click', async () => {
+  if (nextDictationWord()) {
+    showDictationWord();
   } else {
-    await completeQuiz();
+    await completeDictationSession();
   }
 });
 
-async function completeQuiz() {
-  const summary = getQuizSummary();
+async function completeDictationSession() {
+  const summary = getDictationSummary();
 
-  // 1. Update Global Statistics
+  // Record Sunday Routine Progress & Streak
+  const sundayResult = recordSundayRoutineCompleted();
+
+  // Update Database stats
   if (!vaultData.stats) {
     vaultData.stats = { quizzesCompleted: 0, correctAnswers: 0, incorrectAnswers: 0, history: [] };
   }
-  
   vaultData.stats.quizzesCompleted = (vaultData.stats.quizzesCompleted || 0) + 1;
   vaultData.stats.correctAnswers = (vaultData.stats.correctAnswers || 0) + summary.correct;
   vaultData.stats.incorrectAnswers = (vaultData.stats.incorrectAnswers || 0) + summary.incorrect;
-  
-  if (!vaultData.stats.history) {
-    vaultData.stats.history = [];
-  }
 
-  const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  vaultData.stats.history.push({
-    date: timestamp,
-    correct: summary.correct,
-    total: summary.total,
-    percentage: summary.percentage
-  });
-
-  // Keep last 30 items in history to avoid huge files
-  if (vaultData.stats.history.length > 30) {
-    vaultData.stats.history.shift();
-  }
-
-  // Save changes
   showLoader();
   await saveDatabase();
   hideLoader();
 
-  // 2. Render Scoreboard Screen
-  quizSetupPanel.style.display = 'none';
-  quizActivePanel.style.display = 'none';
-  quizResultsPanel.style.display = 'block';
+  // Render Dictation Scoreboard
+  dictationSetupPanel.style.display = 'none';
+  dictationActivePanel.style.display = 'none';
+  dictationResultsPanel.style.display = 'block';
 
-  document.getElementById('quiz-res-total').innerText = summary.total;
-  document.getElementById('quiz-res-correct').innerText = summary.correct;
-  document.getElementById('quiz-res-incorrect').innerText = summary.incorrect;
-  document.getElementById('quiz-res-pct').innerText = `${summary.percentage}%`;
+  document.getElementById('dictation-res-correct').innerText = summary.correct;
+  document.getElementById('dictation-res-incorrect').innerText = summary.incorrect;
+  document.getElementById('dictation-results-summary-text').innerText = `Score: ${summary.correct} / 10 words spelled correctly`;
 
-  // Set visual circular ring offset
-  const circle = document.getElementById('quiz-score-ring');
-  const radius = circle.r.baseVal.value;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (summary.percentage / 100) * circumference;
-  
-  circle.style.strokeDasharray = `${circumference} ${circumference}`;
-  circle.style.strokeDashoffset = offset;
-
-  // Personal congrats note based on score
-  const summaryMsg = document.getElementById('quiz-results-summary-text');
-  if (summary.percentage === 100) {
-    summaryMsg.innerText = "Bloody brilliant! Perfect score!";
-  } else if (summary.percentage >= 80) {
-    summaryMsg.innerText = "Splendid job! Almost perfect!";
-  } else if (summary.percentage >= 50) {
-    summaryMsg.innerText = "Not half bad! Keep practicing!";
-  } else {
-    summaryMsg.innerText = "Keep going! Practice makes perfect!";
+  const streakMsgEl = document.getElementById('dictation-streak-message');
+  if (streakMsgEl) {
+    streakMsgEl.innerText = `Sunday Streak: ${sundayResult.newStreak} week${sundayResult.newStreak === 1 ? '' : 's'} active! Practice every Sunday.`;
   }
 }
 
-// Exit practice buttons
-document.getElementById('quiz-cancel-btn').addEventListener('click', () => {
-  if (confirm("Are you sure you want to exit the quiz? Progress in this session will not be saved.")) {
-    setupQuizUI();
+// Dictation Exit & Retry buttons
+document.getElementById('dictation-cancel-btn').addEventListener('click', () => {
+  if (confirm("Are you sure you want to exit dictation? Progress in this session will not be saved.")) {
+    openDictationSetup();
   }
 });
 
-document.getElementById('quiz-retry-btn').addEventListener('click', setupQuizUI);
-document.getElementById('quiz-home-btn').addEventListener('click', () => navigateTo('words'));
+document.getElementById('dictation-retry-btn').addEventListener('click', openDictationSetup);
+document.getElementById('dictation-home-btn').addEventListener('click', () => navigateTo('words'));
 
 // ==========================================================================
 // SETTINGS VIEWS AND EVENT LISTENERS
