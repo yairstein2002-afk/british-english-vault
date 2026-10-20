@@ -1,4 +1,12 @@
 import { 
+  fetchVaultData, 
+  saveVaultData, 
+  getGitHubConfig, 
+  saveGitHubConfig, 
+  testGitHubConnection, 
+  getLocalFallbackData 
+} from './github.js';
+import { 
   startQuiz, 
   getCurrentQuestion, 
   getQuizProgress, 
@@ -252,33 +260,38 @@ function normalizeTerm(term) {
 }
 
 async function loadDatabase() {
-  // 1. Always load complete 33-item vaultData first
-  vaultData = await fetchVaultData(updateSyncStateUI);
+  try {
+    // 1. Immediately load curated local data so user sees everything in 0ms!
+    vaultData = getLocalFallbackData() || { items: [], stats: {} };
+    if (!vaultData.items || !Array.isArray(vaultData.items)) {
+      vaultData.items = [];
+    }
 
-  // 2. Fetch Supabase items if available
-  const sbRes = await fetchVaultFromSupabase();
-  if (sbRes && sbRes.success && Array.isArray(sbRes.items) && sbRes.items.length > 0) {
-    const itemMap = new Map();
-    (vaultData.items || []).forEach(item => itemMap.set(item.id, item));
-    (sbRes.items || []).forEach(item => itemMap.set(item.id, item));
-    vaultData.items = Array.from(itemMap.values());
-  } else {
-    // Automatically seed all 33 items into Supabase
-    syncAllVaultToSupabase(vaultData);
-  }
+    renderStatsUI(vaultData);
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
+    hideLoader();
 
-  // Deduplicate items by normalized term across all categories
-  const termSet = new Set();
-  vaultData.items = (vaultData.items || []).filter(item => {
-    const norm = normalizeTerm(item.term);
-    if (!norm || termSet.has(norm)) return false;
-    termSet.add(norm);
-    return true;
-  });
-
-  renderStatsUI(vaultData);
-  if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
-    renderCardsGrid();
+    // 2. Background check: fetch updates without ever blocking the UI
+    fetchVaultData(updateSyncStateUI).then(remoteData => {
+      if (remoteData && Array.isArray(remoteData.items) && remoteData.items.length > 0) {
+        vaultData = remoteData;
+        renderStatsUI(vaultData);
+        if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+          renderCardsGrid();
+        }
+      }
+    }).catch(e => console.warn('Background sync:', e));
+  } catch (err) {
+    console.error('loadDatabase error:', err);
+    if (!vaultData || !Array.isArray(vaultData.items)) {
+      vaultData = { items: [], stats: {} };
+    }
+    hideLoader();
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
   }
 }
 
@@ -1636,7 +1649,8 @@ function showLoader() {
 }
 
 function hideLoader() {
-  // Handled by rendering cards
+  const loaders = document.querySelectorAll('.loader-container');
+  loaders.forEach(el => el.remove());
 }
 
 // ==========================================================================

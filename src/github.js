@@ -118,9 +118,8 @@ const DEFAULT_VAULT_DATA = {
 };
 
 // Master Cloud Database Config (Zero-Token Setup for Users)
-const MASTER_DB_TOKEN = atob('Z2hwX01rQXlTTTZJSTI5UmxScjNaMWZMSGIwYmN1VTFxSzJLYXI0ZA==');
 const DEFAULT_CLOUD_DB_CONFIG = {
-  pat: MASTER_DB_TOKEN,
+  pat: '',
   owner: 'yairstein2002-afk',
   repo: 'british-english-vault',
   branch: 'main',
@@ -324,6 +323,9 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
   const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${now}`;
   
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
+
     let response;
     if (pat) {
       response = await fetch(url, {
@@ -331,8 +333,9 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
         headers: {
           'Authorization': getAuthHeader(pat),
           'Accept': 'application/vnd.github.v3+json'
-        }
-      });
+        },
+        signal: controller.signal
+      }).catch(() => null);
     }
 
     // If no PAT, or if PAT returns 401/403, fallback to unauthenticated public GET
@@ -341,11 +344,13 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
         method: 'GET',
         headers: {
           'Accept': 'application/vnd.github.v3+json'
-        }
-      });
+        },
+        signal: controller.signal
+      }).catch(() => null);
     }
+    clearTimeout(timeoutId);
 
-    if (response.status === 200) {
+    if (response && response.status === 200) {
       const data = await response.json();
       const contentString = decodeBase64UTF8(data.content);
       const parsedData = JSON.parse(contentString);
@@ -356,22 +361,19 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
       sessionStorage.setItem('bev_github_file_sha', data.sha);
 
       return mergeRemoteWithLocal(parsedData, onSyncStateChange);
-    } else if (response.status === 404) {
+    } else if (response && response.status === 404) {
       // File not found in GitHub. Create it immediately using local data.
       const localData = getLocalFallbackData();
       saveVaultData(localData, onSyncStateChange);
       return localData;
     } else {
-      let errDetail = `HTTP ${response.status}`;
-      try {
-        const errJson = await response.json();
-        if (errJson.message) errDetail = errJson.message;
-      } catch (e) {}
-      throw new Error(errDetail);
+      // Any other HTTP code (403, 500, etc.)
+      onSyncStateChange('local');
+      return getLocalFallbackData();
     }
   } catch (error) {
-    console.error("GitHub fetch failed, loading local cache", error);
-    onSyncStateChange('sync-failed', error.message);
+    console.warn("GitHub fetch failed, loading local cache:", error?.message || error);
+    onSyncStateChange('local');
     return getLocalFallbackData();
   }
 }
@@ -501,7 +503,7 @@ export async function saveVaultData(data, onSyncStateChange = () => {}) {
 /**
  * Local Fallback functions
  */
-function getLocalFallbackData() {
+export function getLocalFallbackData() {
   const localDataStr = localStorage.getItem(LOCAL_STORAGE_KEY);
   if (localDataStr) {
     try {
