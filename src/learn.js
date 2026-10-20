@@ -12,64 +12,11 @@ let practiceAnswers = {}; // { questionIndex: selectedOptionIndex }
 let checklistFilter = 'all'; // 'all', 'remaining', 'completed'
 
 export function initLearnUI() {
-  setupQuickNav();
   initGrammarChecklist();
   initWhereToStartGuide();
   renderCategoryChips();
   renderTopicsList();
   setupSearchHandler();
-}
-
-/**
- * Setup Single-Page Quick Jump Navigation
- */
-function setupQuickNav() {
-  const quickNavLinks = document.querySelectorAll('.quick-nav-btn');
-  quickNavLinks.forEach(btn => {
-    if (!btn.dataset.bound) {
-      btn.dataset.bound = 'true';
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        quickNavLinks.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const targetSelector = btn.getAttribute('href');
-        const targetEl = document.querySelector(targetSelector);
-        if (targetEl) {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-  });
-
-  // Support legacy tab buttons if present in DOM for safety
-  const btnChecklist = document.getElementById('learn-tab-btn-checklist');
-  const btnLessons = document.getElementById('learn-tab-btn-lessons');
-  const panelChecklist = document.getElementById('learn-tab-checklist');
-  const panelLessons = document.getElementById('learn-tab-lessons');
-
-  if (btnChecklist && btnLessons && panelChecklist && panelLessons) {
-    const switchTo = (tab) => {
-      if (tab === 'checklist') {
-        btnChecklist.className = 'btn btn-primary active-mode-btn';
-        btnLessons.className = 'btn btn-secondary';
-        panelChecklist.style.display = 'block';
-        panelLessons.style.display = 'none';
-      } else {
-        btnChecklist.className = 'btn btn-secondary';
-        btnLessons.className = 'btn btn-primary active-mode-btn';
-        panelChecklist.style.display = 'none';
-        panelLessons.style.display = 'block';
-      }
-    };
-    if (!btnChecklist.dataset.bound) {
-      btnChecklist.dataset.bound = 'true';
-      btnChecklist.addEventListener('click', () => switchTo('checklist'));
-    }
-    if (!btnLessons.dataset.bound) {
-      btnLessons.dataset.bound = 'true';
-      btnLessons.addEventListener('click', () => switchTo('lessons'));
-    }
-  }
 }
 
 /**
@@ -378,6 +325,18 @@ function renderCategoryChips() {
       container.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
       e.currentTarget.classList.add('active');
       activeCategory = e.currentTarget.getAttribute('data-cat');
+
+      const checklistCard = document.getElementById('grammar-checklist-card');
+      const startGuideCard = document.getElementById('grammar-start-guide-card');
+
+      if (activeCategory === 'all' || activeCategory === 'parts-of-speech') {
+        if (checklistCard) checklistCard.style.display = 'block';
+        if (startGuideCard) startGuideCard.style.display = 'block';
+      } else {
+        if (checklistCard) checklistCard.style.display = 'none';
+        if (startGuideCard) startGuideCard.style.display = 'none';
+      }
+
       renderTopicsList();
     });
   });
@@ -418,7 +377,7 @@ export function renderTopicsList() {
       <div class="card text-center" style="grid-column: 1/-1; padding: 3rem 1.5rem; color: var(--text-muted);">
         <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--uk-blue);"></i>
         <h4>No grammar topics found matching "${searchQuery}".</h4>
-        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Try adjusting your search term or select "All Topics".</p>
+        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Try selecting "All Topics" above.</p>
       </div>
     `;
     return;
@@ -454,20 +413,36 @@ export function renderTopicsList() {
       </div>
 
       <div class="learn-topics-accordion-list">
-        ${topicsInCat.map(topic => `
-          <div class="learn-topic-item ${activeTopicId === topic.id ? 'active' : ''}" data-topic-id="${topic.id}">
-            <div class="topic-item-header">
-              <div class="topic-title-group">
-                <span class="topic-tag">${topic.subgroup || catData.titleEng}</span>
-                <h4 class="topic-name">${topic.title}</h4>
-                <p class="topic-summary">${topic.summary}</p>
-              </div>
-              <div class="topic-action-arrow">
-                <i class="fa-solid fa-chevron-right"></i>
+        ${topicsInCat.map(topic => {
+          const firstEx = (topic.examples && topic.examples[0]) ? topic.examples[0] : '';
+          const escapedEx = firstEx.replace(/"/g, '&quot;');
+          return `
+            <div class="learn-topic-item ${activeTopicId === topic.id ? 'active' : ''}" data-topic-id="${topic.id}">
+              <div class="topic-item-header">
+                <div class="topic-title-group" style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
+                    <span class="topic-tag"><i class="fa-solid fa-tag" style="font-size: 0.7rem;"></i> ${topic.subgroup || catData.titleEng}</span>
+                  </div>
+                  <h4 class="topic-name">${topic.title}</h4>
+                  <p class="topic-summary">${topic.summary}</p>
+                  ${firstEx ? `
+                    <div class="topic-card-example-preview">
+                      <i class="fa-solid fa-quote-left quote-icon"></i>
+                      <span class="preview-text">${firstEx}</span>
+                      <button type="button" class="audio-btn-modern topic-preview-speak-btn" data-text="${escapedEx}" title="Listen in British English">
+                        <span class="audio-wave-anim"><span></span><span></span><span></span></span>
+                        <i class="fa-solid fa-volume-high audio-icon"></i>
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+                <div class="topic-action-arrow">
+                  <i class="fa-solid fa-chevron-right"></i>
+                </div>
               </div>
             </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
 
@@ -475,6 +450,21 @@ export function renderTopicsList() {
       item.addEventListener('click', () => {
         const id = item.getAttribute('data-topic-id');
         openTopicDetail(id);
+      });
+    });
+
+    groupCard.querySelectorAll('.topic-preview-speak-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const text = btn.getAttribute('data-text');
+        btn.classList.add('speaking');
+        try {
+          await speakText(text, { rate: 0.9 });
+        } catch (err) {
+          console.error('Audio play error:', err);
+        } finally {
+          btn.classList.remove('speaking');
+        }
       });
     });
 
@@ -787,3 +777,4 @@ function renderPracticeQuestions(topic) {
 
   return summaryHTML + questionsHTML;
 }
+

@@ -53,10 +53,19 @@
 }
 
 /* General Resets */
-* {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+  position: relative;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -65,7 +74,6 @@ body {
   color: var(--text-main);
   line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
-  overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -4348,4 +4356,167 @@ button, input, select, textarea {
 
 #quiz-dictation-play-btn:hover {
   transform: scale(1.03);
+}
+
+/* Curriculum Highlight Callout */
+.grammar-curriculum-callout {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(0, 36, 125, 0.05) 0%, rgba(212, 175, 55, 0.06) 100%);
+  border-left: 4px solid var(--uk-blue);
+  border-radius: var(--radius-md, 12px);
+  border-top: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--card-shadow);
+}
+
+[data-theme="dark"] .grammar-curriculum-callout {
+  background: linear-gradient(135deg, rgba(0, 36, 125, 0.22) 0%, rgba(212, 175, 55, 0.1) 100%);
+  border-left-color: var(--gold);
+}
+
+.curriculum-callout-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+/* Topic Card Example Preview inside All Grammar Lessons */
+.topic-card-example-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.85rem;
+  background: rgba(0, 36, 125, 0.04);
+  border-radius: 8px;
+  margin-top: 0.65rem;
+  border: 1px dashed rgba(0, 36, 125, 0.18);
+}
+
+[data-theme="dark"] .topic-card-example-preview {
+  background: rgba(212, 175, 55, 0.06);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.topic-card-example-preview .preview-text {
+  font-size: 0.86rem;
+  font-style: italic;
+  color: var(--text-main);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.4;
+}
+
+.topic-preview-speak-btn {
+  width: 30px !important;
+  height: 30px !important;
+}
+
+.topic-preview-speak-btn .audio-icon {
+  font-size: 0.8rem !important;
+}
+
+/* Strict Mobile Layout Lock - Prevents Horizontal Moving / Wobble */
+@media (max-width: 768px) {
+  html, body, #app, .app-layout, .main-content, .content-body, .view-section, #view-learn {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    touch-action: pan-y !important;
+  }
+
+  .content-body {
+    padding: 0.75rem 0.5rem !important;
+  }
+
+  #view-learn * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .learn-hero-banner {
+    padding: 1.25rem 1rem !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .learn-hero-content {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .learn-hero-metrics {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 0.4rem !important;
+  }
+
+  .metric-pill {
+    min-width: 0 !important;
+    padding: 0.45rem 0.5rem !important;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 0.2rem !important;
+  }
+
+  .learn-topics-accordion-list,
+  .checklist-items-grid,
+  .guide-examples-grid,
+  .learn-topics-grid {
+    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 0.75rem !important;
+  }
+
+  .checklist-item-row,
+  .guide-example-card,
+  .learn-topic-item,
+  .learn-category-group,
+  .grammar-checklist-card,
+  .grammar-start-guide-card,
+  .grammar-curriculum-callout,
+  .learn-filter-card,
+  .card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 1rem 0.85rem !important;
+  }
+
+  .checklist-tracker-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.75rem !important;
+    padding: 0.75rem !important;
+  }
+
+  .checklist-tracker-info {
+    min-width: 0 !important;
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .checklist-actions-group {
+    width: 100% !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+
+  .domain-filter-chips {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.4rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .chip {
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.8rem !important;
+  }
 }
