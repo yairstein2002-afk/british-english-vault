@@ -274,21 +274,7 @@
             <p class="panel-desc">Select a category and challenge yourself to recall the meanings and example sentences. Your progress and performance will be tracked in Statistics.</p>
             
             <div class="form-group">
-              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <label class="form-label" style="margin-bottom: 0;">Choose Category:</label>
-                <!-- Quick Selection Action Buttons -->
-                <div class="quiz-quick-actions" style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
-                  <button type="button" id="btn-quiz-quick-all4" class="btn btn-secondary btn-sm" title="Select Words, Slangs, Phrases & Idioms">
-                    <i class="fa-solid fa-layer-group"></i> All 4 (Vocab)
-                  </button>
-                  <button type="button" id="btn-quiz-quick-grammar" class="btn btn-secondary btn-sm" title="Switch to Grammar Dictation">
-                    <i class="fa-solid fa-headphones"></i> Grammar Dictation
-                  </button>
-                  <button type="button" id="btn-quiz-quick-mixed" class="btn btn-secondary btn-sm" title="Mix everything">
-                    <i class="fa-solid fa-shuffle"></i> Mixed / All
-                  </button>
-                </div>
-              </div>
+              <label class="form-label">Choose Category:</label>
 
               <div class="category-grid" id="quiz-category-grid">
                 <label class="cat-radio-card active">
@@ -296,20 +282,6 @@
                   <div class="cat-content">
                     <i class="fa-solid fa-globe"></i>
                     <span>Mixed / All</span>
-                  </div>
-                </label>
-                <label class="cat-radio-card">
-                  <input type="radio" name="quiz-cat" value="all-vocab">
-                  <div class="cat-content">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <span>All 4 Vocab</span>
-                  </div>
-                </label>
-                <label class="cat-radio-card" id="quiz-cat-card-grammar">
-                  <input type="radio" name="quiz-cat" value="grammar">
-                  <div class="cat-content">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                    <span>Grammar</span>
                   </div>
                 </label>
                 <label class="cat-radio-card">

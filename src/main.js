@@ -852,50 +852,12 @@ function openQuizSetup() {
       categoryCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       input.checked = true;
-
-      // If Grammar is selected, user requested it leads to Dictation!
-      if (input.value === 'grammar') {
-        openDictationSetup();
-      }
     };
 
     if (input.checked) {
       card.classList.add('active');
     }
   });
-
-  const selectCat = (catValue) => {
-    categoryCards.forEach(c => {
-      const inp = c.querySelector('input[type="radio"]');
-      if (inp.value === catValue) {
-        c.classList.add('active');
-        inp.checked = true;
-      } else {
-        c.classList.remove('active');
-        inp.checked = false;
-      }
-    });
-  };
-
-  const btnAll4 = document.getElementById('btn-quiz-quick-all4');
-  if (btnAll4 && !btnAll4.dataset.bound) {
-    btnAll4.dataset.bound = 'true';
-    btnAll4.addEventListener('click', () => selectCat('all-vocab'));
-  }
-
-  const btnGrammar = document.getElementById('btn-quiz-quick-grammar');
-  if (btnGrammar && !btnGrammar.dataset.bound) {
-    btnGrammar.dataset.bound = 'true';
-    btnGrammar.addEventListener('click', () => {
-      openDictationSetup();
-    });
-  }
-
-  const btnMixed = document.getElementById('btn-quiz-quick-mixed');
-  if (btnMixed && !btnMixed.dataset.bound) {
-    btnMixed.dataset.bound = 'true';
-    btnMixed.addEventListener('click', () => selectCat('all'));
-  }
 }
 
 function openDictationSetup() {
@@ -942,11 +904,6 @@ function openDictationSetup() {
 // --------------------------------------------------------------------------
 document.getElementById('start-quiz-btn').addEventListener('click', () => {
   const selectedCat = quizSetupPanel.querySelector('input[name="quiz-cat"]:checked')?.value || 'all';
-
-  if (selectedCat === 'grammar') {
-    openDictationSetup();
-    return;
-  }
 
   const success = startQuiz(selectedCat, vaultData.items || [], LEARN_TOPICS, 'mc');
   if (!success) {

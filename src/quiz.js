@@ -70,12 +70,8 @@ export function startQuiz(category = 'all', allItems = [], grammarTopics = [], m
 
   if (category === 'grammar') {
     pool = getGrammarQuestions();
-  } else if (category === 'all-vocab') {
+  } else if (category === 'all' || category === 'all-vocab') {
     pool = allItems.filter(item => ['words', 'slangs', 'phrases', 'idioms'].includes(item.category));
-  } else if (category === 'all') {
-    const vocab = allItems.filter(item => ['words', 'slangs', 'phrases', 'idioms'].includes(item.category));
-    const grammarQs = getGrammarQuestions();
-    pool = [...vocab, ...grammarQs];
   } else {
     pool = allItems.filter(item => item.category === category);
   }
