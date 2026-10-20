@@ -8,21 +8,21 @@ export const LEARN_CATEGORIES = [
     "id": "tenses",
     "titleEng": "Verb Tenses",
     "icon": "fa-clock",
-    "emoji": "⏳",
+    "emoji": "⏰",
     "desc": "Present, Past, and Future tenses with structures, signal words, and usage rules."
   },
   {
     "id": "parts-of-speech",
     "titleEng": "Parts of Speech",
     "icon": "fa-cubes",
-    "emoji": "🧩",
+    "emoji": "🧱",
     "desc": "Nouns, Articles, Quantifiers, Pronouns, Adjectives, Adverbs, and Prepositions."
   },
   {
     "id": "syntax",
     "titleEng": "Sentence Structure & Syntax",
     "icon": "fa-diagram-project",
-    "emoji": "📐",
+    "emoji": "🔀",
     "desc": "Word order (SVO), clause types, negation, question forms, and relative clauses."
   },
   {
@@ -5453,4 +5453,1347 @@ export const LEARN_TOPICS = [
       }
     ]
   }
+,
+  {
+  "id": "parts-of-speech-overview",
+  "categoryId": "parts-of-speech",
+  "subgroup": "Foundations of Grammar",
+  "title": "Parts of Speech (Word Classes)",
+  "summary": "The 9 core word classes: Nouns, Verbs, Adjectives, Adverbs, Pronouns, Prepositions, Conjunctions, Determiners, and Interjections.",
+  "rules": [
+    {
+      "title": "The Core Classification",
+      "details": "Every English word belongs to a grammatical class that determines its role and syntactic position within a sentence."
+    },
+    {
+      "title": "Open vs. Closed Classes",
+      "details": "Open classes (nouns, verbs, adjectives, adverbs) regularly acquire new vocabulary. Closed classes (pronouns, prepositions, conjunctions, determiners) have a fixed set of grammatical function words."
+    },
+    {
+      "title": "Word Class Conversion",
+      "details": "The same word form can serve different parts of speech based on sentence function (e.g. 'She reads a book' [noun] vs. 'I need to book a train' [verb])."
+    }
+  ],
+  "keywords": [
+    "parts of speech",
+    "word classes",
+    "nouns",
+    "verbs",
+    "adjectives",
+    "adverbs",
+    "pronouns",
+    "prepositions",
+    "conjunctions",
+    "determiners"
+  ],
+  "examples": [
+    "Noun: She reads a book in the British Library.",
+    "Verb: She reads a book every evening.",
+    "Adjective: She reads an interesting book.",
+    "Adverb: She reads quickly on the train.",
+    "Pronoun: She reads a book before bed.",
+    "Preposition: The book is on the table.",
+    "Conjunction: She reads and writes every weekend.",
+    "Determiner: She reads a book by Charles Dickens."
+  ],
+  "practice": [
+    {
+      "question": "In the sentence 'She reads an interesting book', which part of speech is 'interesting'?",
+      "options": [
+        "Adjective",
+        "Noun",
+        "Adverb",
+        "Pronoun"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Interesting' describes the noun 'book', making it an adjective."
+    },
+    {
+      "question": "In 'The book is on the table', what role does 'on' play?",
+      "options": [
+        "Preposition",
+        "Conjunction",
+        "Determiner",
+        "Adverb"
+      ],
+      "correctIndex": 0,
+      "explanation": "'On' indicates spatial relationship, functioning as a preposition."
+    },
+    {
+      "question": "Which word in 'She reads quickly' is an adverb of manner?",
+      "options": [
+        "quickly",
+        "She",
+        "reads",
+        "None"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Quickly' describes how she reads, functioning as an adverb."
+    },
+    {
+      "question": "Identify the conjunction in: 'She reads and writes diligently.'",
+      "options": [
+        "and",
+        "reads",
+        "writes",
+        "diligently"
+      ],
+      "correctIndex": 0,
+      "explanation": "'And' joins the two verbs together, functioning as a coordinating conjunction."
+    },
+    {
+      "question": "What part of speech is 'a' in 'She reads a book'?",
+      "options": [
+        "Determiner (Indefinite Article)",
+        "Adjective",
+        "Pronoun",
+        "Preposition"
+      ],
+      "correctIndex": 0,
+      "explanation": "'A' is an indefinite article, which belongs to the class of determiners."
+    },
+    {
+      "question": "In the sentence 'They arrived at Paddington station', which word is a proper noun?",
+      "options": [
+        "Paddington",
+        "arrived",
+        "at",
+        "station"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Paddington' is a specific named place, capitalized as a proper noun."
+    },
+    {
+      "question": "Which of the following contains an interjection?",
+      "options": [
+        "Brilliant! We won the match.",
+        "We won the match yesterday.",
+        "The match was brilliant.",
+        "He played in the match."
+      ],
+      "correctIndex": 0,
+      "explanation": "'Brilliant!' used standalone at the start expresses sudden emotion or praise as an interjection."
+    },
+    {
+      "question": "In 'He made himself a cup of tea', what type of pronoun is 'himself'?",
+      "options": [
+        "Reflexive pronoun",
+        "Possessive pronoun",
+        "Relative pronoun",
+        "Demonstrative pronoun"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Himself' reflects back to the subject 'He', functioning as a reflexive pronoun."
+    }
+  ]
+},
+  {
+  "id": "adverbs-types",
+  "categoryId": "parts-of-speech",
+  "subgroup": "Parts of Speech",
+  "title": "Adverbs: Manner, Time, Place, Frequency & Degree",
+  "summary": "Adverbs modify verbs, adjectives, or entire clauses to convey how, when, where, how often, or to what extent an action occurs.",
+  "rules": [
+    {
+      "title": "Adverbs of Manner (-ly)",
+      "details": "Describe how something happens (e.g. softly, patiently, brilliantly, quickly). Positioned typically after the verb or object."
+    },
+    {
+      "title": "Adverbs of Frequency",
+      "details": "Always, usually, often, sometimes, rarely, never. Placed before main verbs but after the verb 'to be' and auxiliaries."
+    },
+    {
+      "title": "Adverbs of Degree",
+      "details": "Very, extremely, quite, rather, thoroughly, totally. Modify adjectives, adverbs, or verbs to express intensity."
+    }
+  ],
+  "keywords": [
+    "adverbs",
+    "manner",
+    "time",
+    "place",
+    "frequency",
+    "degree",
+    "quickly",
+    "often",
+    "extremely"
+  ],
+  "examples": [
+    "He spoke very politely to the shopkeeper in Covent Garden.",
+    "She rarely misses the morning train to Victoria.",
+    "They walked briskly through Hyde Park in the crisp autumn air.",
+    "The performance was thoroughly impressive."
+  ],
+  "practice": [
+    {
+      "question": "Which sentence has the adverb of frequency correctly placed?",
+      "options": [
+        "He always catches the 8:15 train to Waterloo.",
+        "He catches always the 8:15 train to Waterloo.",
+        "Always he catches to Waterloo the 8:15 train.",
+        "He catches the 8:15 train always to Waterloo."
+      ],
+      "correctIndex": 0,
+      "explanation": "Adverbs of frequency go directly before the main lexical verb."
+    },
+    {
+      "question": "Identify the adverb of degree in: 'The weather in Scotland was extremely chilly.'",
+      "options": [
+        "extremely",
+        "chilly",
+        "weather",
+        "Scotland"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Extremely' intensifies the adjective 'chilly'."
+    },
+    {
+      "question": "Fill in the blank: 'The solicitor handled the confidential case _____.'",
+      "options": [
+        "discreetly",
+        "discreet",
+        "discretion",
+        "discreetness"
+      ],
+      "correctIndex": 0,
+      "explanation": "Modifying how the verb 'handled' was executed requires the adverb 'discreetly'."
+    },
+    {
+      "question": "Which of these is an adverb of place?",
+      "options": [
+        "downstairs",
+        "frequently",
+        "quietly",
+        "barely"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Downstairs' indicates the spatial location."
+    },
+    {
+      "question": "In 'She spoke quite softly', what does 'quite' modify?",
+      "options": [
+        "The adverb 'softly'",
+        "The verb 'spoke'",
+        "The pronoun 'She'",
+        "The whole clause"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Quite' is an adverb of degree modifying the adverb 'softly'."
+    },
+    {
+      "question": "Choose the adverb of time:",
+      "options": [
+        "yesterday",
+        "carefully",
+        "everywhere",
+        "almost"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Yesterday' specifies when the event occurred."
+    },
+    {
+      "question": "What is the irregular adverb form of the adjective 'good'?",
+      "options": [
+        "well",
+        "goodly",
+        "good",
+        "betterly"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Good' becomes 'well' as an adverb."
+    },
+    {
+      "question": "In 'The train barely arrived on time', 'barely' expresses:",
+      "options": [
+        "Degree / limitation (almost not)",
+        "Manner (how it moved)",
+        "Place",
+        "Direction"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Barely' is an adverb of degree meaning hardly or only just."
+    }
+  ]
+},
+  {
+  "id": "auxiliary-verbs",
+  "categoryId": "special-verbs",
+  "subgroup": "Verb Forms & Special Systems",
+  "title": "Auxiliary Verbs (Be, Do, Have)",
+  "summary": "Primary helping verbs used to construct progressive aspects, perfect tenses, passive voice, negations, and questions.",
+  "rules": [
+    {
+      "title": "The Auxiliary 'Be'",
+      "details": "Used with present participles (-ing) for continuous aspects ('is waiting') and with past participles for the passive voice ('was written')."
+    },
+    {
+      "title": "The Auxiliary 'Do'",
+      "details": "Used for simple present/past questions, negations ('Do you know?', 'He did not go'), and emphatic affirmation ('I do appreciate your help')."
+    },
+    {
+      "title": "The Auxiliary 'Have'",
+      "details": "Used with past participles to create the perfect aspect across present, past, and future ('has arrived', 'had finished')."
+    }
+  ],
+  "keywords": [
+    "auxiliary verbs",
+    "be",
+    "do",
+    "have",
+    "helping verbs",
+    "tenses",
+    "aspect"
+  ],
+  "examples": [
+    "We are currently reviewing the annual report.",
+    "Do you fancy a cuppa before the meeting?",
+    "She has lived in Kensington for over ten years.",
+    "The parcel was delivered by Royal Mail this morning."
+  ],
+  "practice": [
+    {
+      "question": "Which sentence uses 'have' as an auxiliary verb rather than a main verb?",
+      "options": [
+        "They have completed the refurbishment of the station.",
+        "They have a lovely cottage in the Cotswolds.",
+        "They have breakfast at seven o'clock.",
+        "They have many interesting books."
+      ],
+      "correctIndex": 0,
+      "explanation": "In 'have completed', 'have' helps form the present perfect tense."
+    },
+    {
+      "question": "Complete the question: '_____ she like Earl Grey tea?'",
+      "options": [
+        "Does",
+        "Is",
+        "Has",
+        "Do"
+      ],
+      "correctIndex": 0,
+      "explanation": "Third-person singular Present Simple questions use 'Does'."
+    },
+    {
+      "question": "Which auxiliary is required for passive voice?",
+      "options": [
+        "Be",
+        "Do",
+        "Have",
+        "Can"
+      ],
+      "correctIndex": 0,
+      "explanation": "Passive voice is always constructed with a form of 'to be' + past participle."
+    },
+    {
+      "question": "In 'I did tell him the right platform!', 'did' is used for:",
+      "options": [
+        "Emphatic stress",
+        "A question",
+        "Negation",
+        "Future intention"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Did' with a base verb provides strong emphatic affirmation."
+    },
+    {
+      "question": "Fill in the blank: 'By the time we arrived, the gallery _____ closed.'",
+      "options": [
+        "had",
+        "has",
+        "did",
+        "was having"
+      ],
+      "correctIndex": 0,
+      "explanation": "Past perfect requires the auxiliary 'had'."
+    },
+    {
+      "question": "Identify the auxiliary verb in: 'The team was awarded first prize.'",
+      "options": [
+        "was",
+        "awarded",
+        "first",
+        "prize"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Was' is the auxiliary verb forming the passive construction."
+    },
+    {
+      "question": "Which auxiliary is used with '-ing' to form continuous tenses?",
+      "options": [
+        "Be",
+        "Have",
+        "Do",
+        "Will"
+      ],
+      "correctIndex": 0,
+      "explanation": "The auxiliary 'be' + '-ing' participle forms progressive/continuous tenses."
+    },
+    {
+      "question": "Select the correct negative contraction of 'have not':",
+      "options": [
+        "haven't",
+        "havn't",
+        "havenot",
+        "have'nt"
+      ],
+      "correctIndex": 0,
+      "explanation": "The apostrophe replaces the omitted letter 'o': 'haven't'."
+    }
+  ]
+},
+  {
+  "id": "negatives-system",
+  "categoryId": "syntax",
+  "subgroup": "Sentence Structure & Syntax",
+  "title": "Negatives & Contractions (Don't, Doesn't, Didn't, Won't)",
+  "summary": "Forming negative clauses correctly with auxiliary verbs, modal verbs, and avoiding double negatives in standard British English.",
+  "rules": [
+    {
+      "title": "Negation with Auxiliaries",
+      "details": "Attach 'not' or contracted \"n't\" directly to the first auxiliary or modal verb (e.g. is not -> isn't, will not -> won't, cannot -> can't)."
+    },
+    {
+      "title": "Do-Support in Simple Tenses",
+      "details": "Present simple uses don't / doesn't; past simple uses didn't. The lexical main verb always reverts to its base infinitive (bare form)."
+    },
+    {
+      "title": "Avoiding Double Negatives",
+      "details": "Standard English grammar uses single negation: 'I didn't see anything' (NOT 'I didn't see nothing')."
+    }
+  ],
+  "keywords": [
+    "negatives",
+    "contractions",
+    "don't",
+    "doesn't",
+    "didn't",
+    "won't",
+    "isn't",
+    "aren't",
+    "can't"
+  ],
+  "examples": [
+    "He doesn't commute to Central London on Fridays.",
+    "We didn't receive the notification until this morning.",
+    "They aren't keen on queueing in the rain.",
+    "I won't be able to attend the gallery opening."
+  ],
+  "practice": [
+    {
+      "question": "Which sentence follows standard British English negation rules?",
+      "options": [
+        "I haven't got any cash on me today.",
+        "I haven't got no cash on me today.",
+        "I didn't got any cash on me today.",
+        "I hasn't any cash on me today."
+      ],
+      "correctIndex": 0,
+      "explanation": "Standard grammar uses single negation ('haven't got any...')."
+    },
+    {
+      "question": "What is the contraction of 'will not'?",
+      "options": [
+        "won't",
+        "willn't",
+        "wont",
+        "woul'nt"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Will not' contracts irregularly to 'won't'."
+    },
+    {
+      "question": "Complete the negative sentence: 'She _____ drink coffee after midday.'",
+      "options": [
+        "doesn't",
+        "don't",
+        "isn't",
+        "aren't"
+      ],
+      "correctIndex": 0,
+      "explanation": "Third-person singular 'She' takes 'doesn't' with the base verb 'drink'."
+    },
+    {
+      "question": "Correct the mistake: 'He didn't knew the route to Oxford.'",
+      "options": [
+        "He didn't know the route to Oxford.",
+        "He didn't known the route to Oxford.",
+        "He didn't knows the route to Oxford.",
+        "He not knew the route to Oxford."
+      ],
+      "correctIndex": 0,
+      "explanation": "After 'didn't', the main verb must remain in its bare infinitive form ('know')."
+    },
+    {
+      "question": "Which sentence uses a negative modal correctly?",
+      "options": [
+        "You mustn't feed the pigeons in Trafalgar Square.",
+        "You don't must feed the pigeons in Trafalgar Square.",
+        "You mustn't to feed the pigeons in Trafalgar Square.",
+        "You must not feeding the pigeons in Trafalgar Square."
+      ],
+      "correctIndex": 0,
+      "explanation": "'Mustn't' takes a bare infinitive without 'to'."
+    },
+    {
+      "question": "Choose the formal, uncontracted negative:",
+      "options": [
+        "It is not permissible under the current regulations.",
+        "It isn't permissible under the current regulations.",
+        "It ain't permissible under the current regulations.",
+        "It not permissible under the current regulations."
+      ],
+      "correctIndex": 0,
+      "explanation": "Formal written British English prefers the full form 'is not'."
+    },
+    {
+      "question": "Select the correct negative question for polite confirmation:",
+      "options": [
+        "Aren't you meeting Oliver at Piccadilly Circus?",
+        "Don't you meeting Oliver at Piccadilly Circus?",
+        "Isn't you meeting Oliver at Piccadilly Circus?",
+        "Are you not meet Oliver at Piccadilly Circus?"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Aren't you meeting...' correctly pairs 'aren't' with 'you' in present continuous."
+    },
+    {
+      "question": "Which word turns the sentence negative without using 'not'?",
+      "options": [
+        "seldom",
+        "frequently",
+        "occasionally",
+        "definitely"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Seldom' is an inherently negative / restrictive adverb meaning rarely."
+    }
+  ]
+},
+  {
+  "id": "passive-voice",
+  "categoryId": "advanced-grammar",
+  "subgroup": "Advanced Grammar & British Varieties",
+  "title": "Passive Voice (Be + Past Participle)",
+  "summary": "Shifting sentence focus to the receiver of the action: 'The cake was made; the letter was sent.' Crucial for academic, journalistic, and formal British English.",
+  "rules": [
+    {
+      "title": "Formation Principle",
+      "details": "Subject (Receiver) + Form of 'Be' (conjugated for tense/person) + Past Participle (+ 'by' agent if necessary)."
+    },
+    {
+      "title": "Why Use Passive Voice?",
+      "details": "When the agent is unknown, obvious, unimportant, or intentionally omitted for objective or diplomatic tone in formal reports."
+    },
+    {
+      "title": "Tense Transformations",
+      "details": "Active 'She writes letters' -> Passive 'Letters are written'. Active 'They built the bridge in 1894' -> Passive 'The bridge was built in 1894'."
+    }
+  ],
+  "keywords": [
+    "passive voice",
+    "past participle",
+    "was made",
+    "was sent",
+    "by agent",
+    "formal english"
+  ],
+  "examples": [
+    "The Magna Carta was signed in 1215 at Runnymede.",
+    "The cake was made for the Queen's jubilee celebration.",
+    "The letter was sent via registered British post.",
+    "All visitors are requested to keep to the designated paths."
+  ],
+  "practice": [
+    {
+      "question": "Convert into passive: 'The architect designed the new museum wing.'",
+      "options": [
+        "The new museum wing was designed by the architect.",
+        "The new museum wing is designed by the architect.",
+        "The new museum wing had designed by the architect.",
+        "The new museum wing was being design by the architect."
+      ],
+      "correctIndex": 0,
+      "explanation": "Past simple active ('designed') converts to past simple passive ('was designed')."
+    },
+    {
+      "question": "Identify the passive sentence:",
+      "options": [
+        "The historic clock tower is being restored this year.",
+        "The engineers are restoring the historic clock tower.",
+        "The engineers restored the historic clock tower.",
+        "The clock tower will chime loudly tomorrow."
+      ],
+      "correctIndex": 0,
+      "explanation": "'is being restored' is present continuous passive."
+    },
+    {
+      "question": "Complete the sentence in the passive voice: 'The invitations _____ yesterday.'",
+      "options": [
+        "were sent",
+        "was sent",
+        "are sent",
+        "sent"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Invitations' is plural and the timeframe is 'yesterday', requiring 'were sent'."
+    },
+    {
+      "question": "Which sentence demonstrates the formal 'impersonal passive'?",
+      "options": [
+        "It is widely believed that the treaty will be signed.",
+        "People widely believe that they will sign the treaty.",
+        "We believe the treaty will be signed.",
+        "They think the treaty is signed."
+      ],
+      "correctIndex": 0,
+      "explanation": "'It is widely believed that...' is a classic impersonal passive structure."
+    },
+    {
+      "question": "Why is 'by Royal Mail' placed at the end of 'The parcel was dispatched by Royal Mail'?",
+      "options": [
+        "It identifies the agent (who performed the action).",
+        "It is the direct object of the clause.",
+        "It acts as an adverb of time.",
+        "It is an indirect pronoun."
+      ],
+      "correctIndex": 0,
+      "explanation": "The preposition 'by' introduces the agent performing the action in passive voice."
+    },
+    {
+      "question": "Select the correct present perfect passive:",
+      "options": [
+        "The documents have been signed by the solicitor.",
+        "The documents have signed by the solicitor.",
+        "The documents were been signed by the solicitor.",
+        "The documents has been signed by the solicitor."
+      ],
+      "correctIndex": 0,
+      "explanation": "Plural subject 'documents' requires 'have been' + past participle 'signed'."
+    },
+    {
+      "question": "Which verb cannot normally be made passive?",
+      "options": [
+        "arrive (intransitive)",
+        "inspect (transitive)",
+        "demolish (transitive)",
+        "publish (transitive)"
+      ],
+      "correctIndex": 0,
+      "explanation": "Intransitive verbs like 'arrive' have no direct object and cannot form a passive voice."
+    },
+    {
+      "question": "What is the passive form of: 'They will announce the winner soon.'?",
+      "options": [
+        "The winner will be announced soon.",
+        "The winner will announced soon.",
+        "The winner is announced soon.",
+        "The winner will being announced soon."
+      ],
+      "correctIndex": 0,
+      "explanation": "Future simple modal passive is formed with 'will be' + past participle."
+    }
+  ]
+},
+  {
+  "id": "reported-speech",
+  "categoryId": "advanced-grammar",
+  "subgroup": "Advanced Grammar & British Varieties",
+  "title": "Reported Speech & Indirect Discourse",
+  "summary": "Reporting what someone said with backshifting tenses, adjusting pronouns, and updating time and place references ('She said that she was tired').",
+  "rules": [
+    {
+      "title": "Tense Backshifting",
+      "details": "When the reporting verb is in the past (e.g. said, told), present tenses shift one step into the past: Present Simple -> Past Simple; Present Continuous -> Past Continuous; Present Perfect -> Past Perfect."
+    },
+    {
+      "title": "Reporting Verbs & Structure",
+      "details": "'Say' does not require a personal indirect object ('He said that...'), whereas 'tell' must have a personal object ('He told me that...')."
+    },
+    {
+      "title": "Time & Place Shift",
+      "details": "Time markers adapt to the reporting frame: 'now' -> 'then', 'today' -> 'that day', 'tomorrow' -> 'the following day', 'here' -> 'there'."
+    }
+  ],
+  "keywords": [
+    "reported speech",
+    "indirect speech",
+    "backshifting",
+    "she said that",
+    "told me",
+    "reported questions"
+  ],
+  "examples": [
+    "Direct: \"I am tired.\" -> Reported: She said that she was tired.",
+    "Direct: \"We have bought tickets.\" -> Reported: They told me they had bought tickets.",
+    "Direct: \"I will call you tomorrow.\" -> Reported: He promised he would call the following day.",
+    "Direct: \"Where is the station?\" -> Reported: She asked where the station was."
+  ],
+  "practice": [
+    {
+      "question": "Direct speech: \"I live in Manchester.\" How is this reported in the past?",
+      "options": [
+        "He said that he lived in Manchester.",
+        "He said that he lives in Manchester.",
+        "He said that he had lived in Manchester.",
+        "He told that he lived in Manchester."
+      ],
+      "correctIndex": 0,
+      "explanation": "Present simple 'live' backshifts to past simple 'lived'."
+    },
+    {
+      "question": "Which sentence correctly uses 'tell' in reported speech?",
+      "options": [
+        "She told me that the meeting was postponed.",
+        "She told that the meeting was postponed.",
+        "She said to me that the meeting postponed.",
+        "She told to me that the meeting was postponed."
+      ],
+      "correctIndex": 0,
+      "explanation": "'Tell' requires an object pronoun ('told me') without 'to'."
+    },
+    {
+      "question": "Direct speech: \"I have finished my thesis.\" -> Reported speech:",
+      "options": [
+        "He stated that he had finished his thesis.",
+        "He stated that he has finished his thesis.",
+        "He stated that he finished his thesis.",
+        "He stated that he would finish his thesis."
+      ],
+      "correctIndex": 0,
+      "explanation": "Present perfect 'have finished' backshifts to past perfect 'had finished'."
+    },
+    {
+      "question": "Convert the modal 'can': \"I can assist you with that.\"",
+      "options": [
+        "She said she could assist with that.",
+        "She said she can assist with that.",
+        "She said she would can assist with that.",
+        "She said she will could assist with that."
+      ],
+      "correctIndex": 0,
+      "explanation": "'Can' shifts to its past equivalent 'could'."
+    },
+    {
+      "question": "How does 'tomorrow' transform in reported speech?",
+      "options": [
+        "The following day / the next day",
+        "The previous day",
+        "The day before yesterday",
+        "That day"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Tomorrow' shifts to 'the next day' or 'the following day'."
+    },
+    {
+      "question": "Report this question: \"Do you take sugar in your tea?\"",
+      "options": [
+        "She asked if I took sugar in my tea.",
+        "She asked did I take sugar in my tea.",
+        "She asked do I take sugar in my tea.",
+        "She asked that I take sugar in my tea."
+      ],
+      "correctIndex": 0,
+      "explanation": "Yes/no questions in reported speech use 'if' or 'whether' with normal statement word order."
+    },
+    {
+      "question": "Which reporting verb matches an order or command?",
+      "options": [
+        "instructed",
+        "inquired",
+        "wondered",
+        "speculated"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Instructed' is used to report commands ('He instructed us to wait')."
+    },
+    {
+      "question": "Direct speech: \"I will be there.\" -> Reported speech:",
+      "options": [
+        "He said he would be there.",
+        "He said he will be there.",
+        "He said he is being there.",
+        "He said he was there."
+      ],
+      "correctIndex": 0,
+      "explanation": "'Will' backshifts to conditional 'would'."
+    }
+  ]
+},
+  {
+  "id": "comparisons",
+  "categoryId": "parts-of-speech",
+  "subgroup": "Parts of Speech",
+  "title": "Comparisons: As...as, More than, The Most",
+  "summary": "Comparing qualities of nouns and actions using comparative and superlative adjectives, adverbs, and equative structures.",
+  "rules": [
+    {
+      "title": "One-Syllable Adjectives",
+      "details": "Add -er / -est (e.g. quick -> quicker -> quickest; cold -> colder -> coldest). Double final consonant after a short vowel (big -> bigger -> biggest)."
+    },
+    {
+      "title": "Multi-Syllable Adjectives",
+      "details": "Use 'more' and 'most' for words of three or more syllables and most two-syllable adjectives (e.g. more sophisticated, the most expensive)."
+    },
+    {
+      "title": "Equative Comparison (As...as)",
+      "details": "Use 'as + base adjective + as' to indicate equality ('London is as vibrant as New York'). In negatives, 'not as...as' or 'not so...as' is standard."
+    }
+  ],
+  "keywords": [
+    "comparisons",
+    "as as",
+    "more than",
+    "the most",
+    "comparative",
+    "superlative",
+    "better",
+    "best"
+  ],
+  "examples": [
+    "The train is much faster than the coach to Bristol.",
+    "The Shard is the tallest building in the United Kingdom.",
+    "Today's weather is not as gloomy as yesterday's.",
+    "She performed far more brilliantly than expected."
+  ],
+  "practice": [
+    {
+      "question": "Which sentence shows correct comparative structure?",
+      "options": [
+        "The Thames is wider than the River Cam.",
+        "The Thames is more wide than the River Cam.",
+        "The Thames is wider as the River Cam.",
+        "The Thames is more wider than the River Cam."
+      ],
+      "correctIndex": 0,
+      "explanation": "One-syllable adjective 'wide' takes the -r suffix ('wider') followed by 'than'."
+    },
+    {
+      "question": "Complete the equative comparison: 'His flat is _____ mine.'",
+      "options": [
+        "as spacious as",
+        "more spacious as",
+        "as spacious than",
+        "spacious as"
+      ],
+      "correctIndex": 0,
+      "explanation": "Equative comparisons strictly require 'as + adjective + as'."
+    },
+    {
+      "question": "What is the superlative form of the irregular adjective 'bad'?",
+      "options": [
+        "worst",
+        "worse",
+        "baddest",
+        "most bad"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Bad' -> 'worse' (comparative) -> 'worst' (superlative)."
+    },
+    {
+      "question": "Fill in the blank: 'This boutique offers _____ service in Mayfair.'",
+      "options": [
+        "the most courteous",
+        "the courteousest",
+        "the more courteous",
+        "most courteous"
+      ],
+      "correctIndex": 0,
+      "explanation": "Multi-syllable adjectives form superlatives with 'the most'."
+    },
+    {
+      "question": "Which modifier is used for emphatic comparative degree?",
+      "options": [
+        "far",
+        "very",
+        "too",
+        "so"
+      ],
+      "correctIndex": 0,
+      "explanation": "We say 'far better' or 'much better' (not 'very better')."
+    },
+    {
+      "question": "Choose the correct irregular comparative:",
+      "options": [
+        "further / farther",
+        "farer",
+        "more far",
+        "farrest"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Far' becomes 'further' or 'farther' in comparative form."
+    },
+    {
+      "question": "Select the correct double comparative expression:",
+      "options": [
+        "The more you practice, the more confident you become.",
+        "The more you practice, more you become confident.",
+        "More you practice, the more you confident.",
+        "As more you practice, so you become confident."
+      ],
+      "correctIndex": 0,
+      "explanation": "'The more..., the more...' is the classic proportional comparative structure."
+    },
+    {
+      "question": "Which word correctly completes: 'She is two years _____ than her brother.'?",
+      "options": [
+        "older",
+        "elder",
+        "more old",
+        "eldest"
+      ],
+      "correctIndex": 0,
+      "explanation": "When followed by 'than', 'older' is grammatically mandatory ('elder' is an attributive adjective without 'than')."
+    }
+  ]
+},
+  {
+  "id": "word-formation",
+  "categoryId": "mechanics",
+  "subgroup": "Mechanics & Word Formation",
+  "title": "Word Formation: Prefixes, Suffixes & Conversion",
+  "summary": "Expanding vocabulary by deriving nouns from verbs, adjectives from nouns, using prefixes (un-, dis-, mis-), and morphological conversion.",
+  "rules": [
+    {
+      "title": "Prefixes (Altering Meaning)",
+      "details": "Common negative prefixes: un- (unhappy), dis- (disagree), mis- (misunderstand), in-/im-/il-/ir- (impossible, irregular). Re- (do again), over- (too much)."
+    },
+    {
+      "title": "Suffixes (Altering Word Class)",
+      "details": "Noun suffixes: -tion, -ment, -ness, -ity (develop -> development). Adjective suffixes: -ful, -less, -able, -ive (care -> careful, careless). Verb suffixes: -ify, -ise/-ize."
+    },
+    {
+      "title": "Conversion (Zero Derivation)",
+      "details": "Creating a new part of speech without altering the form (e.g. 'email' [noun] -> 'to email' [verb]; 'bottle' -> 'to bottle')."
+    }
+  ],
+  "keywords": [
+    "word formation",
+    "prefixes",
+    "suffixes",
+    "conversion",
+    "nouns from verbs",
+    "adjectives from nouns"
+  ],
+  "examples": [
+    "Verb 'conclude' -> Noun 'conclusion'.",
+    "Noun 'delight' -> Adjective 'delightful'.",
+    "Adjective 'kind' -> Noun 'kindness'.",
+    "Prefix 'mis-' + 'understand' -> 'misunderstand'."
+  ],
+  "practice": [
+    {
+      "question": "What is the noun form derived from the verb 'decide'?",
+      "options": [
+        "decision",
+        "decidement",
+        "decisive",
+        "decisiveness"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Decide' forms the abstract noun 'decision'."
+    },
+    {
+      "question": "Which prefix indicates 'incorrectly' or 'wrongly'?",
+      "options": [
+        "mis-",
+        "un-",
+        "anti-",
+        "re-"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Mis-' denotes wrongful action (e.g. mislead, miscalculate)."
+    },
+    {
+      "question": "Form an adjective from the noun 'danger':",
+      "options": [
+        "dangerous",
+        "dangerful",
+        "dangeric",
+        "dangerable"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Danger' takes the suffix '-ous' to create 'dangerous'."
+    },
+    {
+      "question": "What does the suffix '-less' signify in words like 'careless'?",
+      "options": [
+        "Without / lacking",
+        "Full of",
+        "Able to be",
+        "Causing"
+      ],
+      "correctIndex": 0,
+      "explanation": "'-less' indicates the absence or lack of a quality."
+    },
+    {
+      "question": "Which prefix is correctly attached to 'responsible' to create its antonym?",
+      "options": [
+        "ir-",
+        "un-",
+        "in-",
+        "dis-"
+      ],
+      "correctIndex": 0,
+      "explanation": "Words starting with 'r' typically take the assimilative prefix 'ir-' ('irresponsible')."
+    },
+    {
+      "question": "Identify the process where 'google' became a verb without spelling change:",
+      "options": [
+        "Conversion (zero derivation)",
+        "Compounding",
+        "Acronym",
+        "Clipping"
+      ],
+      "correctIndex": 0,
+      "explanation": "Conversion occurs when a word shifts grammatical class without morphological alteration."
+    },
+    {
+      "question": "What is the noun form of the adjective 'patient'?",
+      "options": [
+        "patience",
+        "patientness",
+        "patienthood",
+        "patientity"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Patient' becomes the abstract noun 'patience'."
+    },
+    {
+      "question": "Which suffix converts the adjective 'simple' into a verb?",
+      "options": [
+        "-ify (simplify)",
+        "-ise (simplise)",
+        "-en (simplen)",
+        "-ate (simplate)"
+      ],
+      "correctIndex": 0,
+      "explanation": "The suffix '-ify' creates verbs of making/causing ('simplify')."
+    }
+  ]
+},
+  {
+  "id": "sentence-structure",
+  "categoryId": "syntax",
+  "subgroup": "Sentence Structure & Syntax",
+  "title": "Sentence Structure: Simple, Compound & Complex",
+  "summary": "Mastering clause architecture: independent and dependent clauses, coordinating conjunctions (FANBOYS), subordinators, and complex syntax.",
+  "rules": [
+    {
+      "title": "Simple Sentences",
+      "details": "Contains a single independent clause with a subject and a predicate ('The train arrived promptly at ten')."
+    },
+    {
+      "title": "Compound Sentences",
+      "details": "Joins two independent clauses with a coordinating conjunction (For, And, Nor, But, Or, Yet, So) and a comma ('She loves London, but she enjoys the quiet countryside')."
+    },
+    {
+      "title": "Complex Sentences",
+      "details": "Contains an independent clause and one or more dependent (subordinate) clauses introduced by words like although, because, since, while, if ('Although it was raining, they visited Kew Gardens')."
+    }
+  ],
+  "keywords": [
+    "sentence structure",
+    "simple",
+    "compound",
+    "complex",
+    "clauses",
+    "coordinating",
+    "subordinating",
+    "FANBOYS"
+  ],
+  "examples": [
+    "Simple: The River Thames flows through Central London.",
+    "Compound: Oliver brewed a pot of tea, and Charlotte toasted the crumpets.",
+    "Complex: Because the flight was delayed, we waited at Heathrow for three hours.",
+    "Compound-Complex: Although it was chilly, we walked along the South Bank, and we watched the street performers."
+  ],
+  "practice": [
+    {
+      "question": "Classify this sentence: 'Although the weather was dreary, we thoroughly enjoyed our visit to Windsor Castle.'",
+      "options": [
+        "Complex sentence",
+        "Compound sentence",
+        "Simple sentence",
+        "Fragment"
+      ],
+      "correctIndex": 0,
+      "explanation": "Introduced by the subordinating conjunction 'Although', this contains a dependent and an independent clause."
+    },
+    {
+      "question": "Which acronym represents the 7 coordinating conjunctions?",
+      "options": [
+        "FANBOYS",
+        "PEMDAS",
+        "ROYGBIV",
+        "SWIMMERS"
+      ],
+      "correctIndex": 0,
+      "explanation": "FANBOYS stands for For, And, Nor, But, Or, Yet, So."
+    },
+    {
+      "question": "Identify the compound sentence:",
+      "options": [
+        "I wanted to buy a vintage watch, so I visited Portobello Road Market.",
+        "I visited Portobello Road Market to buy a vintage watch.",
+        "When I visited Portobello Road Market, I bought a watch.",
+        "Buying a vintage watch in London is exciting."
+      ],
+      "correctIndex": 0,
+      "explanation": "Two independent clauses linked by comma + 'so' form a compound sentence."
+    },
+    {
+      "question": "What is an independent clause?",
+      "options": [
+        "A clause that expresses a complete thought and can stand alone as a sentence.",
+        "A clause that must be connected to another clause to make sense.",
+        "A clause without a subject or verb.",
+        "A prepositional phrase."
+      ],
+      "correctIndex": 0,
+      "explanation": "An independent clause has both subject and verb and expresses a complete standalone thought."
+    },
+    {
+      "question": "Choose the subordinating conjunction:",
+      "options": [
+        "whereas",
+        "and",
+        "but",
+        "so"
+      ],
+      "correctIndex": 0,
+      "explanation": "'Whereas' introduces a dependent subordinate clause of contrast."
+    },
+    {
+      "question": "What punctuation error occurs when two independent clauses are joined only by a comma?",
+      "options": [
+        "Comma splice",
+        "Dangling modifier",
+        "Split infinitive",
+        "Sentence fragment"
+      ],
+      "correctIndex": 0,
+      "explanation": "Joining two main clauses with only a comma without a conjunction is a 'comma splice'."
+    },
+    {
+      "question": "Which of the following is a simple sentence with a compound subject?",
+      "options": [
+        "James and Eleanor visited the National Gallery.",
+        "James visited the gallery, and Eleanor went shopping.",
+        "When James and Eleanor arrived, they visited the gallery.",
+        "James visited the gallery while Eleanor stayed outside."
+      ],
+      "correctIndex": 0,
+      "explanation": "'James and Eleanor' is a compound subject performing one main verb 'visited'."
+    },
+    {
+      "question": "Select the correct punctuation for a dependent clause preceding an independent clause:",
+      "options": [
+        "Since you are already in London, you should visit the British Museum.",
+        "Since you are already in London you should visit the British Museum.",
+        "Since you are already in London; you should visit the British Museum.",
+        "Since you are already in London - you should visit the British Museum."
+      ],
+      "correctIndex": 0,
+      "explanation": "When a dependent clause comes first, it should be followed by a comma."
+    }
+  ]
+}
 ];
+
+
+/**
+ * 25 Core Grammar Learning Checklist Topics (in recommended order)
+ */
+export const GRAMMAR_CHECKLIST = [
+  {
+    num: 1,
+    title: "Parts of Speech",
+    desc: "Nouns, verbs, adjectives, adverbs, pronouns, prepositions, conjunctions, determiners, interjections",
+    topicId: "parts-of-speech-overview",
+    example: "She reads a book."
+  },
+  {
+    num: 2,
+    title: "Nouns",
+    desc: "Common, proper, countable, uncountable, singular and plural nouns",
+    topicId: "nouns-plural",
+    example: "She reads a book."
+  },
+  {
+    num: 3,
+    title: "Verbs",
+    desc: "Action verbs, state verbs, regular and irregular verbs",
+    topicId: "stative-verbs",
+    example: "She reads a book."
+  },
+  {
+    num: 4,
+    title: "Adjectives",
+    desc: "Describing words, adjective order, comparative and superlative adjectives",
+    topicId: "adjectives-adverbs",
+    example: "She reads an interesting book."
+  },
+  {
+    num: 5,
+    title: "Adverbs",
+    desc: "Adverbs of manner, time, place, frequency and degree",
+    topicId: "adverbs-types",
+    example: "She reads quickly."
+  },
+  {
+    num: 6,
+    title: "Pronouns",
+    desc: "Personal, possessive, reflexive, relative and demonstrative pronouns",
+    topicId: "pronouns",
+    example: "She reads a book."
+  },
+  {
+    num: 7,
+    title: "Determiners",
+    desc: "A, an, the, this, that, some, any, much, many, few, little",
+    topicId: "determiners-quantifiers",
+    example: "She reads a book."
+  },
+  {
+    num: 8,
+    title: "Prepositions",
+    desc: "In, on, at, by, for, from, to, with, about",
+    topicId: "prepositions",
+    example: "The book is on the table."
+  },
+  {
+    num: 9,
+    title: "Conjunctions",
+    desc: "And, but, or, because, although, while",
+    topicId: "conjunctions-types",
+    example: "She reads and writes."
+  },
+  {
+    num: 10,
+    title: "Articles",
+    desc: "A, an and the",
+    topicId: "articles-quantifiers",
+    example: "She reads a book."
+  },
+  {
+    num: 11,
+    title: "Verb Tenses",
+    desc: "Present simple, present continuous, past simple, past continuous, present perfect, future forms",
+    topicId: "present-simple",
+    example: "She reads every day."
+  },
+  {
+    num: 12,
+    title: "Auxiliary Verbs",
+    desc: "Be, do and have",
+    topicId: "auxiliary-verbs",
+    example: "Do you have the tickets?"
+  },
+  {
+    num: 13,
+    title: "Modal Verbs",
+    desc: "Can, could, may, might, must, should, would",
+    topicId: "modals",
+    example: "You should visit London."
+  },
+  {
+    num: 14,
+    title: "Questions",
+    desc: "Question words, word order, auxiliary verbs and question tags",
+    topicId: "negation-questions",
+    example: "Where is the station?"
+  },
+  {
+    num: 15,
+    title: "Negatives",
+    desc: "Don't, doesn't, didn't, isn't, aren't, can't, won't",
+    topicId: "negatives-system",
+    example: "He doesn't mind waiting."
+  },
+  {
+    num: 16,
+    title: "Subject and Object",
+    desc: "Who performs the action and who receives it",
+    topicId: "syntax-svo",
+    example: "The conductor checked the ticket."
+  },
+  {
+    num: 17,
+    title: "Gerunds and Infinitives",
+    desc: "Doing, to do, enjoy doing, want to do",
+    topicId: "gerunds-infinitives",
+    example: "She enjoys reading."
+  },
+  {
+    num: 18,
+    title: "Passive Voice",
+    desc: "The cake was made; the letter was sent",
+    topicId: "passive-voice",
+    example: "The cake was made; the letter was sent."
+  },
+  {
+    num: 19,
+    title: "Conditionals",
+    desc: "If sentences: zero, first, second and third conditionals",
+    topicId: "conditionals",
+    example: "If it rains, we take an umbrella."
+  },
+  {
+    num: 20,
+    title: "Reported Speech",
+    desc: "She said that she was tired",
+    topicId: "reported-speech",
+    example: "She said that she was tired."
+  },
+  {
+    num: 21,
+    title: "Relative Clauses",
+    desc: "Who, which, that, whose, where",
+    topicId: "relative-clauses",
+    example: "The author who wrote this novel."
+  },
+  {
+    num: 22,
+    title: "Comparisons",
+    desc: "As...as, more than, less than, the most",
+    topicId: "comparisons",
+    example: "London is as vibrant as ever."
+  },
+  {
+    num: 23,
+    title: "Phrasal Verbs",
+    desc: "Give up, find out, look after, get along",
+    topicId: "phrasal-verbs",
+    example: "She looked after the children."
+  },
+  {
+    num: 24,
+    title: "Word Formation",
+    desc: "Prefixes, suffixes, nouns from verbs, adjectives from nouns",
+    topicId: "word-formation",
+    example: "Decide -> Decision; Kind -> Kindness."
+  },
+  {
+    num: 25,
+    title: "Sentence Structure",
+    desc: "Simple, compound and complex sentences",
+    topicId: "sentence-structure",
+    example: "Although it was late, we continued walking."
+  }
+];
+
+export const WHERE_TO_START_GUIDE = {
+  title: "Where should you start?",
+  intro: "I'd recommend starting with Parts of Speech, because understanding the role of each word makes the rest of English grammar much easier.",
+  examples: [
+    { part: "Noun", sentence: "She reads a book.", highlight: "book", role: "Names a person, place, thing, or idea." },
+    { part: "Verb", sentence: "She reads a book.", highlight: "reads", role: "Expresses action or state of being." },
+    { part: "Adjective", sentence: "She reads an interesting book.", highlight: "interesting", role: "Describes or modifies a noun." },
+    { part: "Adverb", sentence: "She reads quickly.", highlight: "quickly", role: "Modifies a verb, adjective, or adverb." },
+    { part: "Pronoun", sentence: "She reads a book.", highlight: "She", role: "Substitutes for a noun or noun phrase." },
+    { part: "Preposition", sentence: "The book is on the table.", highlight: "on", role: "Shows direction, location, or time relationship." },
+    { part: "Conjunction", sentence: "She reads and writes.", highlight: "and", role: "Connects words, phrases, or clauses." },
+    { part: "Determiner", sentence: "She reads a book.", highlight: "a", role: "Specifies, quantifies, or limits a noun." }
+  ],
+  conclusion: "Once you understand these categories, you can move on to tenses, sentence structure and more advanced grammar."
+};

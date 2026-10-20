@@ -2,7 +2,7 @@
  * British English Vault - Learn & Practice UI Module
  */
 
-import { LEARN_CATEGORIES, LEARN_TOPICS } from './learnData.js';
+import { LEARN_CATEGORIES, LEARN_TOPICS, GRAMMAR_CHECKLIST, WHERE_TO_START_GUIDE } from './learnData.js';
 import { speakText } from './speech.js';
 
 let activeCategory = 'all';
@@ -11,9 +11,227 @@ let currentTopicTab = 'rules'; // 'rules' or 'practice'
 let practiceAnswers = {}; // { questionIndex: selectedOptionIndex }
 
 export function initLearnUI() {
+  initGrammarChecklist();
+  initWhereToStartGuide();
   renderCategoryChips();
   renderTopicsList();
   setupSearchHandler();
+}
+
+/**
+ * Get completed checklist item IDs from localStorage
+ */
+function getCompletedChecklist() {
+  try {
+    const raw = localStorage.getItem('grammar_checklist_completed');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Save completed checklist item IDs to localStorage
+ */
+function saveCompletedChecklist(completed) {
+  try {
+    localStorage.setItem('grammar_checklist_completed', JSON.stringify(completed));
+  } catch (e) {
+    console.error('Failed to save checklist to localStorage:', e);
+  }
+}
+
+/**
+ * Initialize 25-topic English Grammar Checklist
+ */
+function initGrammarChecklist() {
+  const container = document.getElementById('checklist-items-container');
+  if (!container) return;
+
+  const completed = getCompletedChecklist();
+  updateChecklistProgress(completed.length);
+
+  container.innerHTML = (GRAMMAR_CHECKLIST || []).map(item => {
+    const isChecked = completed.includes(item.num);
+    return `
+      <div class="checklist-item-row ${isChecked ? 'completed' : ''}" data-item-num="${item.num}">
+        <label class="checklist-item-check-label">
+          <input type="checkbox" class="checklist-checkbox" data-num="${item.num}" ${isChecked ? 'checked' : ''}>
+          <span class="checklist-custom-check"></span>
+          <span class="checklist-num-badge">${item.num}</span>
+        </label>
+        <div class="checklist-item-text">
+          <div class="checklist-item-title-row">
+            <h4 class="checklist-item-title">${item.title}</h4>
+            ${item.topicId ? `
+              <button type="button" class="btn-open-topic-link" data-topic-id="${item.topicId}" title="Open ${item.title} Lesson">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Lesson
+              </button>
+            ` : ''}
+          </div>
+          <p class="checklist-item-desc">${item.desc}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Bind checkbox changes
+  container.querySelectorAll('.checklist-checkbox').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const num = parseInt(e.target.getAttribute('data-num'));
+      let currentCompleted = getCompletedChecklist();
+      const row = e.target.closest('.checklist-item-row');
+
+      if (e.target.checked) {
+        if (!currentCompleted.includes(num)) currentCompleted.push(num);
+        if (row) row.classList.add('completed');
+      } else {
+        currentCompleted = currentCompleted.filter(n => n !== num);
+        if (row) row.classList.remove('completed');
+      }
+
+      saveCompletedChecklist(currentCompleted);
+      updateChecklistProgress(currentCompleted.length);
+    });
+  });
+
+  // Bind Open Topic Lesson buttons
+  container.querySelectorAll('.btn-open-topic-link').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const topicId = btn.getAttribute('data-topic-id');
+      if (topicId) openTopicDetail(topicId);
+    });
+  });
+
+  // Bind Copy study checklist button
+  const copyBtn = document.getElementById('btn-copy-checklist');
+  if (copyBtn && !copyBtn.dataset.bound) {
+    copyBtn.dataset.bound = 'true';
+    copyBtn.addEventListener('click', () => {
+      const currentCompleted = getCompletedChecklist();
+      const lines = [
+        '### English grammar learning checklist',
+        '',
+        '### Your study list',
+        '',
+        `${currentCompleted.length} of 25 completed`,
+        ''
+      ];
+
+      (GRAMMAR_CHECKLIST || []).forEach(item => {
+        const check = currentCompleted.includes(item.num) ? '[x]' : '[ ]';
+        lines.push(`${item.num}. ${item.title} ${check}`);
+        lines.push(`${item.desc}`);
+        lines.push('');
+      });
+
+      lines.push('### Where should you start?');
+      lines.push("I'd recommend starting with Parts of Speech, because understanding the role of each word makes the rest of English grammar much easier.");
+      lines.push('');
+      lines.push('For example:');
+      (WHERE_TO_START_GUIDE.examples || []).forEach(ex => {
+        lines.push(`* ${ex.part}: ${ex.sentence}`);
+      });
+      lines.push('');
+      lines.push('Once you understand these categories, you can move on to tenses, sentence structure and more advanced grammar.');
+
+      const fullText = lines.join('\n');
+      navigator.clipboard.writeText(fullText).then(() => {
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success, #28a745);"></i> <span>Copied!</span>';
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+        }, 2200);
+      }).catch(err => {
+        console.error('Clipboard copy error:', err);
+      });
+    });
+  }
+
+  // Bind Toggle Expand / Collapse button
+  const toggleBtn = document.getElementById('btn-toggle-checklist');
+  if (toggleBtn && !toggleBtn.dataset.bound) {
+    toggleBtn.dataset.bound = 'true';
+    toggleBtn.addEventListener('click', () => {
+      const isHidden = container.style.display === 'none';
+      container.style.display = isHidden ? 'grid' : 'none';
+      toggleBtn.innerHTML = isHidden
+        ? '<i class="fa-solid fa-chevron-up"></i> <span>Hide List</span>'
+        : '<i class="fa-solid fa-chevron-down"></i> <span>Show 25 Topics</span>';
+    });
+  }
+}
+
+/**
+ * Update checklist counter and progress bar
+ */
+function updateChecklistProgress(completedCount) {
+  const textEl = document.getElementById('checklist-progress-text');
+  const fillEl = document.getElementById('checklist-progress-fill');
+
+  const total = (GRAMMAR_CHECKLIST || []).length || 25;
+  const pct = Math.round((completedCount / total) * 100);
+
+  if (textEl) textEl.innerText = `${completedCount} of ${total} completed`;
+  if (fillEl) fillEl.style.width = `${pct}%`;
+}
+
+/**
+ * Initialize "Where should you start?" Guide
+ */
+function initWhereToStartGuide() {
+  const container = document.getElementById('guide-examples-container');
+  if (!container) return;
+
+  const examples = WHERE_TO_START_GUIDE?.examples || [];
+
+  container.innerHTML = examples.map((ex, idx) => {
+    // Format sentence with highlight
+    const parts = ex.sentence.split(new RegExp(`(${ex.highlight})`, 'i'));
+    const formattedSentence = parts.map(part => {
+      if (part.toLowerCase() === ex.highlight.toLowerCase()) {
+        return `<mark class="part-highlight">${part}</mark>`;
+      }
+      return part;
+    }).join('');
+
+    return `
+      <div class="guide-example-card">
+        <div class="guide-card-top">
+          <span class="guide-part-badge">${ex.part}</span>
+          <button type="button" class="mini-speak-btn guide-speak-btn" data-text="${ex.sentence}" title="Listen (UK Pronunciation)">
+            <i class="fa-solid fa-volume-high"></i>
+          </button>
+        </div>
+        <div class="guide-sentence-text">${formattedSentence}</div>
+        <p class="guide-role-note">${ex.role || ''}</p>
+      </div>
+    `;
+  }).join('');
+
+  // Bind speech handlers
+  container.querySelectorAll('.guide-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const text = btn.getAttribute('data-text');
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
+      try {
+        await speakText(text, { rate: 0.9 });
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
+      }
+    });
+  });
+
+  // Bind Start with Parts of Speech button
+  const startBtn = document.getElementById('btn-start-parts-of-speech');
+  if (startBtn && !startBtn.dataset.bound) {
+    startBtn.dataset.bound = 'true';
+    startBtn.addEventListener('click', () => {
+      openTopicDetail('parts-of-speech-overview');
+    });
+  }
 }
 
 function renderCategoryChips() {
@@ -22,7 +240,7 @@ function renderCategoryChips() {
 
   container.innerHTML = `
     <button class="chip ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
-      🌟 All Topics
+      🌐 All Topics
     </button>
     ${LEARN_CATEGORIES.map(cat => `
       <button class="chip ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">
@@ -140,7 +358,7 @@ export function renderTopicsList() {
   });
 }
 
-function openTopicDetail(topicId) {
+export function openTopicDetail(topicId) {
   activeTopicId = topicId;
   currentTopicTab = 'rules';
   practiceAnswers = {};
@@ -205,36 +423,37 @@ function renderTopicDetailContent(topic) {
       </div>
 
       ${topic.keywords && topic.keywords.length > 0 ? `
-        <div class="keywords-box">
-          <h4><i class="fa-solid fa-key" style="color: var(--gold);"></i> Key Signal Words / Keywords:</h4>
-          <div class="keywords-flex">
-            ${topic.keywords.map(kw => `<span class="kw-tag">${kw}</span>`).join('')}
+        <div class="keywords-panel card" style="margin-top: 1.25rem;">
+          <h4><i class="fa-solid fa-key" style="color: var(--gold);"></i> Signal Words & Key Identifiers</h4>
+          <div class="keywords-tag-cloud" style="margin-top: 0.5rem;">
+            ${topic.keywords.map(kw => `<span class="keyword-tag">${kw}</span>`).join('')}
           </div>
         </div>
       ` : ''}
 
-      ${topic.examples && topic.examples.length > 0 ? `
-        <div class="examples-box card">
-          <h4><i class="fa-solid fa-volume-high" style="color: var(--uk-blue);"></i> Sample Sentences (UK Pronunciation):</h4>
-          <div class="examples-list">
-            ${topic.examples.map(ex => `
-              <div class="example-audio-row">
-                <span class="ex-text">"${ex}"</span>
-                <button class="mini-speak-btn ex-speak-btn" data-text="${ex.replace(/"/g, '&quot;')}" title="Listen (UK Accent)">
-                  <i class="fa-solid fa-circle-play"></i> Listen
-                </button>
-              </div>
-            `).join('')}
-          </div>
+      <div class="examples-panel card" style="margin-top: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h4><i class="fa-solid fa-quote-left" style="color: var(--uk-crimson);"></i> Illustrative Examples (British English)</h4>
         </div>
-      ` : ''}
+        <div class="example-sentences-list">
+          ${(topic.examples || []).map(sentence => `
+            <div class="example-sentence-row">
+              <div class="sentence-text">
+                <i class="fa-solid fa-circle-check" style="color: var(--success, #28a745); margin-right: 0.5rem; font-size: 0.85rem;"></i>
+                <span>${sentence}</span>
+              </div>
+              <button class="mini-speak-btn sentence-speak-btn" data-text="${sentence}" title="Listen in British English">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     </div>
 
     <!-- TAB 2: PRACTICE QUIZ -->
     <div id="topic-tab-practice-content" class="topic-tab-content" style="display: ${currentTopicTab === 'practice' ? 'block' : 'none'};">
-      <div class="practice-quiz-wrapper">
-        ${renderPracticeQuestions(topic)}
-      </div>
+      ${renderPracticeQuestions(topic)}
     </div>
   `;
 
@@ -249,23 +468,25 @@ function renderTopicDetailContent(topic) {
     renderTopicDetailContent(topic);
   });
 
-  // Bind Speak Lesson Full Audio
-  const speakLessonBtn = document.getElementById('btn-speak-lesson');
-  if (speakLessonBtn) {
-    speakLessonBtn.addEventListener('click', async () => {
-      const fullScript = `${topic.title}. ${topic.summary}. ${(topic.rules || []).map(r => `${r.title}: ${r.details}`).join('. ')}`;
-      speakLessonBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Reading Lesson...</span>';
-      try {
-        await speakText(fullScript);
-      } finally {
-        speakLessonBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>';
-      }
-    });
-  }
+  // Bind Lesson Narrator
+  document.getElementById('btn-speak-lesson').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-speak-lesson');
+    const lessonNarrative = `${topic.title}. ${topic.summary}. Rules: ` +
+      (topic.rules || []).map(r => `${r.title}: ${r.details}`).join('. ') +
+      '. Examples: ' + (topic.examples || []).join('. ');
+
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Reading Lesson...';
+    try {
+      await speakText(lessonNarrative);
+    } finally {
+      btn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen Lesson</span>';
+    }
+  });
 
   // Bind Rule Audio Buttons
   modalBody.querySelectorAll('.rule-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const text = btn.getAttribute('data-text');
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
       try {
@@ -277,21 +498,23 @@ function renderTopicDetailContent(topic) {
   });
 
   // Bind Sentence Audio Buttons
-  modalBody.querySelectorAll('.ex-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+  modalBody.querySelectorAll('.sentence-speak-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const text = btn.getAttribute('data-text');
-      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
+      btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i>';
       try {
         await speakText(text);
       } finally {
-        btn.innerHTML = '<i class="fa-solid fa-circle-play"></i> Listen';
+        btn.innerHTML = '<i class="fa-solid fa-volume-high"></i>';
       }
     });
   });
 
   // Bind Question Audio Buttons
   modalBody.querySelectorAll('.q-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       const text = btn.getAttribute('data-text');
       btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Listen';
       try {
@@ -362,7 +585,7 @@ function renderPracticeQuestions(topic) {
             </button>
             ${hasAnswered ? `
               <span class="q-badge ${isCorrect ? 'correct' : 'incorrect'}">
-                ${isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                ${isCorrect ? '✓ Correct' : '✕ Incorrect'}
               </span>
             ` : ''}
           </div>

@@ -784,12 +784,12 @@ function setupQuizUI() {
   quizResultsPanel.style.display = 'none';
 
   // Toggle active styling on custom quiz category radio cards
-  const radioCards = quizSetupPanel.querySelectorAll('.cat-radio-card');
-  radioCards.forEach(card => {
+  const categoryCards = quizSetupPanel.querySelectorAll('#quiz-category-grid .cat-radio-card');
+  categoryCards.forEach(card => {
     const input = card.querySelector('input[type="radio"]');
     
     card.addEventListener('click', () => {
-      radioCards.forEach(c => c.classList.remove('active'));
+      categoryCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       input.checked = true;
     });
@@ -798,14 +798,64 @@ function setupQuizUI() {
       card.classList.add('active');
     }
   });
+
+  // Toggle active styling on custom quiz mode radio cards
+  const modeCards = quizSetupPanel.querySelectorAll('.mode-radio-card');
+  modeCards.forEach(card => {
+    const input = card.querySelector('input[type="radio"]');
+    
+    card.addEventListener('click', () => {
+      modeCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      input.checked = true;
+    });
+
+    if (input.checked) {
+      card.classList.add('active');
+    }
+  });
+
+  // Helper to programmatically select category card
+  const selectCat = (catValue) => {
+    categoryCards.forEach(c => {
+      const inp = c.querySelector('input[type="radio"]');
+      if (inp.value === catValue) {
+        c.classList.add('active');
+        inp.checked = true;
+      } else {
+        c.classList.remove('active');
+        inp.checked = false;
+      }
+    });
+  };
+
+  // Quick Action Buttons
+  const btnAll4 = document.getElementById('btn-quiz-quick-all4');
+  if (btnAll4 && !btnAll4.dataset.bound) {
+    btnAll4.dataset.bound = 'true';
+    btnAll4.addEventListener('click', () => selectCat('all-vocab'));
+  }
+
+  const btnGrammar = document.getElementById('btn-quiz-quick-grammar');
+  if (btnGrammar && !btnGrammar.dataset.bound) {
+    btnGrammar.dataset.bound = 'true';
+    btnGrammar.addEventListener('click', () => selectCat('grammar'));
+  }
+
+  const btnMixed = document.getElementById('btn-quiz-quick-mixed');
+  if (btnMixed && !btnMixed.dataset.bound) {
+    btnMixed.dataset.bound = 'true';
+    btnMixed.addEventListener('click', () => selectCat('all'));
+  }
 }
 
 document.getElementById('start-quiz-btn').addEventListener('click', () => {
-  const selectedCat = quizSetupPanel.querySelector('input[name="quiz-cat"]:checked').value;
-  
-  const success = startQuiz(selectedCat, vaultData.items || []);
+  const selectedCat = quizSetupPanel.querySelector('input[name="quiz-cat"]:checked')?.value || 'all';
+  const selectedMode = quizSetupPanel.querySelector('input[name="quiz-mode"]:checked')?.value || 'mc';
+
+  const success = startQuiz(selectedCat, vaultData.items || [], LEARN_TOPICS, selectedMode);
   if (!success) {
-    alert("Insufficient vocabulary in this category. Please add items to this category before starting the quiz.");
+    alert("Insufficient questions in this category. Please add items or choose another category to start the quiz.");
     return;
   }
 
@@ -819,6 +869,7 @@ function showQuizQuestion() {
 
   const item = getCurrentQuestion();
   const progress = getQuizProgress();
+  const mode = getQuizMode();
 
   // Reset display states and next question buttons
   document.getElementById('quiz-answer-block').style.display = 'none';
@@ -829,9 +880,9 @@ function showQuizQuestion() {
   document.getElementById('quiz-progress-fill').style.width = `${progress.percentage}%`;
   
   const categoryPill = document.getElementById('quiz-card-category');
-  categoryPill.innerText = item.category;
+  categoryPill.innerText = item.category === 'grammar' ? (item.subgroup || 'Grammar') : item.category;
   
-  document.getElementById('quiz-card-word').innerText = item.term;
+  const cardWordEl = document.getElementById('quiz-card-word');
   
   const containsHebrew = /[\u0590-\u05FF]/.test(item.meaning);
   const meaningEl = document.getElementById('quiz-card-meaning');
@@ -840,11 +891,14 @@ function showQuizQuestion() {
 
   document.getElementById('quiz-card-example').innerText = item.example;
 
+  // Word speech target
+  const spokenText = item.isGrammar ? (item.meaning || item.term) : item.term;
+
   // Bind Speak Word handlers in Quiz Card
   const speakBtn = document.getElementById('quiz-speak-btn');
   const newSpeakBtn = speakBtn.cloneNode(true);
   speakBtn.parentNode.replaceChild(newSpeakBtn, speakBtn);
-  bindLongPressSpeak(newSpeakBtn, item.term);
+  bindLongPressSpeak(newSpeakBtn, spokenText);
 
   // Setup Sentence Toolbar in Quiz Card
   const sentenceToolbar = document.getElementById('quiz-sentence-toolbar');
@@ -900,34 +954,147 @@ function showQuizQuestion() {
     });
   }
 
-  // Render Multiple Choice Option Buttons
   const optionsContainer = document.getElementById('quiz-options');
-  optionsContainer.innerHTML = '';
+  const dictationContainer = document.getElementById('quiz-dictation-container');
 
-  const choices = getQuizChoices(item, vaultData.items || []);
-  
-  choices.forEach(choice => {
-    const btn = document.createElement('button');
-    btn.className = 'quiz-option-btn';
-    
-    // Check direction (RTL for Hebrew, LTR for English)
-    const optionContainsHebrew = /[\u0590-\u05FF]/.test(choice.text);
-    if (optionContainsHebrew) {
-      btn.style.direction = 'rtl';
-      btn.style.textAlign = 'right';
+  // MODE BRANCHING: Multiple Choice vs Audio Dictation (Listen & Write)
+  if (mode === 'dictation') {
+    if (optionsContainer) optionsContainer.style.display = 'none';
+    if (dictationContainer) dictationContainer.style.display = 'block';
+
+    // Mask card term so user listens first
+    if (item.isGrammar) {
+      cardWordEl.innerHTML = `<span style="font-size: 1.15rem; font-weight: 600;">${item.term}</span>`;
     } else {
-      btn.style.direction = 'ltr';
-      btn.style.textAlign = 'left';
+      cardWordEl.innerHTML = `<span style="color: var(--text-muted); font-size: 1.15rem; font-style: italic;"><i class="fa-solid fa-headphones"></i> Listen &amp; Spell</span>`;
     }
 
-    btn.innerText = choice.text;
+    const dictationInput = document.getElementById('quiz-dictation-input');
+    const dictationCheckBtn = document.getElementById('quiz-dictation-check-btn');
+    const dictationPlayBtn = document.getElementById('quiz-dictation-play-btn');
 
-    btn.addEventListener('click', () => {
-      handleQuizChoiceSelected(choice, btn, choices);
+    if (dictationInput) {
+      dictationInput.value = '';
+      dictationInput.disabled = false;
+    }
+    if (dictationCheckBtn) {
+      dictationCheckBtn.disabled = false;
+    }
+
+    // Auto-play audio with UK accent
+    const playCurrentAudio = async () => {
+      if (dictationPlayBtn) dictationPlayBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Playing...';
+      try {
+        const rateSelect = document.getElementById('quiz-word-rate');
+        const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+        await speakText(spokenText, { rate });
+      } finally {
+        if (dictationPlayBtn) dictationPlayBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> <span>Listen (UK Pronunciation)</span>';
+      }
+    };
+
+    // Auto-play pronunciation
+    playCurrentAudio();
+
+    if (dictationPlayBtn) {
+      const newPlayBtn = dictationPlayBtn.cloneNode(true);
+      dictationPlayBtn.parentNode.replaceChild(newPlayBtn, dictationPlayBtn);
+      newPlayBtn.addEventListener('click', playCurrentAudio);
+    }
+
+    // Dictation Check Handler
+    const runDictationCheck = () => {
+      const userInput = (dictationInput?.value || '').trim();
+      if (!userInput) {
+        if (dictationInput) dictationInput.focus();
+        return;
+      }
+
+      if (dictationInput) dictationInput.disabled = true;
+      if (dictationCheckBtn) dictationCheckBtn.disabled = true;
+
+      const result = checkDictationAnswer(userInput);
+      const isCorrect = result.isCorrect;
+
+      // Unmask the word
+      if (item.isGrammar) {
+        cardWordEl.innerHTML = `<span style="font-size: 1.15rem; font-weight: 600;">${item.term}</span><br><strong style="color: var(--success, #28a745); font-size: 1.3rem;">Answer: ${result.correctTerm}</strong>`;
+      } else {
+        cardWordEl.innerText = result.correctTerm;
+      }
+
+      const feedbackBanner = document.getElementById('quiz-feedback-banner');
+      if (isCorrect) {
+        feedbackBanner.className = 'quiz-feedback-banner correct';
+        feedbackBanner.innerText = `Splendid! Correct spelling: "${result.correctTerm}"`;
+      } else {
+        feedbackBanner.className = 'quiz-feedback-banner incorrect';
+        feedbackBanner.innerText = `Incorrect. You typed: "${result.userAnswer}" — Correct spelling: "${result.correctTerm}"`;
+      }
+
+      gradeQuestion(isCorrect);
+
+      if (!isCorrect && !item.isGrammar) {
+        const index = vaultData.items.findIndex(i => i.id === item.id);
+        if (index !== -1) {
+          vaultData.items[index].mistakeCount = (vaultData.items[index].mistakeCount || 0) + 1;
+        }
+      }
+
+      document.getElementById('quiz-answer-block').style.display = 'block';
+      document.getElementById('quiz-next-btn').style.display = 'block';
+    };
+
+    if (dictationCheckBtn) {
+      const newCheckBtn = dictationCheckBtn.cloneNode(true);
+      dictationCheckBtn.parentNode.replaceChild(newCheckBtn, dictationCheckBtn);
+      newCheckBtn.addEventListener('click', runDictationCheck);
+    }
+
+    if (dictationInput) {
+      const newInput = dictationInput.cloneNode(true);
+      dictationInput.parentNode.replaceChild(newInput, dictationInput);
+      newInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          runDictationCheck();
+        }
+      });
+      setTimeout(() => newInput.focus(), 150);
+    }
+
+  } else {
+    // MULTIPLE CHOICE MODE
+    if (optionsContainer) optionsContainer.style.display = 'grid';
+    if (dictationContainer) dictationContainer.style.display = 'none';
+
+    cardWordEl.innerText = item.term;
+    optionsContainer.innerHTML = '';
+
+    const choices = getQuizChoices(item, vaultData.items || []);
+    
+    choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option-btn';
+      
+      const optionContainsHebrew = /[\u0590-\u05FF]/.test(choice.text);
+      if (optionContainsHebrew) {
+        btn.style.direction = 'rtl';
+        btn.style.textAlign = 'right';
+      } else {
+        btn.style.direction = 'ltr';
+        btn.style.textAlign = 'left';
+      }
+
+      btn.innerText = choice.text;
+
+      btn.addEventListener('click', () => {
+        handleQuizChoiceSelected(choice, btn, choices);
+      });
+
+      optionsContainer.appendChild(btn);
     });
-
-    optionsContainer.appendChild(btn);
-  });
+  }
 }
 
 async function handleQuizChoiceSelected(choice, selectedBtn, choices) {
