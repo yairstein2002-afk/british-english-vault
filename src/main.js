@@ -924,6 +924,12 @@ function showQuizQuestion() {
 
   document.getElementById('quiz-answer-block').style.display = 'none';
   document.getElementById('quiz-next-btn').style.display = 'none';
+  const feedbackBanner = document.getElementById('quiz-feedback-banner');
+  if (feedbackBanner) {
+    feedbackBanner.style.display = 'none';
+    feedbackBanner.className = 'quiz-feedback-banner';
+    feedbackBanner.innerHTML = '';
+  }
 
   document.getElementById('quiz-progress-text').innerText = `Question ${progress.current} of ${progress.total}`;
   document.getElementById('quiz-progress-fill').style.width = `${progress.percentage}%`;
@@ -942,18 +948,18 @@ function showQuizQuestion() {
   document.getElementById('quiz-card-example').innerText = item.example;
 
   const speakBtn = document.getElementById('quiz-speak-btn');
-  const newSpeakBtn = speakBtn.cloneNode(true);
-  speakBtn.parentNode.replaceChild(newSpeakBtn, speakBtn);
-  newSpeakBtn.addEventListener('click', async () => {
-    newSpeakBtn.classList.add('speaking');
-    const rateSelect = document.getElementById('quiz-word-rate');
-    const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
-    try {
-      await speakText(item.term, { rate });
-    } finally {
-      newSpeakBtn.classList.remove('speaking');
-    }
-  });
+  if (speakBtn) {
+    speakBtn.onclick = async () => {
+      speakBtn.classList.add('speaking');
+      const rateSelect = document.getElementById('quiz-word-rate');
+      const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
+      try {
+        await speakText(item.term, { rate });
+      } finally {
+        speakBtn.classList.remove('speaking');
+      }
+    };
+  }
 
   const sentenceToolbar = document.getElementById('quiz-sentence-toolbar');
   sentenceToolbar.innerHTML = `
@@ -978,7 +984,7 @@ function showQuizQuestion() {
   const rateSelect = sentenceToolbar.querySelector('.quiz-sentence-rate');
   const repeatSelect = sentenceToolbar.querySelector('.quiz-sentence-repeat');
   
-  speakQuizSentenceBtn.addEventListener('click', async () => {
+  speakQuizSentenceBtn.onclick = async () => {
     const rate = parseFloat(rateSelect.value);
     const repeats = parseInt(repeatSelect.value);
     speakQuizSentenceBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
@@ -987,14 +993,12 @@ function showQuizQuestion() {
     } finally {
       speakQuizSentenceBtn.innerHTML = '<i class="fa-solid fa-circle-play"></i>';
     }
-  });
+  };
 
   const meaningSpeakBtn = document.getElementById('quiz-meaning-speak-btn');
   if (meaningSpeakBtn) {
-    const newMeaningSpeakBtn = meaningSpeakBtn.cloneNode(true);
-    meaningSpeakBtn.parentNode.replaceChild(newMeaningSpeakBtn, meaningSpeakBtn);
-    newMeaningSpeakBtn.addEventListener('click', async () => {
-      newMeaningSpeakBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
+    meaningSpeakBtn.onclick = async () => {
+      meaningSpeakBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
       try {
         const rateSelect = document.getElementById('quiz-word-rate');
         const rate = rateSelect ? parseFloat(rateSelect.value) : 1.0;
@@ -1002,9 +1006,9 @@ function showQuizQuestion() {
       } catch (err) {
         console.error(err);
       } finally {
-        newMeaningSpeakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        meaningSpeakBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       }
-    });
+    };
   }
 
   const optionsContainer = document.getElementById('quiz-options');
@@ -1034,6 +1038,137 @@ function showQuizQuestion() {
     optionsContainer.appendChild(btn);
   });
 }
+
+function handleQuizChoiceSelected(choice, selectedBtn, choices) {
+  const optionsContainer = document.getElementById('quiz-options');
+  if (!optionsContainer) return;
+
+  const allButtons = Array.from(optionsContainer.querySelectorAll('.quiz-option-btn'));
+  // Disable all buttons immediately to prevent duplicate selection
+  allButtons.forEach(b => {
+    b.disabled = true;
+    b.classList.add('disabled');
+  });
+
+  const item = getCurrentQuestion();
+  const isCorrect = Boolean(choice.isCorrect);
+
+  // Grade the question in session
+  gradeQuestion(isCorrect);
+
+  if (isCorrect) {
+    selectedBtn.classList.remove('disabled');
+    selectedBtn.classList.add('correct');
+    selectedBtn.innerHTML = `<span>${choice.text}</span> <i class="fa-solid fa-circle-check" style="color: var(--success); margin-left: 8px;"></i>`;
+  } else {
+    selectedBtn.classList.remove('disabled');
+    selectedBtn.classList.add('incorrect');
+    selectedBtn.innerHTML = `<span>${choice.text}</span> <i class="fa-solid fa-circle-xmark" style="color: var(--danger); margin-left: 8px;"></i>`;
+
+    // Highlight the correct option among buttons
+    allButtons.forEach((b, idx) => {
+      if (choices[idx] && choices[idx].isCorrect) {
+        b.classList.remove('disabled');
+        b.classList.add('correct');
+        b.innerHTML = `<span>${choices[idx].text}</span> <i class="fa-solid fa-circle-check" style="color: var(--success); margin-left: 8px;"></i>`;
+      }
+    });
+
+    // Record mistake in vaultData
+    if (item && item.id) {
+      const idx = (vaultData.items || []).findIndex(i => i.id === item.id);
+      if (idx !== -1) {
+        vaultData.items[idx].mistakeCount = (vaultData.items[idx].mistakeCount || 0) + 1;
+      }
+    }
+  }
+
+  // Display feedback banner
+  const feedbackBanner = document.getElementById('quiz-feedback-banner');
+  if (feedbackBanner) {
+    feedbackBanner.style.display = 'block';
+    if (isCorrect) {
+      feedbackBanner.className = 'quiz-feedback-banner correct';
+      feedbackBanner.innerHTML = '<i class="fa-solid fa-circle-check"></i> Splendid! Exactly correct.';
+    } else {
+      feedbackBanner.className = 'quiz-feedback-banner incorrect';
+      const cleanMeaning = item ? item.meaning : '';
+      feedbackBanner.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> Incorrect. Correct meaning: <strong>${cleanMeaning}</strong>`;
+    }
+  }
+
+  // Reveal answer block & Next button
+  const answerBlock = document.getElementById('quiz-answer-block');
+  if (answerBlock) answerBlock.style.display = 'block';
+
+  const nextBtn = document.getElementById('quiz-next-btn');
+  if (nextBtn) nextBtn.style.display = 'block';
+}
+
+async function completeQuiz() {
+  const summary = getQuizSummary();
+
+  // Update Database stats
+  if (!vaultData.stats) {
+    vaultData.stats = { quizzesCompleted: 0, correctAnswers: 0, incorrectAnswers: 0, history: [] };
+  }
+  vaultData.stats.quizzesCompleted = (vaultData.stats.quizzesCompleted || 0) + 1;
+  vaultData.stats.correctAnswers = (vaultData.stats.correctAnswers || 0) + summary.correct;
+  vaultData.stats.incorrectAnswers = (vaultData.stats.incorrectAnswers || 0) + summary.incorrect;
+
+  showLoader();
+  await saveDatabase();
+  hideLoader();
+
+  // Render Quiz Scoreboard
+  quizSetupPanel.style.display = 'none';
+  quizActivePanel.style.display = 'none';
+  quizResultsPanel.style.display = 'block';
+
+  const totalEl = document.getElementById('quiz-res-total');
+  const correctEl = document.getElementById('quiz-res-correct');
+  const incorrectEl = document.getElementById('quiz-res-incorrect');
+  const pctEl = document.getElementById('quiz-res-pct');
+  const ringEl = document.getElementById('quiz-score-ring');
+  const summaryText = document.getElementById('quiz-results-summary-text');
+
+  if (totalEl) totalEl.innerText = summary.total;
+  if (correctEl) correctEl.innerText = summary.correct;
+  if (incorrectEl) incorrectEl.innerText = summary.incorrect;
+  if (pctEl) pctEl.innerText = `${summary.percentage}%`;
+  if (ringEl) {
+    const circumference = 314.16;
+    const offset = circumference - (summary.percentage / 100) * circumference;
+    ringEl.style.strokeDashoffset = offset;
+  }
+  if (summaryText) {
+    if (summary.percentage >= 80) {
+      summaryText.innerText = `Splendid! Outstanding British English mastery (${summary.percentage}%).`;
+    } else if (summary.percentage >= 50) {
+      summaryText.innerText = `Good effort! Keep practising to hone your British nuances (${summary.percentage}%).`;
+    } else {
+      summaryText.innerText = `Keep at it! Regular practice will strengthen your recall (${summary.percentage}%).`;
+    }
+  }
+}
+
+// Quiz Flow Button Listeners
+document.getElementById('quiz-next-btn').addEventListener('click', async () => {
+  if (nextQuestion()) {
+    showQuizQuestion();
+  } else {
+    await completeQuiz();
+  }
+});
+
+document.getElementById('quiz-cancel-btn').addEventListener('click', () => {
+  if (confirm("Are you sure you want to exit the quiz? Progress in this session will not be saved.")) {
+    openQuizSetup();
+  }
+});
+
+document.getElementById('quiz-retry-btn').addEventListener('click', openQuizSetup);
+document.getElementById('quiz-home-btn').addEventListener('click', () => navigateTo('words'));
 
 // --------------------------------------------------------------------------
 // GRAMMAR DICTATION FLOW (10 Words, 3 Attempts, Play Word Button)
@@ -1079,7 +1214,6 @@ function showDictationWord() {
   inputEl.value = '';
   inputEl.disabled = false;
   inputEl.className = 'form-control';
-  setTimeout(() => inputEl.focus(), 150);
 
   // Setup Check button
   const checkBtn = document.getElementById('dictation-check-btn');
@@ -1100,15 +1234,17 @@ function showDictationWord() {
     }
   };
 
-  const newPlayWordBtn = playWordBtn.cloneNode(true);
-  playWordBtn.parentNode.replaceChild(newPlayWordBtn, playWordBtn);
-  newPlayWordBtn.addEventListener('click', playCurrentWordAudio);
+  if (playWordBtn) {
+    playWordBtn.onclick = playCurrentWordAudio;
+  }
 
   // Dictation Check Logic with 3 Attempts
   const handleCheckAnswer = () => {
-    const typedValue = (inputEl.value || '').trim();
+    const liveInput = document.getElementById('dictation-user-input');
+    const liveCheckBtn = document.getElementById('dictation-check-btn');
+    const typedValue = (liveInput?.value || '').trim();
     if (!typedValue) {
-      inputEl.focus();
+      liveInput?.focus();
       return;
     }
 
@@ -1117,8 +1253,8 @@ function showDictationWord() {
     if (result.isCorrect) {
       // SUCCESS!
       renderDictationHearts(result.attemptsLeft);
-      inputEl.disabled = true;
-      checkBtn.disabled = true;
+      if (liveInput) liveInput.disabled = true;
+      if (liveCheckBtn) liveCheckBtn.disabled = true;
 
       feedbackBanner.className = 'quiz-feedback-banner correct';
       feedbackBanner.style.display = 'block';
@@ -1135,8 +1271,8 @@ function showDictationWord() {
         feedbackBanner.className = 'quiz-feedback-banner incorrect';
         feedbackBanner.style.display = 'block';
         feedbackBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Incorrect ("${result.userInput}"). Try again! <strong>2 attempts remaining.</strong>`;
-        inputEl.select();
-        inputEl.focus();
+        liveInput?.select();
+        liveInput?.focus();
         // Play word again to assist
         playCurrentWordAudio();
 
@@ -1144,15 +1280,15 @@ function showDictationWord() {
         feedbackBanner.className = 'quiz-feedback-banner incorrect';
         feedbackBanner.style.display = 'block';
         feedbackBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Incorrect. Final attempt! <strong>1 attempt remaining.</strong>`;
-        inputEl.select();
-        inputEl.focus();
+        liveInput?.select();
+        liveInput?.focus();
         // Play word again to assist
         playCurrentWordAudio();
 
       } else {
         // 3 ATTEMPTS EXHAUSTED! Move to next word
-        inputEl.disabled = true;
-        checkBtn.disabled = true;
+        if (liveInput) liveInput.disabled = true;
+        if (liveCheckBtn) liveCheckBtn.disabled = true;
 
         feedbackBanner.className = 'quiz-feedback-banner incorrect';
         feedbackBanner.style.display = 'block';
@@ -1170,19 +1306,18 @@ function showDictationWord() {
     }
   };
 
-  const newCheckBtn = checkBtn.cloneNode(true);
-  checkBtn.parentNode.replaceChild(newCheckBtn, checkBtn);
-  newCheckBtn.addEventListener('click', handleCheckAnswer);
-
-  const newInputEl = inputEl.cloneNode(true);
-  inputEl.parentNode.replaceChild(newInputEl, inputEl);
-  newInputEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleCheckAnswer();
-    }
-  });
-  setTimeout(() => newInputEl.focus(), 150);
+  if (checkBtn) {
+    checkBtn.onclick = handleCheckAnswer;
+  }
+  if (inputEl) {
+    inputEl.onkeydown = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleCheckAnswer();
+      }
+    };
+    setTimeout(() => inputEl.focus(), 150);
+  }
 }
 
 function renderDictationHearts(attemptsLeft) {
@@ -1210,16 +1345,14 @@ function revealDictationAnswer(item, correctTerm) {
   // Bind Meaning audio button in Dictation
   const meaningBtn = document.getElementById('dictation-meaning-speak-btn');
   if (meaningBtn) {
-    const newMeaningBtn = meaningBtn.cloneNode(true);
-    meaningBtn.parentNode.replaceChild(newMeaningBtn, meaningBtn);
-    newMeaningBtn.addEventListener('click', async () => {
-      newMeaningBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
+    meaningBtn.onclick = async () => {
+      meaningBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Listen';
       try {
         await speakText(item.meaning, { rate: 1.0 });
       } finally {
-        newMeaningBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
+        meaningBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> Listen';
       }
-    });
+    };
   }
 
   // Setup Sentence Toolbar in Dictation
