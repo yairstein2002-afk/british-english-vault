@@ -517,13 +517,16 @@ export function getLocalFallbackData() {
   const localDataStr = localStorage.getItem(LOCAL_STORAGE_KEY);
   if (localDataStr) {
     try {
-      return JSON.parse(localDataStr);
+      const parsed = JSON.parse(localDataStr);
+      if (parsed && Array.isArray(parsed.items) && parsed.items.length > 0) {
+        return parsed;
+      }
     } catch (e) {
       console.error("Error parsing local vault data", e);
     }
   }
   
-  // Set default data
+  // Set default data (full 34 curated vocabulary items)
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(DEFAULT_VAULT_DATA));
   return DEFAULT_VAULT_DATA;
 }

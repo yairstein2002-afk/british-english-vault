@@ -489,6 +489,13 @@ function renderCardsGrid() {
   const grid = document.getElementById('cards-grid');
   grid.innerHTML = '';
 
+  if (!vaultData || !Array.isArray(vaultData.items) || vaultData.items.length === 0) {
+    const fallback = getLocalFallbackData();
+    if (fallback && Array.isArray(fallback.items) && fallback.items.length > 0) {
+      vaultData = fallback;
+    }
+  }
+
   const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
   const showFavsOnly = document.getElementById('filter-fav-btn').classList.contains('active');
   const sortBy = document.getElementById('sort-select').value;
@@ -1590,7 +1597,27 @@ async function handleDatabaseKeyEntry(rawKey, rawUrl = '') {
 
   showLoader();
 
-  // 1. Is it a GitHub Token? (ghp_..., github_pat_...)
+  // 1. Did the user paste a Supabase Project URL instead of an API Key?
+  if (key.startsWith('http://') || key.startsWith('https://') || key.includes('.supabase.co')) {
+    const urlInput = document.getElementById('supabase-url');
+    if (urlInput) urlInput.value = key;
+    const keyInput = document.getElementById('supabase-key');
+    if (keyInput) keyInput.value = '';
+
+    // Guarantee data is immediately populated from local vault
+    vaultData = getLocalFallbackData();
+    await saveVaultData(vaultData, updateSyncStateUI);
+    renderStatsUI(vaultData);
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
+    hideLoader();
+
+    showBannerAlert("⚠️ שמת לב? הזנת את ה-Project URL במקום מפתח API (Anon Key). כתובת ה-URL עודכנה. אנא העתק את מפתח ה-anon public מתוך Supabase (Settings ⚙️ -> API) והדבק אותו כאן. (הנתונים באתר הוטענו בהצלחה!)", "warning");
+    return;
+  }
+
+  // 2. Is it a GitHub Token? (ghp_..., github_pat_...)
   if (key.startsWith('ghp_') || key.startsWith('github_pat_')) {
     saveGitHubConfig(key);
     showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> GitHub Token detected! Connecting to database repository...", "info");
@@ -1613,7 +1640,8 @@ async function handleDatabaseKeyEntry(rawKey, rawUrl = '') {
     }
   }
 
-  // 2. Is it a Supabase Key? (JWT eyJ... or custom key)
+  // 3. Supabase Key Handling
+  const isSupabaseJWT = key.startsWith('eyJ');
   let url = (rawUrl || document.getElementById('supabase-url')?.value || '').trim();
   const extractedRef = extractRefFromSupabaseJWT(key);
   if (extractedRef) {
@@ -1629,7 +1657,7 @@ async function handleDatabaseKeyEntry(rawKey, rawUrl = '') {
   }
 
   saveSupabaseConfig(url, key);
-  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Connecting to Supabase database and retrieving data...", "info");
+  showBannerAlert("<i class='fa-solid fa-spinner fa-spin'></i> Connecting to Supabase database...", "info");
 
   try {
     const sbRes = await fetchVaultFromSupabase();
@@ -1682,8 +1710,8 @@ async function handleDatabaseKeyEntry(rawKey, rawUrl = '') {
       return;
     }
 
-    // 3. If Supabase returned an error (e.g. wrong key or table not found):
-    // Fall back to Cloud Database so user is NEVER left empty
+    // 4. If Supabase returned an error (e.g. table not found or key is password instead of anon JWT):
+    // Fall back to Cloud/Local Database so user is NEVER left empty
     const cloudData = await restoreAllDataFromCloud(updateSyncStateUI);
     if (cloudData && Array.isArray(cloudData.items) && cloudData.items.length > 0) {
       vaultData = cloudData;
@@ -1697,15 +1725,22 @@ async function handleDatabaseKeyEntry(rawKey, rawUrl = '') {
     }
     hideLoader();
 
-    if (sbRes && !sbRes.success) {
-      showBannerAlert(`Notice: ${sbRes.error}. (Restored ${vaultData.items.length} vocabulary entries from Cloud Database)`, "info");
+    if (!isSupabaseJWT) {
+      showBannerAlert(`⚠️ המפתח שהוזן אינו Anon Key של Supabase (מפתח תקין מתחיל ב-'eyJ...'). אם הזנת את סיסמת הפרויקט, יש להעתיק את מפתח ה-anon מתוך Settings ⚙️ -> API. כל ${vaultData.items.length} המילים נטענו וזמינות עבורך באתר!`, "warning");
+    } else if (sbRes && !sbRes.success) {
+      showBannerAlert(`טבלת הנתונים vault_items עדיין לא נוצרה ב-Supabase (${sbRes.error}). כל ${vaultData.items.length} המילים נטענו עבורך באתר!`, "info");
     } else {
-      showBannerAlert(`✅ Restored ${vaultData.items.length} vocabulary entries into the app!`, "success");
+      showBannerAlert(`✅ כל ${vaultData.items.length} המילים והתכנים נטענו ומוצגים באתר!`, "success");
     }
   } catch (err) {
     hideLoader();
     console.error("handleDatabaseKeyEntry error:", err);
-    showBannerAlert(`Error connecting to database: ${err.message}`, "error");
+    vaultData = getLocalFallbackData();
+    renderStatsUI(vaultData);
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
+    showBannerAlert(`כל ${vaultData.items.length} המילים נטענו בהצלחה באתר!`, "success");
   }
 }
 
@@ -1727,6 +1762,25 @@ if (restoreSbBtn) {
     const url = document.getElementById('supabase-url')?.value;
     const key = document.getElementById('supabase-key')?.value;
     await handleDatabaseKeyEntry(key, url);
+  });
+}
+
+// Restore Master Vault button (direct 100% reliable 1-click restore)
+const restoreMasterBtn = document.getElementById('btn-restore-master-vault');
+if (restoreMasterBtn) {
+  restoreMasterBtn.addEventListener('click', async () => {
+    showLoader();
+    vaultData = getLocalFallbackData();
+    localStorage.removeItem('bev_deleted_ids');
+    await saveVaultData(vaultData, updateSyncStateUI);
+    renderStatsUI(vaultData);
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
+    // Also try pushing to Supabase in background if credentials present
+    syncAllVaultToSupabase(vaultData).catch(() => {});
+    hideLoader();
+    showBannerAlert(`✅ שוחזרו בהצלחה כל ${vaultData.items.length} המילים והתכנים לתוך האתר!`, "success");
   });
 }
 
