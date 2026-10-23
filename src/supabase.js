@@ -48,18 +48,34 @@ function getSupabaseHeaders() {
  */
 export async function fetchVaultFromSupabase() {
   const config = getSupabaseConfig();
+  if (!config.url || !config.key) {
+    return { success: false, error: 'Supabase URL or Key is not configured.' };
+  }
+  
   const url = `${config.url}/rest/v1/vault_items?select=*&order=id.asc`;
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
     const response = await fetch(url, {
       method: 'GET',
-      headers: getSupabaseHeaders()
+      headers: getSupabaseHeaders(),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
 
     if (response.ok) {
       const items = await response.json();
-      return { success: true, items };
+      return { success: true, items: Array.isArray(items) ? items : [] };
     } else {
-      return { success: false, status: response.status };
+      let errDetail = `HTTP ${response.status}`;
+      try {
+        const errJson = await response.json();
+        if (errJson.message) errDetail = errJson.message;
+        else if (errJson.hint) errDetail = `${errJson.message || ''} (${errJson.hint})`;
+        else if (errJson.details) errDetail = errJson.details;
+      } catch (e) {}
+      return { success: false, status: response.status, error: errDetail };
     }
   } catch (err) {
     console.warn("Supabase fetch notice:", err.message);
@@ -72,6 +88,8 @@ export async function fetchVaultFromSupabase() {
  */
 export async function upsertItemInSupabase(item) {
   const config = getSupabaseConfig();
+  if (!config.url || !config.key) return false;
+
   const url = `${config.url}/rest/v1/vault_items`;
   const headers = {
     ...getSupabaseHeaders(),
@@ -97,6 +115,8 @@ export async function upsertItemInSupabase(item) {
  */
 export async function deleteItemFromSupabase(itemId) {
   const config = getSupabaseConfig();
+  if (!config.url || !config.key) return false;
+
   const url = `${config.url}/rest/v1/vault_items?id=eq.${encodeURIComponent(itemId)}`;
   try {
     const response = await fetch(url, {
@@ -115,11 +135,36 @@ export async function deleteItemFromSupabase(itemId) {
  * Sync entire Vault database items to Supabase
  */
 export async function syncAllVaultToSupabase(vaultData) {
-  if (!vaultData || !Array.isArray(vaultData.items)) return false;
+  if (!vaultData || !Array.isArray(vaultData.items)) return { success: false, count: 0 };
+  const config = getSupabaseConfig();
+  if (!config.url || !config.key) return { success: false, count: 0, error: 'No credentials' };
+
+  // 1. Try batch upsert
+  const url = `${config.url}/rest/v1/vault_items`;
+  const headers = {
+    ...getSupabaseHeaders(),
+    'Prefer': 'resolution=merge-duplicates,return=representation'
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(vaultData.items)
+    });
+
+    if (response.ok) {
+      return { success: true, count: vaultData.items.length };
+    }
+  } catch (err) {
+    console.warn("Batch Supabase sync fallback:", err);
+  }
+
+  // 2. Sequential fallback if batch rejected
   let successCount = 0;
   for (const item of vaultData.items) {
     const ok = await upsertItemInSupabase(item);
     if (ok) successCount++;
   }
-  return successCount > 0;
+  return { success: successCount > 0, count: successCount };
 }

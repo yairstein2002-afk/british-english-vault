@@ -1250,12 +1250,15 @@
                 <input type="password" id="supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." class="form-control">
               </div>
 
-              <div class="settings-actions">
+              <div class="settings-actions" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
                 <button type="submit" class="btn btn-primary">
                   <i class="fa-solid fa-floppy-disk"></i> Save Supabase Settings
                 </button>
                 <button type="button" id="btn-sync-now" class="btn btn-secondary">
                   <i class="fa-solid fa-rotate"></i> Sync Database Now
+                </button>
+                <button type="button" id="btn-restore-supabase" class="btn btn-secondary">
+                  <i class="fa-solid fa-cloud-arrow-down"></i> Restore from Supabase
                 </button>
               </div>
             </form>
@@ -1314,6 +1317,9 @@
               </button>
               <button id="btn-import-data" class="btn btn-secondary">
                 <i class="fa-solid fa-file-import"></i> Import Backup File
+              </button>
+              <button id="btn-restore-cloud-db" class="btn btn-primary" style="background: linear-gradient(135deg, var(--uk-blue), #1e3a8a);">
+                <i class="fa-solid fa-rotate-left"></i> Restore from Database
               </button>
               <button id="btn-reset-data" class="btn btn-danger-outline" style="margin-left: auto;">
                 <i class="fa-solid fa-trash-can"></i> Reset App Data

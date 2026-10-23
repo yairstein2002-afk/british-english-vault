@@ -5,113 +5,47 @@
 const LOCAL_STORAGE_KEY = 'bev_vault_data';
 const GITHUB_CONFIG_KEY = 'bev_github_config';
 
-// Default pre-populated items
+// Default pre-populated items (34 Curated Master British Vocabulary Items)
 const DEFAULT_VAULT_DATA = {
   items: [
-    {
-      id: "word-1",
-      category: "words",
-      term: "Knackered",
-      meaning: "Extremely tired or exhausted.",
-      example: "I was absolutely knackered after a long day at the office.",
-      favorite: false,
-      dateAdded: "2026-07-10T10:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "word-2",
-      category: "words",
-      term: "Gobsmacked",
-      meaning: "Utterly astonished or surprised.",
-      example: "I was completely gobsmacked when she told me the news.",
-      favorite: true,
-      dateAdded: "2026-07-11T12:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "word-3",
-      category: "words",
-      term: "Quid",
-      meaning: "One pound sterling (slang).",
-      example: "Can you lend me ten quid until tomorrow?",
-      favorite: false,
-      dateAdded: "2026-07-12T09:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "slang-1",
-      category: "slangs",
-      term: "Chuffed",
-      meaning: "Very pleased or happy.",
-      example: "He was chuffed to bits with his birthday present.",
-      favorite: true,
-      dateAdded: "2026-07-10T11:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "slang-2",
-      category: "slangs",
-      term: "Gutted",
-      meaning: "Extremely disappointed or devastated.",
-      example: "She was absolutely gutted when her team lost the cup final.",
-      favorite: false,
-      dateAdded: "2026-07-11T14:30:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "slang-3",
-      category: "slangs",
-      term: "Skint",
-      meaning: "Having no money; penniless.",
-      example: "I would love to go to the pub, but I'm skint.",
-      favorite: false,
-      dateAdded: "2026-07-12T16:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "phrase-1",
-      category: "phrases",
-      term: "Bob's your uncle",
-      meaning: "A phrase used to show that a task is simple and successfully completed.",
-      example: "Just add hot water, stir, and Bob's your uncle!",
-      favorite: false,
-      dateAdded: "2026-07-10T08:00:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "phrase-2",
-      category: "phrases",
-      term: "Fancy a cuppa?",
-      meaning: "Would you like a cup of tea?",
-      example: "You look cold and tired. Fancy a cuppa?",
-      favorite: true,
-      dateAdded: "2026-07-11T10:15:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "idiom-1",
-      category: "idioms",
-      term: "A penny for your thoughts",
-      meaning: "A way of asking what someone is thinking about when they are quiet.",
-      example: "You've been staring out the window for ages. A penny for your thoughts?",
-      favorite: false,
-      dateAdded: "2026-07-10T09:30:00Z",
-      mistakeCount: 0
-    },
-    {
-      id: "idiom-2",
-      category: "idioms",
-      term: "Cost an arm and a leg",
-      meaning: "To be extremely expensive.",
-      example: "Buying that designer winter coat cost me an arm and a leg.",
-      favorite: false,
-      dateAdded: "2026-07-12T11:00:00Z",
-      mistakeCount: 0
-    }
+    {"id":"word-1","category":"words","term":"Knackered","meaning":"Very tired or completely exhausted.","example":"I was absolutely knackered after a long day at the office.","favorite":false,"dateAdded":"2026-07-10T10:00:00Z","mistakeCount":0},
+    {"id":"word-2","category":"words","term":"Gobsmacked","meaning":"completely astonished, shocked, or amazed","example":"I was completely gobsmacked when she told me the news.","favorite":false,"dateAdded":"2026-07-11T12:00:00Z","mistakeCount":0},
+    {"id":"word-3","category":"words","term":"Quid","meaning":"A pound (£1) in British currency.","example":"Can you lend me ten quid until tomorrow?","favorite":false,"dateAdded":"2026-07-12T09:00:00Z","mistakeCount":0},
+    {"id":"slang-1","category":"slangs","term":"Chuffed","meaning":"Very pleased, really happy, or proud about something.","example":"He was chuffed to bits with his birthday present.","favorite":false,"dateAdded":"2026-07-10T11:00:00Z","mistakeCount":0},
+    {"id":"slang-2","category":"slangs","term":"Gutted","meaning":"Very disappointed, upset, or heartbroken about something.","example":"She was absolutely gutted when her team lost the cup final.","favorite":false,"dateAdded":"2026-07-11T14:30:00Z","mistakeCount":0},
+    {"id":"slang-3","category":"slangs","term":"Skint","meaning":"Broke","example":"I would love to go to the pub, but I'm skint.","favorite":false,"dateAdded":"2026-07-12T16:00:00Z","mistakeCount":0},
+    {"id":"phrase-1","category":"phrases","term":"Bob's your uncle","meaning":"👉 And there you go!\n👉 That’s it — it’s done!\n👉 Everything is sorted.","example":"Just add hot water, stir, and Bob's your uncle!","favorite":false,"dateAdded":"2026-07-10T08:00:00Z","mistakeCount":0},
+    {"id":"phrase-2","category":"phrases","term":"Fancy a cuppa?","meaning":"Would you like a cup of tea?","example":"You look cold and tired. Fancy a cuppa?","favorite":false,"dateAdded":"2026-07-11T10:15:00Z","mistakeCount":0},
+    {"id":"idiom-1","category":"idioms","term":"A penny for your thoughts","meaning":"👉 What are you thinking about?\n👉 Tell me what’s on your mind.","example":"You've been staring out the window for ages. A penny for your thoughts?","favorite":false,"dateAdded":"2026-07-10T09:30:00Z","mistakeCount":0},
+    {"id":"idiom-2","category":"idioms","term":"Cost an arm and a leg","meaning":"To be extremely expensive.","example":"Buying that designer winter coat cost me an arm and a leg.","favorite":false,"dateAdded":"2026-07-12T11:00:00Z","mistakeCount":0},
+    {"id":"slangs-1784605466595","category":"slangs","term":"Pukka","meaning":"Excellent, first-class, really good.","example":"You've done a pukka job.","favorite":false,"dateAdded":"2026-07-21T03:44:26.595Z","mistakeCount":0},
+    {"id":"words-1784605875375","category":"words","term":"Bin","meaning":"trash can / garbage can","example":"Put the rubbish in the bin.","favorite":false,"dateAdded":"2026-07-21T03:51:15.375Z","mistakeCount":0},
+    {"id":"idioms-1784605974856","category":"idioms","term":"Barking up the wrong tree","meaning":"To be mistaken about something or looking in the wrong place for an answer.","example":"I thought John broke the computer, but I was barking up the wrong tree.","favorite":false,"dateAdded":"2026-07-21T03:52:54.856Z","mistakeCount":0},
+    {"id":"phrases-1784606144752","category":"phrases","term":"I’m just off","meaning":"I’m leaving now / I’m going.","example":"Right, I’m just off. See you later! → I’m leaving now.","favorite":false,"dateAdded":"2026-07-21T03:55:44.752Z","mistakeCount":0},
+    {"id":"slangs-1784908163992","category":"slangs","term":"Naff","meaning":"Unfashionable, uncool, cheap-looking, or a bit rubbish.","example":"“The film was pretty naff, to be honest.” → The film wasn't very good.","favorite":false,"dateAdded":"2026-07-24T15:49:23.992Z","mistakeCount":0},
+    {"id":"phrases-1784908238776","category":"phrases","term":"I’d better be off","meaning":"I should leave now.","example":"It’s getting late. I’d better be off.","favorite":false,"dateAdded":"2026-07-24T15:50:38.776Z","mistakeCount":0},
+    {"id":"idioms-1784908318479","category":"idioms","term":"Go the extra mile","meaning":"To make more effort than is expected","example":"“She always goes the extra mile to help her customers.”","favorite":false,"dateAdded":"2026-07-24T15:51:58.479Z","mistakeCount":0},
+    {"id":"words-1784908395608","category":"words","term":"Zebra crossing","meaning":"a pedestrian crossing marked with black and white stripes","example":"Always stop at a zebra crossing when someone is waiting to cross","favorite":false,"dateAdded":"2026-07-24T15:53:15.608Z","mistakeCount":0},
+    {"id":"words-1785090558825","category":"words","term":"Post","meaning":"mail (letters and parcels).","example":"Did the post arrive this morning?","favorite":false,"dateAdded":"2026-07-26T18:29:18.825Z","mistakeCount":0},
+    {"id":"slangs-1785090607360","category":"slangs","term":"Mither","meaning":"To bother, pester, or annoy someone, usually by repeatedly asking for something.","example":"“Stop mithering me—I’m trying to work.” → Stop bothering me.","favorite":false,"dateAdded":"2026-07-26T18:30:07.360Z","mistakeCount":0},
+    {"id":"phrases-1785090654042","category":"phrases","term":"I’ll leave you to it","meaning":"I'll let you get on with what you're doing.","example":"You look busy, so I'll leave you to it.","favorite":false,"dateAdded":"2026-07-26T18:30:54.042Z","mistakeCount":0},
+    {"id":"idioms-1785090694903","category":"idioms","term":"Burn the midnight oil","meaning":"To stay up late working or studying.","example":"“I had to burn the midnight oil to finish my assignment.”","favorite":false,"dateAdded":"2026-07-26T18:31:34.903Z","mistakeCount":0},
+    {"id":"idioms-1785171218516","category":"idioms","term":"Miss the boat","meaning":"To miss an opportunity because you were too late.","example":"“I wanted to buy those concert tickets, but I missed the boat.”","favorite":false,"dateAdded":"2026-07-27T16:53:38.516Z","mistakeCount":0},
+    {"id":"phrases-1785171276400","category":"phrases","term":"I’m easy","meaning":"I don't mind / I'm happy with whatever you choose.","example":"“Where shall we eat?” — “I’m easy.”","favorite":false,"dateAdded":"2026-07-27T16:54:36.400Z","mistakeCount":0},
+    {"id":"slangs-1785171321689","category":"slangs","term":"Yap / Yapping","meaning":"To talk a lot, usually too much or about unimportant things.","example":"“He's been yapping all afternoon.” → He's been talking non-stop.","favorite":false,"dateAdded":"2026-07-27T16:55:21.689Z","mistakeCount":0},
+    {"id":"words-1785171372753","category":"words","term":"Solicitor","meaning":"a lawyer who gives legal advice and prepares legal documents.","example":"You should speak to a solicitor before signing the contract.","favorite":false,"dateAdded":"2026-07-27T16:56:12.753Z","mistakeCount":0},
+    {"id":"words-1785209723717","category":"words","term":"Timetable","meaning":"schedule (especially for trains, buses, schools, or events).","example":"Have you checked the train timetable?","favorite":false,"dateAdded":"2026-07-28T03:35:23.717Z","mistakeCount":0},
+    {"id":"slangs-1785209781159","category":"slangs","term":"Chinwag","meaning":"A friendly chat or conversation.","example":"“I bumped into my neighbour and ended up having a half-hour chinwag.” → We ended up chatting for half an hour.","favorite":false,"dateAdded":"2026-07-28T03:36:21.159Z","mistakeCount":0},
+    {"id":"phrases-1785209838393","category":"phrases","term":"I’ll catch you later","meaning":"See you later / I'll see you later.","example":"“I’ve got to head off. I’ll catch you later.”","favorite":false,"dateAdded":"2026-07-28T03:37:18.393Z","mistakeCount":0},
+    {"id":"idioms-1785209890371","category":"idioms","term":"Once in a blue moon","meaning":"Very rarely.","example":"“We see each other once in a blue moon these days.”","favorite":false,"dateAdded":"2026-07-28T03:38:10.371Z","mistakeCount":0},
+    {"id":"idioms-1785391218338","category":"idioms","term":"Be over the moon","meaning":"To be extremely happy or delighted.","example":"I was over the moon when I got the job","favorite":false,"dateAdded":"2026-07-30T06:00:18.338Z","mistakeCount":0},
+    {"id":"phrases-1785391289356","category":"phrases","term":"I wouldn’t bother","meaning":"I don't think it's worth doing.","example":"“Should I queue up for that café?” — “I wouldn’t bother. It’s not that good.”","favorite":false,"dateAdded":"2026-07-30T06:01:29.356Z","mistakeCount":0},
+    {"id":"slangs-1785391364081","category":"slangs","term":"Nicked","meaning":"Stolen","example":"“Someone's nicked my bike!” → Someone has stolen my bike.","favorite":false,"dateAdded":"2026-07-30T06:02:44.081Z","mistakeCount":0},
+    {"id":"words-1785391414371","category":"words","term":"Revision","meaning":"studying or reviewing school material before an exam.","example":"I'm doing some revision for my maths exam","favorite":false,"dateAdded":"2026-07-30T06:03:34.371Z","mistakeCount":0}
   ],
   stats: {
-    quizzesCompleted: 0,
-    correctAnswers: 0,
+    quizzesCompleted: 1,
+    correctAnswers: 3,
     incorrectAnswers: 0,
     history: []
   }
@@ -225,18 +159,18 @@ export async function testGitHubConnection(config) {
  * Fetch Data: Checks GitHub first. If configured, pulls the data file.
  * If not, or if it fails, falls back to browser localStorage.
  */
-function mergeRemoteWithLocal(parsedData, onSyncStateChange = () => {}) {
+function mergeRemoteWithLocal(parsedData, onSyncStateChange = () => {}, ignoreDeleted = false) {
   const isLocalStorageEmpty = !localStorage.getItem(LOCAL_STORAGE_KEY);
   
-  // If localStorage was cleared, Cloud DB is 100% ground truth!
-  if (isLocalStorageEmpty && parsedData && Array.isArray(parsedData.items) && parsedData.items.length > 0) {
+  // If localStorage was cleared or explicit full restore requested, Cloud DB is 100% ground truth!
+  if ((isLocalStorageEmpty || ignoreDeleted) && parsedData && Array.isArray(parsedData.items) && parsedData.items.length > 0) {
     saveLocalData(parsedData);
     onSyncStateChange('synced');
     return parsedData;
   }
 
   const localData = getLocalFallbackData();
-  const deletedIds = new Set(localData.deletedIds || []);
+  const deletedIds = ignoreDeleted ? new Set() : new Set(localData.deletedIds || []);
 
   const itemMap = new Map();
 
@@ -286,9 +220,9 @@ function mergeRemoteWithLocal(parsedData, onSyncStateChange = () => {}) {
 
 /**
  * Fetch Data: Checks GitHub first. If configured, pulls the data file.
- * If not, or if it fails, falls back to browser localStorage.
+ * Falls back to raw.githubusercontent.com CDN, local static vault.json, and localStorage.
  */
-export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh = false) {
+export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh = false, ignoreDeleted = false) {
   const config = getGitHubConfig();
   
   if (!config) {
@@ -296,9 +230,9 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
     return getLocalFallbackData();
   }
 
-  // If localStorage was cleared, clear session cache to force fresh pull from Cloud DB
+  // If localStorage was cleared or force refresh, clear session cache
   const isLocalEmpty = !localStorage.getItem(LOCAL_STORAGE_KEY);
-  if (isLocalEmpty) {
+  if (isLocalEmpty || forceRefresh) {
     sessionStorage.removeItem('bev_last_github_fetch_time');
     sessionStorage.removeItem('bev_github_cached_remote');
   }
@@ -311,7 +245,7 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
   if (!forceRefresh && !isLocalEmpty && lastFetch && cachedRemoteJson && (now - parseInt(lastFetch, 10) < 300000)) {
     try {
       const parsedData = JSON.parse(cachedRemoteJson);
-      return mergeRemoteWithLocal(parsedData, onSyncStateChange);
+      return mergeRemoteWithLocal(parsedData, onSyncStateChange, ignoreDeleted);
     } catch (e) {}
   }
 
@@ -320,62 +254,111 @@ export async function fetchVaultData(onSyncStateChange = () => {}, forceRefresh 
   const targetBranch = branch || 'main';
   const targetPath = path || 'data/vault.json';
   
-  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${now}`;
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${targetPath}?ref=${targetBranch}&t=${now}`;
+  const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${targetBranch}/${targetPath}?t=${now}`;
+  const localUrl = `${import.meta.env?.BASE_URL || './'}data/vault.json?t=${now}`;
   
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 3500);
+    const timeoutId = setTimeout(() => controller.abort(), 4000);
 
-    let response;
-    if (pat) {
-      response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Authorization': getAuthHeader(pat),
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        signal: controller.signal
-      }).catch(() => null);
+    let parsedData = null;
+
+    // 1. Try GitHub API
+    try {
+      let response = null;
+      if (pat) {
+        response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Authorization': getAuthHeader(pat),
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          signal: controller.signal
+        }).catch(() => null);
+      }
+
+      if (!response || response.status === 401 || response.status === 403) {
+        response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          signal: controller.signal
+        }).catch(() => null);
+      }
+
+      if (response && response.status === 200) {
+        const data = await response.json();
+        const contentString = decodeBase64UTF8(data.content);
+        parsedData = JSON.parse(contentString);
+        if (data.sha) {
+          sessionStorage.setItem('bev_github_file_sha', data.sha);
+        }
+      }
+    } catch (apiErr) {
+      console.warn("GitHub API fetch notice:", apiErr);
     }
 
-    // If no PAT, or if PAT returns 401/403, fallback to unauthenticated public GET
-    if (!response || response.status === 401 || response.status === 403) {
-      response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/vnd.github.v3+json'
-        },
-        signal: controller.signal
-      }).catch(() => null);
+    // 2. If API didn't return data (e.g. Rate Limit 403 or network error), fallback to direct raw CDN
+    if (!parsedData) {
+      try {
+        const rawRes = await fetch(rawUrl, {
+          method: 'GET',
+          signal: controller.signal
+        }).catch(() => null);
+
+        if (rawRes && rawRes.ok) {
+          parsedData = await rawRes.json();
+        }
+      } catch (rawErr) {
+        console.warn("Raw CDN fetch notice:", rawErr);
+      }
     }
+
+    // 3. If raw CDN also failed, fallback to local bundled static data/vault.json
+    if (!parsedData) {
+      try {
+        const localRes = await fetch(localUrl, {
+          method: 'GET',
+          signal: controller.signal
+        }).catch(() => null);
+
+        if (localRes && localRes.ok) {
+          parsedData = await localRes.json();
+        }
+      } catch (locErr) {
+        console.warn("Local static bundle fetch notice:", locErr);
+      }
+    }
+
     clearTimeout(timeoutId);
 
-    if (response && response.status === 200) {
-      const data = await response.json();
-      const contentString = decodeBase64UTF8(data.content);
-      const parsedData = JSON.parse(contentString);
-      
-      // Store in session cache
+    if (parsedData && Array.isArray(parsedData.items) && parsedData.items.length > 0) {
       sessionStorage.setItem('bev_last_github_fetch_time', now.toString());
       sessionStorage.setItem('bev_github_cached_remote', JSON.stringify(parsedData));
-      sessionStorage.setItem('bev_github_file_sha', data.sha);
-
-      return mergeRemoteWithLocal(parsedData, onSyncStateChange);
-    } else if (response && response.status === 404) {
-      // File not found in GitHub. Create it immediately using local data.
-      const localData = getLocalFallbackData();
-      saveVaultData(localData, onSyncStateChange);
-      return localData;
-    } else {
-      // Any other HTTP code (403, 500, etc.)
-      onSyncStateChange('local');
-      return getLocalFallbackData();
+      return mergeRemoteWithLocal(parsedData, onSyncStateChange, ignoreDeleted);
     }
+
+    onSyncStateChange('local');
+    return getLocalFallbackData();
   } catch (error) {
     console.warn("GitHub fetch failed, loading local cache:", error?.message || error);
     onSyncStateChange('local');
     return getLocalFallbackData();
   }
+}
+
+/**
+ * Explicit Data Restoration from Cloud Database
+ */
+export async function restoreAllDataFromCloud(onSyncStateChange = () => {}) {
+  const localData = getLocalFallbackData();
+  localData.deletedIds = [];
+  saveLocalData(localData);
+  sessionStorage.removeItem('bev_last_github_fetch_time');
+  sessionStorage.removeItem('bev_github_cached_remote');
+  return await fetchVaultData(onSyncStateChange, true, true);
 }
 
 /**

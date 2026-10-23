@@ -4,7 +4,8 @@ import {
   getGitHubConfig, 
   saveGitHubConfig, 
   testGitHubConnection, 
-  getLocalFallbackData 
+  getLocalFallbackData,
+  restoreAllDataFromCloud
 } from './github.js';
 import {
   initSpeech,
@@ -268,12 +269,14 @@ function normalizeTerm(term) {
     .toLowerCase();
 }
 
-async function loadDatabase() {
+async function loadDatabase(forceRemote = false) {
   try {
     // 1. Immediately load curated local data so user sees everything in 0ms!
-    vaultData = getLocalFallbackData() || { items: [], stats: {} };
-    if (!vaultData.items || !Array.isArray(vaultData.items)) {
-      vaultData.items = [];
+    if (!vaultData || !Array.isArray(vaultData.items) || vaultData.items.length === 0 || forceRemote) {
+      vaultData = getLocalFallbackData() || { items: [], stats: {} };
+      if (!vaultData.items || !Array.isArray(vaultData.items)) {
+        vaultData.items = [];
+      }
     }
 
     renderStatsUI(vaultData);
@@ -282,8 +285,37 @@ async function loadDatabase() {
     }
     hideLoader();
 
-    // 2. Background check: fetch updates without ever blocking the UI
-    fetchVaultData(updateSyncStateUI).then(remoteData => {
+    // 2. If Supabase configured, check and pull from Supabase in background
+    const sbConfig = getSupabaseConfig();
+    if (sbConfig && sbConfig.url && sbConfig.key) {
+      fetchVaultFromSupabase().then(sbRes => {
+        if (sbRes && sbRes.success && Array.isArray(sbRes.items) && sbRes.items.length > 0) {
+          let updated = false;
+          sbRes.items.forEach(sbItem => {
+            if (sbItem && (sbItem.term || sbItem.word)) {
+              const term = (sbItem.term || sbItem.word).trim();
+              const idx = vaultData.items.findIndex(i => (sbItem.id && i.id === sbItem.id) || normalizeTerm(i.term) === normalizeTerm(term));
+              if (idx !== -1) {
+                vaultData.items[idx] = { ...vaultData.items[idx], ...sbItem };
+              } else {
+                vaultData.items.push(sbItem);
+                updated = true;
+              }
+            }
+          });
+          if (updated) {
+            saveVaultData(vaultData, updateSyncStateUI);
+            renderStatsUI(vaultData);
+            if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+              renderCardsGrid();
+            }
+          }
+        }
+      }).catch(e => console.warn('Supabase background sync:', e));
+    }
+
+    // 3. Background check: fetch updates from Cloud Database
+    fetchVaultData(updateSyncStateUI, forceRemote).then(remoteData => {
       if (remoteData && Array.isArray(remoteData.items) && remoteData.items.length > 0) {
         vaultData = remoteData;
         renderStatsUI(vaultData);
@@ -301,6 +333,98 @@ async function loadDatabase() {
     if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
       renderCardsGrid();
     }
+  }
+}
+
+/**
+ * Universal Database Restore: Restores all vocabulary data from Supabase or Cloud Database
+ */
+async function restoreDataFromDatabase(targetSource = 'all') {
+  showLoader();
+  let restoredCount = 0;
+  let sourceLabel = '';
+  let errorDetail = '';
+
+  try {
+    const sbConfig = getSupabaseConfig();
+    let supabaseSuccess = false;
+
+    // 1. Try Supabase PostgreSQL if requested or 'all'
+    if ((targetSource === 'all' || targetSource === 'supabase') && sbConfig && sbConfig.url && sbConfig.key) {
+      try {
+        const sbRes = await fetchVaultFromSupabase();
+        if (sbRes && sbRes.success && Array.isArray(sbRes.items) && sbRes.items.length > 0) {
+          localStorage.removeItem('bev_deleted_ids');
+          const itemMap = new Map();
+          (sbRes.items || []).forEach(item => {
+            if (item && (item.term || item.word)) {
+              const term = (item.term || item.word).trim();
+              const cleanItem = {
+                id: item.id || `sb-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+                category: item.category || 'words',
+                term,
+                meaning: item.meaning || item.definition || item.translation || '',
+                example: item.example || item.sentence || '',
+                favorite: Boolean(item.favorite),
+                dateAdded: item.dateAdded || new Date().toISOString(),
+                mistakeCount: item.mistakeCount || 0
+              };
+              itemMap.set(normalizeTerm(cleanItem.term), cleanItem);
+            }
+          });
+          vaultData.items = Array.from(itemMap.values());
+          restoredCount = vaultData.items.length;
+          sourceLabel = 'Supabase PostgreSQL';
+          supabaseSuccess = true;
+        } else if (sbRes && !sbRes.success) {
+          errorDetail = sbRes.error || `HTTP ${sbRes.status || ''}`;
+        }
+      } catch (sbErr) {
+        errorDetail = sbErr.message || String(sbErr);
+      }
+    }
+
+    // 2. If Supabase was not configured or didn't return items, restore from Cloud Database
+    if (!supabaseSuccess && (targetSource === 'all' || targetSource === 'cloud')) {
+      const cloudData = await restoreAllDataFromCloud(updateSyncStateUI);
+      if (cloudData && Array.isArray(cloudData.items) && cloudData.items.length > 0) {
+        vaultData = cloudData;
+        restoredCount = vaultData.items.length;
+        sourceLabel = 'Cloud Database';
+      }
+    }
+
+    // 3. Fallback to Master Bundled Dataset if remote empty
+    if (restoredCount === 0 && (!vaultData.items || vaultData.items.length === 0)) {
+      vaultData = getLocalFallbackData();
+      restoredCount = vaultData.items ? vaultData.items.length : 0;
+      sourceLabel = 'Master Vault Backup';
+    }
+
+    // Save locally and sync
+    await saveVaultData(vaultData, updateSyncStateUI);
+    if (sbConfig && sbConfig.url && sbConfig.key) {
+      syncAllVaultToSupabase(vaultData).catch(() => {});
+    }
+
+    renderStatsUI(vaultData);
+    if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+      renderCardsGrid();
+    }
+
+    if (restoredCount > 0) {
+      showBannerAlert(`✅ Data restored successfully from ${sourceLabel}! (${vaultData.items.length} total entries loaded)`, "success");
+      return { success: true, count: vaultData.items.length, source: sourceLabel };
+    } else {
+      showBannerAlert(`Restore failed: ${errorDetail || 'No database entries found.'}`, "error");
+      return { success: false, error: errorDetail };
+    }
+  } catch (err) {
+    console.error("restoreDataFromDatabase error:", err);
+    showBannerAlert(`Failed to restore data: ${err.message}`, "error");
+    return { success: false, error: err.message };
+  } finally {
+    hideLoader();
   }
 }
 
@@ -1458,15 +1582,33 @@ function loadSettingsUI() {
 // Supabase Form Submit Listener
 const sbForm = document.getElementById('settings-supabase-form');
 if (sbForm) {
-  sbForm.addEventListener('submit', (e) => {
+  sbForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const url = document.getElementById('supabase-url').value;
     const key = document.getElementById('supabase-key').value;
     if (saveSupabaseConfig(url, key)) {
-      showBannerAlert("Supabase PostgreSQL Settings saved successfully!", "success");
-      loadDatabase();
+      showBannerAlert("Connecting and restoring database from Supabase...", "info");
+      const res = await restoreDataFromDatabase('supabase');
+      if (res && res.success) {
+        showBannerAlert(`✅ Supabase connected! Successfully loaded ${res.count} entries.`, "success");
+      } else {
+        showBannerAlert("Supabase credentials saved. (Notice: " + (res.error || 'No items in table vault_items') + ")", "info");
+      }
     } else {
       showBannerAlert("Please enter both Supabase URL and Anon Key.", "error");
+    }
+  });
+}
+
+// Restore from Supabase button
+const restoreSbBtn = document.getElementById('btn-restore-supabase');
+if (restoreSbBtn) {
+  restoreSbBtn.addEventListener('click', async () => {
+    restoreSbBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
+    try {
+      await restoreDataFromDatabase('supabase');
+    } finally {
+      restoreSbBtn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Restore from Supabase';
     }
   });
 }
@@ -1523,16 +1665,64 @@ document.querySelectorAll('.toggle-password-btn').forEach(btn => {
 const syncNowBtn = document.getElementById('btn-sync-now');
 if (syncNowBtn) {
   syncNowBtn.addEventListener('click', async () => {
-    syncNowBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing Cloud Database...';
+    syncNowBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Syncing Database...';
     try {
-      const ok = await saveVaultData(vaultData, updateSyncStateUI);
-      if (ok) {
-        showBannerAlert("Cloud Database synced successfully!", "success");
-      } else {
-        showBannerAlert("Database synced to local cache.", "info");
+      const sbConfig = getSupabaseConfig();
+      let sbInfo = '';
+
+      // 1. If Supabase configured, pull remote items then push additions
+      if (sbConfig && sbConfig.url && sbConfig.key) {
+        const fetchRes = await fetchVaultFromSupabase();
+        if (fetchRes && fetchRes.success && Array.isArray(fetchRes.items)) {
+          fetchRes.items.forEach(sbItem => {
+            if (sbItem && (sbItem.term || sbItem.word)) {
+              const term = (sbItem.term || sbItem.word).trim();
+              const idx = vaultData.items.findIndex(i => (sbItem.id && i.id === sbItem.id) || normalizeTerm(i.term) === normalizeTerm(term));
+              if (idx !== -1) {
+                vaultData.items[idx] = { ...vaultData.items[idx], ...sbItem };
+              } else {
+                vaultData.items.push(sbItem);
+              }
+            }
+          });
+        }
+        const pushRes = await syncAllVaultToSupabase(vaultData);
+        if (pushRes && pushRes.success) {
+          sbInfo = ` (Supabase: ${pushRes.count} items synced)`;
+        }
       }
+
+      // 2. Save locally and to Cloud Database
+      const ok = await saveVaultData(vaultData, updateSyncStateUI);
+      renderStatsUI(vaultData);
+      if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
+        renderCardsGrid();
+      }
+
+      if (ok || sbInfo) {
+        showBannerAlert(`✅ Database synced successfully!${sbInfo} (${vaultData.items.length} total entries)`, "success");
+      } else {
+        showBannerAlert(`Database saved to local cache (${vaultData.items.length} entries).`, "info");
+      }
+    } catch (err) {
+      showBannerAlert(`Sync note: ${err.message}`, "error");
     } finally {
-      syncNowBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Sync Cloud Database Now';
+      syncNowBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> Sync Database Now';
+    }
+  });
+}
+
+// Restore from Cloud Database button (in Backup Card)
+const restoreCloudBtn = document.getElementById('btn-restore-cloud-db');
+if (restoreCloudBtn) {
+  restoreCloudBtn.addEventListener('click', async () => {
+    if (confirm("Restore all vocabulary data from the database? Existing entries will be merged and preserved.")) {
+      restoreCloudBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Restoring...';
+      try {
+        await restoreDataFromDatabase('all');
+      } finally {
+        restoreCloudBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Restore from Database';
+      }
     }
   });
 }
@@ -1576,29 +1766,66 @@ if (importBtn && importFileInput) {
     reader.onload = async (event) => {
       try {
         const importedData = JSON.parse(event.target.result);
-        if (!importedData || !Array.isArray(importedData.items)) {
-          showBannerAlert("Invalid backup file structure. File must contain an 'items' array.", "error");
+        let itemsToImport = [];
+
+        if (Array.isArray(importedData)) {
+          itemsToImport = importedData;
+        } else if (importedData && Array.isArray(importedData.items)) {
+          itemsToImport = importedData.items;
+        } else if (importedData && Array.isArray(importedData.data)) {
+          itemsToImport = importedData.data;
+        } else if (importedData && Array.isArray(importedData.vault_items)) {
+          itemsToImport = importedData.vault_items;
+        } else {
+          showBannerAlert("Invalid backup file. File must contain an items array or a list of vocabulary entries.", "error");
           return;
         }
 
-        // Merge imported items into local vaultData
-        const existingIds = new Set(vaultData.items.map(i => i.id));
+        // Merge imported items into vaultData
         let addedCount = 0;
+        let updatedCount = 0;
 
-        importedData.items.forEach(item => {
-          if (item && item.term && item.meaning) {
-            const index = vaultData.items.findIndex(i => i.id === item.id || i.term.toLowerCase().trim() === item.term.toLowerCase().trim());
-            if (index !== -1) {
-              vaultData.items[index] = item;
-            } else {
-              if (!item.id) item.id = `imported-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`;
-              vaultData.items.push(item);
-              addedCount++;
-            }
+        itemsToImport.forEach(item => {
+          if (!item) return;
+          const term = (item.term || item.word || item.name || '').trim();
+          const meaning = (item.meaning || item.definition || item.translation || '').trim();
+          if (!term) return;
+
+          const category = item.category || 'words';
+          const example = item.example || item.sentence || '';
+          const favorite = Boolean(item.favorite);
+
+          const index = vaultData.items.findIndex(i => 
+            (item.id && i.id === item.id) || 
+            normalizeTerm(i.term) === normalizeTerm(term)
+          );
+
+          if (index !== -1) {
+            vaultData.items[index] = {
+              ...vaultData.items[index],
+              category: category || vaultData.items[index].category,
+              meaning: meaning || vaultData.items[index].meaning,
+              example: example || vaultData.items[index].example,
+              favorite: item.favorite !== undefined ? favorite : vaultData.items[index].favorite
+            };
+            updatedCount++;
+          } else {
+            const newItem = {
+              id: item.id || `imported-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+              category,
+              term,
+              meaning,
+              example,
+              favorite,
+              dateAdded: item.dateAdded || new Date().toISOString(),
+              mistakeCount: item.mistakeCount || 0
+            };
+            vaultData.items.push(newItem);
+            addedCount++;
           }
         });
 
-        if (importedData.stats) {
+        if (importedData && importedData.stats) {
           vaultData.stats = {
             quizzesCompleted: Math.max(vaultData.stats.quizzesCompleted || 0, importedData.stats.quizzesCompleted || 0),
             correctAnswers: Math.max(vaultData.stats.correctAnswers || 0, importedData.stats.correctAnswers || 0),
@@ -1607,13 +1834,14 @@ if (importBtn && importFileInput) {
           };
         }
 
-        saveDatabase();
+        // Save locally and sync to database
+        await saveDatabase();
         renderStatsUI(vaultData);
         if (['words', 'slangs', 'phrases', 'idioms'].includes(currentView)) {
           renderCardsGrid();
         }
 
-        showBannerAlert(`Backup imported successfully! Database updated (${vaultData.items.length} total entries).`, "success");
+        showBannerAlert(`✅ Backup imported successfully! ${addedCount} new added, ${updatedCount} updated (${vaultData.items.length} total entries).`, "success");
       } catch (err) {
         showBannerAlert(`Failed to read backup file: ${err.message}`, "error");
       }
