@@ -1,7 +1,7 @@
 /**
  * British English Vault - Daily Practice (תרגול יומי: דיבור וכתיבה חופשית) 🎙️✍️
- * Record speaking freely or write freely, with instant grammar checks,
- * explanation of mistakes ("למה טעיתי"), and correct British answer ("מה התשובה הנכונה").
+ * Rock-solid continuous speech recognition, real audio voice recording with playback,
+ * grammar analysis, "למה טעיתי" explanations, and native British model answers.
  */
 
 import { speakText } from './speech.js';
@@ -20,14 +20,24 @@ export const PRACTICE_IDEAS = [
 let activeIdea = PRACTICE_IDEAS[0];
 let recognition = null;
 let isRecording = false;
-let recordedTranscript = '';
 let recognitionTimer = null;
 let recognitionStartTime = 0;
 
+// MediaRecorder state for actual voice playback
+let mediaStream = null;
+let mediaRecorder = null;
+let recordedAudioChunks = [];
+let voiceAudioUrl = null;
+
+// Speech recognition text accumulator to prevent cutting off or duplicating
+let baseTextCommitted = '';
+let currentSessionFinal = '';
+let currentSessionInterim = '';
+
 /**
- * Speech Recognition initialization with 0-duplicate guaranteed transcript engine
+ * Initialize Speech Recognition with continuous auto-restart and zero duplication
  */
-function setupSpeechRecognition(basePrefix, onResultCallback, onEndCallback) {
+function createSpeechEngine(onTranscriptUpdate, onStopped) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return null;
 
@@ -35,50 +45,75 @@ function setupSpeechRecognition(basePrefix, onResultCallback, onEndCallback) {
   rec.continuous = true;
   rec.interimResults = true;
   rec.lang = 'en-GB';
+  rec.maxAlternatives = 1;
 
   rec.onresult = (event) => {
     let sessionFinal = '';
     let sessionInterim = '';
 
-    // Loop through ALL results from 0 to length - 1 (the single authoritative session source)
     for (let i = 0; i < event.results.length; ++i) {
-      const res = event.results[i];
-      if (res && res[0]) {
-        if (res.isFinal) {
-          sessionFinal += res[0].transcript + ' ';
+      const item = event.results[i];
+      if (item && item[0]) {
+        if (item.isFinal) {
+          sessionFinal += item[0].transcript + ' ';
         } else {
-          sessionInterim += res[0].transcript;
+          sessionInterim += item[0].transcript;
         }
       }
     }
 
-    sessionFinal = sessionFinal.trim();
-    sessionInterim = sessionInterim.trim();
+    currentSessionFinal = sessionFinal.trim();
+    currentSessionInterim = sessionInterim.trim();
 
-    // Construct full text strictly without duplicate appending
-    let fullText = basePrefix ? basePrefix : '';
-    if (sessionFinal) {
-      fullText += (fullText ? ' ' : '') + sessionFinal;
+    // Assemble full transcript without duplication
+    let assembled = baseTextCommitted;
+    if (currentSessionFinal) {
+      assembled += (assembled ? ' ' : '') + currentSessionFinal;
     }
-    if (sessionInterim) {
-      fullText += (fullText ? ' ' : '') + sessionInterim;
+    if (currentSessionInterim) {
+      assembled += (assembled ? ' ' : '') + currentSessionInterim;
     }
 
-    if (onResultCallback) {
-      onResultCallback(fullText.trim());
+    if (onTranscriptUpdate) {
+      onTranscriptUpdate(assembled.trim());
     }
   };
 
   rec.onerror = (event) => {
-    console.warn('Speech error:', event.error);
-    if (event.error === 'not-allowed') {
-      alert('נא לאשר גישה למיקרופון בדפדפן כדי להקליט, או הקלד ישירות את הטקסט בתיבה.');
+    // 'no-speech' is non-fatal: user paused to breathe/think
+    if (event.error === 'no-speech') {
+      return;
     }
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert('נא לאשר גישה למיקרופון בדפדפן כדי להקליט, או הקלד ישירות את המשפט בתיבה.');
+      isRecording = false;
+      if (onStopped) onStopped();
+      return;
+    }
+    console.warn('Speech recognition warning:', event.error);
   };
 
   rec.onend = () => {
-    isRecording = false;
-    if (onEndCallback) onEndCallback();
+    // If user is still actively recording, commit finalized chunk and seamlessly restart!
+    if (isRecording) {
+      if (currentSessionFinal) {
+        baseTextCommitted += (baseTextCommitted ? ' ' : '') + currentSessionFinal;
+        currentSessionFinal = '';
+        currentSessionInterim = '';
+      }
+      try {
+        rec.start();
+      } catch (e) {
+        // Retry shortly if restarting too quickly
+        setTimeout(() => {
+          if (isRecording) {
+            try { rec.start(); } catch (err) {}
+          }
+        }, 200);
+      }
+    } else {
+      if (onStopped) onStopped();
+    }
   };
 
   return rec;
@@ -120,7 +155,7 @@ export function getDailyPracticeStats() {
 }
 
 /**
- * Analyze English text (spoken or typed) for grammar, errors, and "Why did I make a mistake?"
+ * Linguistic Analyzer for Daily Input
  */
 export function analyzeDailyInput(rawText) {
   const text = (rawText || '').trim();
@@ -131,7 +166,6 @@ export function analyzeDailyInput(rawText) {
   const words = text.split(/\s+/).filter(Boolean);
   const wordCount = words.length;
   const mistakes = [];
-  const lower = text.toLowerCase();
 
   // 1. Subject-Verb Agreement
   if (/\b(he|she|it)\s+(don't|do|have|are)\b/i.test(text)) {
@@ -214,7 +248,7 @@ export function analyzeDailyInput(rawText) {
     britishHints.push('בלונדון הרכבת התחתית נקראת **Tube** או **Underground**.');
   }
 
-  // 5. Generate Polished British Version ("מה התשובה הנכונה")
+  // 5. Generate Polished British Version
   let polished = text
     .replace(/\bhe don't\b/gi, "he doesn't")
     .replace(/\bshe don't\b/gi, "she doesn't")
@@ -251,6 +285,9 @@ export function analyzeDailyInput(rawText) {
 export function initDailyPracticeUI() {
   const container = document.getElementById('view-daily-practice');
   if (!container) return;
+
+  // Clean up any stale active recording before re-rendering
+  stopActiveRecording();
 
   const history = getDailyPracticeHistory();
   const stats = getDailyPracticeStats();
@@ -305,16 +342,17 @@ export function initDailyPracticeUI() {
         <!-- RECORD & WRITE WORKBENCH -->
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <!-- RECORDING BAR -->
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 0.75rem 1rem; background: var(--bg-hover); border-radius: 12px; border: 1px solid var(--border-color);">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding: 0.85rem 1.15rem; background: var(--bg-hover); border-radius: 14px; border: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;">
               <button type="button" id="btn-practice-record" 
-                style="background: var(--uk-red); color: #fff; border: none; padding: 0.65rem 1.4rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(200,16,46,0.3); transition: all 0.2s;">
+                style="background: var(--uk-red); color: #fff; border: none; padding: 0.75rem 1.5rem; border-radius: 999px; font-weight: 700; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.55rem; box-shadow: 0 4px 14px rgba(200,16,46,0.3); transition: all 0.25s;">
                 <i class="fa-solid fa-microphone"></i>
-                <span id="practice-rec-text">הקלט דיבור באנגלית</span>
+                <span id="practice-rec-text">לחץ להקלטת דיבור</span>
               </button>
-              <div id="practice-rec-indicator" style="display: none; align-items: center; gap: 0.5rem; color: var(--uk-red); font-weight: 700; font-size: 0.88rem;">
-                <span class="pulse-dot" style="display: inline-block; width: 10px; height: 10px; background: var(--uk-red); border-radius: 50%;"></span>
-                <span id="practice-rec-timer">מקליט באנגלית בריטית... 00:00</span>
+              
+              <div id="practice-rec-indicator" style="display: none; align-items: center; gap: 0.6rem; color: var(--uk-red); font-weight: 700; font-size: 0.9rem;">
+                <span class="pulse-dot" style="display: inline-block; width: 12px; height: 12px; background: var(--uk-red); border-radius: 50%; box-shadow: 0 0 0 4px rgba(200,16,46,0.25); animation: blink 1s infinite;"></span>
+                <span id="practice-rec-timer">מקליט ומאזין... 00:00</span>
               </div>
             </div>
 
@@ -323,9 +361,17 @@ export function initDailyPracticeUI() {
             </button>
           </div>
 
+          <!-- VOICE AUDIO PLAYBACK ROW (YOUR RECORDING) -->
+          <div id="practice-voice-playback" style="display: none; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.75rem 1rem; background: rgba(0,36,125,0.06); border: 1px solid var(--uk-blue); border-radius: 12px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 700; color: var(--uk-blue); font-size: 0.92rem;">
+              <i class="fa-solid fa-circle-play"></i> שמע את הקול שלך (הקלטה מהמיקרופון):
+            </div>
+            <audio id="practice-voice-audio" controls style="height: 38px; max-width: 100%; border-radius: 8px;"></audio>
+          </div>
+
           <!-- TEXTAREA -->
           <div>
-            <label for="practice-textarea" class="form-label" style="font-weight: 700; display: flex; justify-content: space-between;">
+            <label for="practice-textarea" class="form-label" style="font-weight: 700; display: flex; justify-content: space-between; margin-bottom: 0.4rem;">
               <span>הטקסט שלך (מדבר או כותב):</span>
               <span id="practice-word-counter" style="color: var(--text-muted); font-size: 0.82rem; font-weight: 500;">0 מילים</span>
             </label>
@@ -366,6 +412,31 @@ export function initDailyPracticeUI() {
 
   setupDailyPracticeEvents();
   renderDailyPracticeHistory();
+}
+
+/**
+ * Safely stop active recording and release streams
+ */
+function stopActiveRecording() {
+  isRecording = false;
+  clearInterval(recognitionTimer);
+
+  if (recognition) {
+    try { recognition.abort(); } catch (e) {}
+    recognition = null;
+  }
+
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try { mediaRecorder.stop(); } catch (e) {}
+    mediaRecorder = null;
+  }
+
+  if (mediaStream) {
+    try {
+      mediaStream.getTracks().forEach(track => track.stop());
+    } catch (e) {}
+    mediaStream = null;
+  }
 }
 
 /**
@@ -412,11 +483,44 @@ function setupDailyPracticeEvents() {
 
   // Recording toggle
   if (recBtn) {
-    recBtn.addEventListener('click', () => {
+    recBtn.addEventListener('click', async () => {
       if (!isRecording) {
-        const basePrefix = textarea.value.trim();
-        recognition = setupSpeechRecognition(
-          basePrefix,
+        // 1. Prepare text accumulators
+        baseTextCommitted = textarea.value.trim();
+        currentSessionFinal = '';
+        currentSessionInterim = '';
+
+        // 2. Request mic access and start voice recorder (MediaRecorder)
+        recordedAudioChunks = [];
+        try {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (window.MediaRecorder) {
+              mediaRecorder = new MediaRecorder(mediaStream);
+              mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) recordedAudioChunks.push(e.data);
+              };
+              mediaRecorder.onstop = () => {
+                const blob = new Blob(recordedAudioChunks, { type: 'audio/webm' });
+                if (voiceAudioUrl) URL.revokeObjectURL(voiceAudioUrl);
+                voiceAudioUrl = URL.createObjectURL(blob);
+
+                const voicePlayback = document.getElementById('practice-voice-playback');
+                const voiceAudio = document.getElementById('practice-voice-audio');
+                if (voicePlayback && voiceAudio) {
+                  voiceAudio.src = voiceAudioUrl;
+                  voicePlayback.style.display = 'flex';
+                }
+              };
+              mediaRecorder.start(250);
+            }
+          }
+        } catch (micErr) {
+          console.warn('Microphone capture error:', micErr);
+        }
+
+        // 3. Start speech recognition engine
+        recognition = createSpeechEngine(
           (fullText) => {
             textarea.value = fullText;
             if (wordCounter) {
@@ -427,13 +531,13 @@ function setupDailyPracticeEvents() {
           () => stopRecUI()
         );
 
-        if (!recognition) {
-          alert('דפדפן זה אינו תומך בהקלטה ישירה. מומלץ להשתמש ב-Chrome או להקליד ישירות את הטקסט.');
+        if (!recognition && !mediaRecorder) {
+          alert('דפדפן זה אינו תומך בהקלטה ישירה. מומלץ להשתמש ב-Chrome/Edge או להקליד ישירות את הטקסט.');
           return;
         }
 
         try {
-          recognition.start();
+          if (recognition) recognition.start();
           isRecording = true;
           recBtn.style.background = '#111';
           recText.innerText = 'עצור הקלטה';
@@ -444,16 +548,14 @@ function setupDailyPracticeEvents() {
             const elapsed = Math.floor((Date.now() - recognitionStartTime) / 1000);
             const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
             const secs = String(elapsed % 60).padStart(2, '0');
-            timerEl.innerText = `מקליט באנגלית בריטית... ${mins}:${secs}`;
+            timerEl.innerText = `מקליט ומאזין... ${mins}:${secs}`;
           }, 1000);
         } catch (e) {
-          console.error(e);
+          console.error('Speech recognition start failed:', e);
           stopRecUI();
         }
       } else {
-        if (recognition) {
-          try { recognition.stop(); } catch (e) {}
-        }
+        // User explicitly clicked Stop Recording
         stopRecUI();
       }
     });
@@ -462,21 +564,44 @@ function setupDailyPracticeEvents() {
   function stopRecUI() {
     isRecording = false;
     clearInterval(recognitionTimer);
+
+    if (recognition) {
+      try { recognition.stop(); } catch (e) {}
+      recognition = null;
+    }
+
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+      try { mediaRecorder.stop(); } catch (e) {}
+    }
+
+    if (mediaStream) {
+      try {
+        mediaStream.getTracks().forEach(track => track.stop());
+      } catch (e) {}
+      mediaStream = null;
+    }
+
     if (recBtn) {
       recBtn.style.background = 'var(--uk-red)';
-      recText.innerText = 'הקלט דיבור באנגלית';
+      recText.innerText = 'לחץ להקלטת דיבור';
     }
     if (indicator) indicator.style.display = 'none';
   }
 
-  // Clear
+  // Clear text button
   if (clearBtn) {
     clearBtn.addEventListener('click', () => {
       textarea.value = '';
-      recordedTranscript = '';
+      baseTextCommitted = '';
+      currentSessionFinal = '';
+      currentSessionInterim = '';
       if (wordCounter) wordCounter.innerText = '0 מילים';
+
       const feedbackCard = document.getElementById('practice-feedback-card');
       if (feedbackCard) feedbackCard.style.display = 'none';
+
+      const voicePlayback = document.getElementById('practice-voice-playback');
+      if (voicePlayback) voicePlayback.style.display = 'none';
     });
   }
 
