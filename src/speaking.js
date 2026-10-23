@@ -78,7 +78,7 @@ let recognitionTimer = null;
 /**
  * Initialize Speech Recognition instance
  */
-function setupSpeechRecognition(onResultCallback, onEndCallback) {
+function setupSpeechRecognition(basePrefix, onResultCallback, onEndCallback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
     return null;
@@ -87,30 +87,36 @@ function setupSpeechRecognition(onResultCallback, onEndCallback) {
   const rec = new SpeechRecognition();
   rec.continuous = true;
   rec.interimResults = true;
-  rec.lang = 'en-GB'; // Native British English recognition
+  rec.lang = 'en-GB';
 
   rec.onresult = (event) => {
-    let interim = '';
-    let final = '';
+    let sessionFinal = '';
+    let sessionInterim = '';
 
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        final += event.results[i][0].transcript + ' ';
-      } else {
-        interim += event.results[i][0].transcript;
+    for (let i = 0; i < event.results.length; ++i) {
+      const res = event.results[i];
+      if (res && res[0]) {
+        if (res.isFinal) {
+          sessionFinal += res[0].transcript + ' ';
+        } else {
+          sessionInterim += res[0].transcript;
+        }
       }
     }
 
-    if (onResultCallback) {
-      onResultCallback({
-        finalText: final.trim(),
-        interimText: interim.trim(),
-        fullText: (recordedTranscript + ' ' + final + ' ' + interim).trim()
-      });
+    sessionFinal = sessionFinal.trim();
+    sessionInterim = sessionInterim.trim();
+
+    let fullText = basePrefix ? basePrefix : '';
+    if (sessionFinal) {
+      fullText += (fullText ? ' ' : '') + sessionFinal;
+    }
+    if (sessionInterim) {
+      fullText += (fullText ? ' ' : '') + sessionInterim;
     }
 
-    if (final) {
-      recordedTranscript = (recordedTranscript + ' ' + final).trim();
+    if (onResultCallback) {
+      onResultCallback(fullText.trim());
     }
   };
 
@@ -498,9 +504,11 @@ function setupSpeakingEventListeners() {
       if (!isRecording) {
         // Start Recording
         recordedTranscript = transcriptArea.value.trim();
+        const basePrefix = transcriptArea.value.trim();
         recognition = setupSpeechRecognition(
-          (res) => {
-            transcriptArea.value = res.fullText;
+          basePrefix,
+          (fullText) => {
+            transcriptArea.value = fullText;
           },
           () => {
             // on End

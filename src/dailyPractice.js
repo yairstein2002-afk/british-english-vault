@@ -25,9 +25,9 @@ let recognitionTimer = null;
 let recognitionStartTime = 0;
 
 /**
- * Speech Recognition initialization
+ * Speech Recognition initialization with 0-duplicate guaranteed transcript engine
  */
-function setupSpeechRecognition(onResultCallback, onEndCallback) {
+function setupSpeechRecognition(basePrefix, onResultCallback, onEndCallback) {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) return null;
 
@@ -37,27 +37,35 @@ function setupSpeechRecognition(onResultCallback, onEndCallback) {
   rec.lang = 'en-GB';
 
   rec.onresult = (event) => {
-    let interim = '';
-    let final = '';
+    let sessionFinal = '';
+    let sessionInterim = '';
 
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal) {
-        final += event.results[i][0].transcript + ' ';
-      } else {
-        interim += event.results[i][0].transcript;
+    // Loop through ALL results from 0 to length - 1 (the single authoritative session source)
+    for (let i = 0; i < event.results.length; ++i) {
+      const res = event.results[i];
+      if (res && res[0]) {
+        if (res.isFinal) {
+          sessionFinal += res[0].transcript + ' ';
+        } else {
+          sessionInterim += res[0].transcript;
+        }
       }
     }
 
-    if (onResultCallback) {
-      onResultCallback({
-        finalText: final.trim(),
-        interimText: interim.trim(),
-        fullText: (recordedTranscript + ' ' + final + ' ' + interim).trim()
-      });
+    sessionFinal = sessionFinal.trim();
+    sessionInterim = sessionInterim.trim();
+
+    // Construct full text strictly without duplicate appending
+    let fullText = basePrefix ? basePrefix : '';
+    if (sessionFinal) {
+      fullText += (fullText ? ' ' : '') + sessionFinal;
+    }
+    if (sessionInterim) {
+      fullText += (fullText ? ' ' : '') + sessionInterim;
     }
 
-    if (final) {
-      recordedTranscript = (recordedTranscript + ' ' + final).trim();
+    if (onResultCallback) {
+      onResultCallback(fullText.trim());
     }
   };
 
@@ -406,12 +414,13 @@ function setupDailyPracticeEvents() {
   if (recBtn) {
     recBtn.addEventListener('click', () => {
       if (!isRecording) {
-        recordedTranscript = textarea.value.trim();
+        const basePrefix = textarea.value.trim();
         recognition = setupSpeechRecognition(
-          (res) => {
-            textarea.value = res.fullText;
+          basePrefix,
+          (fullText) => {
+            textarea.value = fullText;
             if (wordCounter) {
-              const words = res.fullText.split(/\s+/).filter(Boolean).length;
+              const words = fullText.split(/\s+/).filter(Boolean).length;
               wordCounter.innerText = `${words} מילים`;
             }
           },
