@@ -218,7 +218,7 @@ function updateView() {
     phrases: 'Phrases',
     idioms: 'Idioms',
     learn: 'Learn & Practice',
-    'daily-practice': 'תרגול יומי • Daily Practice',
+    'daily-practice': 'Daily Practice',
     games: 'Interactive Games',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',

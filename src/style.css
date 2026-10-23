@@ -5423,3 +5423,27 @@ button, input, select, textarea {
   transition: width 0.3s ease;
 }
 
+/* History Date Range Filter Tabs */
+.btn-filter-tab {
+  padding: 0.35rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  transition: all 0.2s ease;
+}
+
+.btn-filter-tab:hover {
+  color: var(--text-main);
+  border-color: var(--uk-blue);
+}
+
+.btn-filter-tab.active {
+  background: var(--uk-blue);
+  color: #fff;
+  border-color: var(--uk-blue);
+}
+
