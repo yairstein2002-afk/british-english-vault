@@ -57,8 +57,7 @@ import {
   calculateGoalsStats 
 } from './goals.js';
 import { initLearnUI, closeTopicDetail } from './learn.js';
-import { initSpeakingLabUI } from './speaking.js';
-import { initWritingLabUI } from './writing.js';
+import { initDailyPracticeUI } from './dailyPractice.js';
 import {
   getGameStats,
   calculateUserLevel,
@@ -118,8 +117,7 @@ const views = {
   settings: document.getElementById('view-settings'),
   ai: document.getElementById('view-ai'),
   goals: document.getElementById('view-goals'),
-  speaking: document.getElementById('view-speaking'),
-  writing: document.getElementById('view-writing')
+  dailyPractice: document.getElementById('view-daily-practice')
 };
 
 // ==========================================================================
@@ -178,7 +176,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals', 'speaking', 'writing'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'daily-practice', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -220,14 +218,13 @@ function updateView() {
     phrases: 'Phrases',
     idioms: 'Idioms',
     learn: 'Learn & Practice',
+    'daily-practice': 'תרגול יומי • Daily Practice',
     games: 'Interactive Games',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
     settings: 'App Settings',
     ai: 'AI Assistant',
-    goals: 'Goals & Achievements',
-    speaking: 'Speaking Lab 🎙️',
-    writing: 'Writing Lab ✍️'
+    goals: 'Goals & Achievements'
   };
   
   document.getElementById('current-view-title').innerText = titleMap[currentView] || 'Vault';
@@ -243,12 +240,9 @@ function updateView() {
     if (currentView === 'learn') {
       if (views.learn) views.learn.classList.add('active');
       initLearnUI();
-    } else if (currentView === 'speaking') {
-      if (views.speaking) views.speaking.classList.add('active');
-      initSpeakingLabUI();
-    } else if (currentView === 'writing') {
-      if (views.writing) views.writing.classList.add('active');
-      initWritingLabUI();
+    } else if (currentView === 'daily-practice') {
+      if (views.dailyPractice) views.dailyPractice.classList.add('active');
+      initDailyPracticeUI();
     } else if (currentView === 'games') {
       if (views.games) views.games.classList.add('active');
       renderGamesUI();
