@@ -575,9 +575,9 @@ export function initDailyPracticeUI() {
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div>
             <span style="background: var(--uk-blue); color: #fff; font-size: 0.8rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 999px; text-transform: uppercase;">
-              <i class="fa-solid fa-pen-nib"></i> Daily Practice
+              <i class="fa-solid fa-pen-nib"></i> תרגול יומי באנגלית
             </span>
-            <h2 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.6rem; color: var(--text-main);">Daily English Writing & Grammar Workshop</h2>
+            <h2 style="margin: 0.5rem 0 0.25rem 0; font-size: 1.6rem; color: var(--text-main);">תרגול יומי באנגלית</h2>
             <p style="margin: 0; color: var(--text-muted); font-size: 0.95rem;">
               כתוב באנגלית חופשית על כל נושא. המערכת תבדוק את <strong>כל סוגי השגיאות</strong> (דקדוק, איות, מילות יחס, התאמת זמנים), תסביר בעברית <strong>למה טעית</strong>, ותציג <strong>מה צריך לעשות נכון</strong> עם הגרסה הבריטית המושלמת!
             </p>

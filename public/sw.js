@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bev-cache-v10';
+const CACHE_NAME = 'bev-cache-v11';
 const ASSETS = [
   '/',
   '/index.html',
