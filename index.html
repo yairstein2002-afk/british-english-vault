@@ -20,7 +20,7 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="./assets/index-Cm9pzIuK.js"></script>
+  <script type="module" crossorigin src="./assets/index-C90YUWbc.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-Dcwf5Rdq.css">
 </head>
 <body>
@@ -1267,8 +1267,23 @@
                 <button type="button" id="btn-restore-supabase" class="btn btn-secondary">
                   <i class="fa-solid fa-cloud-arrow-down"></i> Restore from Database
                 </button>
+                <button type="button" id="btn-restore-master-vault" class="btn btn-secondary" style="background: rgba(0,36,125,0.08); border-color: var(--uk-blue); color: var(--uk-blue); font-weight: 600;">
+                  <i class="fa-solid fa-box-archive"></i> שחזר את כל 34 המילים מיידית (Master Vault)
+                </button>
               </div>
             </form>
+
+            <!-- Quick Supabase Guidance Box -->
+            <div style="margin-top: 1.5rem; padding: 1rem 1.25rem; background: var(--bg-hover, rgba(0,0,0,0.03)); border-radius: 12px; border: 1px dashed var(--border-color); font-size: 0.88rem; line-height: 1.6;">
+              <h4 style="margin: 0 0 0.5rem 0; font-size: 0.95rem; color: var(--text-main); display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-circle-info" style="color: var(--uk-blue);"></i>
+                הנחיות לחיבור Supabase:
+              </h4>
+              <ul style="margin: 0; padding-left: 1.25rem; color: var(--text-muted);">
+                <li><strong>איפה המפתח?</strong> היכנס לפרויקט ב-Supabase, לחץ בתפריט השמאלי על <strong>Project Settings ⚙️</strong> &rarr; <strong>API</strong>, והעתק את המפתח <strong><code>anon</code> <code>public</code></strong> (מתחיל ב-<code>eyJ...</code>). שים לב: סיסמת מסד הנתונים או כתובת ה-URL אינן מפתח ה-API.</li>
+                <li><strong>יצירת הטבלה:</strong> אם הפרויקט חדש, פתח את <strong>SQL Editor (&gt;_)</strong> בתפריט השמאלי של Supabase, והרץ את הפקודה ליצירת טבלת <code>vault_items</code>. מיד לאחר מכן האתר יסנכרן את כל המילים אוטומטית!</li>
+              </ul>
+            </div>
           </div>
           
           <!-- Pronunciation & Speech Preferences Card -->
