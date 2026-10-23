@@ -51,7 +51,7 @@ const DEFAULT_VAULT_DATA = {
   }
 };
 
-// Master Cloud Database Config (Zero-Token Setup for Users)
+// Master Cloud Database Config (Zero-Token Setup with custom PAT override)
 const DEFAULT_CLOUD_DB_CONFIG = {
   pat: '',
   owner: 'yairstein2002-afk',
@@ -61,11 +61,38 @@ const DEFAULT_CLOUD_DB_CONFIG = {
 };
 
 export function getGitHubConfig() {
-  return DEFAULT_CLOUD_DB_CONFIG;
+  const saved = localStorage.getItem(GITHUB_CONFIG_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      if (parsed) {
+        return {
+          pat: parsed.pat || '',
+          owner: parsed.owner || 'yairstein2002-afk',
+          repo: parsed.repo || 'british-english-vault',
+          branch: parsed.branch || 'main',
+          path: parsed.path || 'data/vault.json'
+        };
+      }
+    } catch (e) {}
+  }
+  return { ...DEFAULT_CLOUD_DB_CONFIG };
 }
 
 export function saveGitHubConfig(config) {
-  return true;
+  if (typeof config === 'string') {
+    const current = getGitHubConfig();
+    current.pat = config.trim();
+    localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(current));
+    return true;
+  }
+  if (config && typeof config === 'object') {
+    const current = getGitHubConfig();
+    const merged = { ...current, ...config };
+    localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(merged));
+    return true;
+  }
+  return false;
 }
 
 // Auth & Encoding Helpers

@@ -18,13 +18,42 @@ export function getSupabaseConfig() {
   };
 }
 
+export function extractRefFromSupabaseJWT(token) {
+  if (!token || typeof token !== 'string') return null;
+  const clean = token.trim();
+  try {
+    const parts = clean.split('.');
+    if (parts.length === 3) {
+      const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      const jsonStr = atob(base64);
+      const payload = JSON.parse(jsonStr);
+      if (payload && payload.ref) {
+        return payload.ref;
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
 export function saveSupabaseConfig(url, key) {
-  if (url && key) {
-    let cleanUrl = url.trim().replace(/\/+$/, '');
+  if (key) {
+    let cleanKey = key.trim();
+    let cleanUrl = (url || '').trim().replace(/\/+$/, '');
     if (cleanUrl.endsWith('/rest/v1')) {
       cleanUrl = cleanUrl.replace(/\/rest\/v1$/, '');
     }
-    localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({ url: cleanUrl, key: key.trim() }));
+
+    // Auto-detect project ref from JWT if URL not provided or default
+    const ref = extractRefFromSupabaseJWT(cleanKey);
+    if (ref && (!cleanUrl || cleanUrl.includes('iqngleyyuwyaomufdmlm'))) {
+      cleanUrl = `https://${ref}.supabase.co`;
+    }
+
+    if (!cleanUrl) {
+      cleanUrl = 'https://iqngleyyuwyaomufdmlm.supabase.co';
+    }
+
+    localStorage.setItem(SUPABASE_CONFIG_KEY, JSON.stringify({ url: cleanUrl, key: cleanKey }));
     return true;
   }
   return false;
@@ -44,7 +73,7 @@ function getSupabaseHeaders() {
 }
 
 /**
- * Fetch all Vault items from Supabase PostgreSQL Database
+ * Fetch all Vault items from Supabase PostgreSQL Database (checks vault_items, vault, items, words)
  */
 export async function fetchVaultFromSupabase() {
   const config = getSupabaseConfig();
@@ -52,35 +81,45 @@ export async function fetchVaultFromSupabase() {
     return { success: false, error: 'Supabase URL or Key is not configured.' };
   }
   
-  const url = `${config.url}/rest/v1/vault_items?select=*&order=id.asc`;
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+  const possibleTables = ['vault_items', 'vault', 'items', 'words', 'vocabulary'];
+  let lastError = null;
 
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: getSupabaseHeaders(),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
+  for (const tableName of possibleTables) {
+    const url = `${config.url}/rest/v1/${tableName}?select=*&order=id.asc`;
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
-    if (response.ok) {
-      const items = await response.json();
-      return { success: true, items: Array.isArray(items) ? items : [] };
-    } else {
-      let errDetail = `HTTP ${response.status}`;
-      try {
-        const errJson = await response.json();
-        if (errJson.message) errDetail = errJson.message;
-        else if (errJson.hint) errDetail = `${errJson.message || ''} (${errJson.hint})`;
-        else if (errJson.details) errDetail = errJson.details;
-      } catch (e) {}
-      return { success: false, status: response.status, error: errDetail };
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getSupabaseHeaders(),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const items = await response.json();
+        if (Array.isArray(items)) {
+          return { success: true, items, tableName };
+        }
+      } else if (response.status === 401) {
+        return { success: false, status: 401, error: 'Invalid Supabase Anon Key (HTTP 401 Unauthorized).' };
+      } else if (response.status !== 404) {
+        let errDetail = `HTTP ${response.status}`;
+        try {
+          const errJson = await response.json();
+          if (errJson.message) errDetail = errJson.message;
+          else if (errJson.hint) errDetail = `${errJson.message || ''} (${errJson.hint})`;
+          else if (errJson.details) errDetail = errJson.details;
+        } catch (e) {}
+        lastError = errDetail;
+      }
+    } catch (err) {
+      lastError = err.message;
     }
-  } catch (err) {
-    console.warn("Supabase fetch notice:", err.message);
-    return { success: false, error: err.message };
   }
+
+  return { success: false, status: 404, error: lastError || 'Table "vault_items" not found in Supabase database.' };
 }
 
 /**
