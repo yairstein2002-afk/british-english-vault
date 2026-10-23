@@ -369,3 +369,5 @@ export async function speakSlowSyllables(word, onStateChange = () => {}) {
     onStateChange({ status: 'error', error });
   }
 }
+
+export const speakPhrase = speakText;
