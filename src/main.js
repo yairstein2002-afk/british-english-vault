@@ -57,7 +57,6 @@ import {
   calculateGoalsStats 
 } from './goals.js';
 import { initLearnUI, closeTopicDetail } from './learn.js';
-import { initDailyPracticeUI } from './dailyPractice.js';
 import {
   getGameStats,
   calculateUserLevel,
@@ -116,8 +115,7 @@ const views = {
   stats: document.getElementById('view-stats'),
   settings: document.getElementById('view-settings'),
   ai: document.getElementById('view-ai'),
-  goals: document.getElementById('view-goals'),
-  dailyPractice: document.getElementById('view-daily-practice')
+  goals: document.getElementById('view-goals')
 };
 
 // ==========================================================================
@@ -176,7 +174,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'daily-practice', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'learn', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -218,7 +216,6 @@ function updateView() {
     phrases: 'Phrases',
     idioms: 'Idioms',
     learn: 'Learn & Practice',
-    'daily-practice': 'תרגול יומי באנגלית',
     games: 'Interactive Games',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
@@ -240,9 +237,6 @@ function updateView() {
     if (currentView === 'learn') {
       if (views.learn) views.learn.classList.add('active');
       initLearnUI();
-    } else if (currentView === 'daily-practice') {
-      if (views.dailyPractice) views.dailyPractice.classList.add('active');
-      initDailyPracticeUI();
     } else if (currentView === 'games') {
       if (views.games) views.games.classList.add('active');
       renderGamesUI();
