@@ -634,6 +634,181 @@ Return a valid JSON object ONLY:
   return null;
 }
 
+// ============================================================================
+// COMPREHENSIVE LINGUISTIC & PREPOSITION AUDIT ENGINE
+// ============================================================================
+export function runLinguisticAudit(cleanText) {
+  const localErrors = [];
+  let polished = cleanText;
+
+  const rules = [
+    // Preposition & Time of day expressions
+    {
+      regex: /\b(and|at|on|to)\s+(the\s+)?(morning)\b/i,
+      matchWord: (m) => m[0],
+      correction: 'in the morning',
+      category: 'Preposition Error',
+      rule: 'In English, to express a time of day, use the preposition "in" ("in the morning"), not "and the morning" or "at the morning". You cannot drink "the morning".'
+    },
+    {
+      regex: /\b(and|at|on|to)\s+(the\s+)?(afternoon)\b/i,
+      matchWord: (m) => m[0],
+      correction: 'in the afternoon',
+      category: 'Preposition Error',
+      rule: 'To indicate when an event occurs during the day, use "in the afternoon", never "and the afternoon" or "at the afternoon".'
+    },
+    {
+      regex: /\b(and|at|on|to)\s+(the\s+)?(evening)\b/i,
+      matchWord: (m) => m[0],
+      correction: 'in the evening',
+      category: 'Preposition Error',
+      rule: 'In English, the correct time phrase is "in the evening", not "and the evening" or "at the evening".'
+    },
+    {
+      regex: /\b(and|in|on)\s+(the\s+)?night\b/i,
+      matchWord: (m) => m[0],
+      correction: 'at night',
+      category: 'Preposition Error',
+      rule: 'For general time of day at night, English pairs with "at" ("at night"), not "and night" or "in the night".'
+    },
+    {
+      regex: /\b(in|at|and)\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => 'on ' + m[2],
+      category: 'Preposition Error',
+      rule: 'Specific days of the week always take the preposition "on" (e.g. "on Monday"), never "in", "at", or "and".'
+    },
+    {
+      regex: /\bmarried\s+with\b/i,
+      matchWord: () => 'married with',
+      correction: 'married to',
+      category: 'Preposition Error',
+      rule: 'In English, one is married "to" someone, rather than "with".'
+    },
+    {
+      regex: /\barrive\s+to\b/i,
+      matchWord: () => 'arrive to',
+      correction: 'arrive at / in',
+      category: 'Preposition Error',
+      rule: 'The verb "arrive" pairs with "at" (for venues and buildings) or "in" (for cities and countries), never "to".'
+    },
+    {
+      regex: /\bgo\s+to\s+home\b/i,
+      matchWord: () => 'go to home',
+      correction: 'go home',
+      category: 'Preposition Redundancy',
+      rule: '"Home" functions as an adverb of direction here and does not take the preposition "to". Say "go home".'
+    },
+    {
+      regex: /\blisten\s+(the\s+music|music|the\s+radio|him|her|them|me)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => 'listen to ' + m[1],
+      category: 'Preposition Error',
+      rule: 'The verb "listen" requires the preposition "to" before an object (e.g. "listen to music", "listen to me").'
+    },
+    {
+      regex: /\bexplain\s+(me|him|her|us|them)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => 'explain to ' + m[1],
+      category: 'Preposition Error',
+      rule: 'In English, you explain something "to" someone (e.g. "explain to me"), not "explain me".'
+    },
+    {
+      regex: /\blook\s+forward\s+to\s+([a-z]+)(?!ing\b)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => 'look forward to ' + m[1] + 'ing',
+      category: 'Gerund after Preposition',
+      rule: 'In the idiom "look forward to", "to" is a preposition, which requires a gerund (-ing) verb form.'
+    },
+    {
+      regex: /\bdespite\s+of\b/i,
+      matchWord: () => 'despite of',
+      correction: 'despite',
+      category: 'Preposition Redundancy',
+      rule: '"Despite" does not take "of". Say "despite" alone or "in spite of".'
+    },
+    {
+      regex: /\balthough\b.*\bbut\b/i,
+      matchWord: () => 'although ... but',
+      correction: 'Although (without "but")',
+      category: 'Conjunction Redundancy',
+      rule: '"Although" and "but" are both contrast connectors. Using both creates grammatical conflict in one sentence.'
+    },
+    {
+      regex: /\bI\s+am\s+agree\b/i,
+      matchWord: () => 'I am agree',
+      correction: 'I agree',
+      category: 'Verb Usage',
+      rule: '"Agree" is an active verb, not an adjective. Say "I agree", without auxiliary "am".'
+    },
+    {
+      regex: /\b(he|she|it)\s+(don't|dont)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => m[1] + " doesn't",
+      category: 'Subject-Verb Agreement',
+      rule: 'Third-person singular subjects (he, she, it) require the negative auxiliary "doesn\'t", not "don\'t".'
+    },
+    {
+      regex: /\b(he|she|it)\s+(have)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => m[1] + ' has',
+      category: 'Subject-Verb Agreement',
+      rule: 'Third-person singular subjects (he, she, it) pair with "has", while plural subjects pair with "have".'
+    },
+    {
+      regex: /\b(they|we|you)\s+(is|was)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => m[1] + ' ' + (m[2].toLowerCase() === 'is' ? 'are' : 'were'),
+      category: 'Subject-Verb Agreement',
+      rule: 'Plural pronouns (they, we, you) must agree with plural verb forms ("are" or "were").'
+    },
+    {
+      regex: /\b(he|she|it)\s+(make|take|think|feel|want|like|need|know|seem)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => m[1] + ' ' + m[2] + 's',
+      category: 'Subject-Verb Agreement',
+      rule: 'In the Present Simple, verbs following third-person singular (he, she, it) require an "-s" suffix.'
+    },
+    {
+      regex: /\byesterday\s+I\s+(go|see|buy|eat|make|meet|take|drink)\b/i,
+      matchWord: (m) => m[0],
+      correction: (m) => {
+        const map = { go: 'went', see: 'saw', buy: 'bought', eat: 'ate', make: 'made', meet: 'met', take: 'took', drink: 'drank' };
+        return 'yesterday I ' + (map[m[1].toLowerCase()] || m[1]);
+      },
+      category: 'Past Tense Consistency',
+      rule: 'Actions completed in the past (such as "yesterday") must use the Past Simple form of the verb.'
+    },
+    {
+      regex: /\b(i)\b/,
+      matchWord: () => 'i',
+      correction: 'I',
+      category: 'Capitalization',
+      rule: 'The personal pronoun "I" must always be written in uppercase in English.'
+    }
+  ];
+
+  rules.forEach(rule => {
+    const match = cleanText.match(rule.regex);
+    if (match) {
+      const mist = typeof rule.matchWord === 'function' ? rule.matchWord(match) : match[0];
+      const corr = typeof rule.correction === 'function' ? rule.correction(match) : rule.correction;
+      localErrors.push({
+        category: rule.category,
+        mistake: mist,
+        correction: corr,
+        rule: rule.rule,
+        explanation: rule.rule
+      });
+      if (typeof corr === 'string' && !/\bor\b/i.test(corr) && !corr.includes('(')) {
+        polished = polished.replace(new RegExp(mist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), corr);
+      }
+    }
+  });
+
+  return { errors: localErrors, polished };
+}
+
 export async function auditWritingSubmission(text, exercise = {}) {
   const errors = [];
   const suggestions = [];
@@ -651,7 +826,8 @@ export async function auditWritingSubmission(text, exercise = {}) {
         category: 'Empty Submission', 
         mistake: 'Blank entry', 
         correction: 'Type your sentence in English',
-        rule: 'Please enter your response before submitting.' 
+        rule: 'Please enter your response before submitting.',
+        explanation: 'Please enter your response before submitting.'
       }],
       suggestions: ['Write your thoughts in the text area above.'],
       strengths: [],
@@ -675,7 +851,8 @@ export async function auditWritingSubmission(text, exercise = {}) {
         category: 'Missing Target Words',
         mistake: `Missing: ${missingWords.join(', ')}`,
         correction: `Include all mandatory words: [${exercise.words.join(', ')}]`,
-        rule: `This challenge requires you to incorporate all target words in your sentence: ${missingWords.join(', ')}.`
+        rule: `This challenge requires you to incorporate all target words in your sentence: ${missingWords.join(', ')}.`,
+        explanation: `This challenge requires you to incorporate all target words in your sentence: ${missingWords.join(', ')}.`
       });
     } else {
       strengths.push(`✨ Successfully incorporated all mandatory target words: [${exercise.words.join(', ')}].`);
@@ -690,7 +867,8 @@ export async function auditWritingSubmission(text, exercise = {}) {
         category: 'Missing Target Word',
         mistake: `Word "${exercise.word}" not found`,
         correction: `Include "${exercise.word}" in your sentence`,
-        rule: `Make sure your sentence includes the target vocabulary word "${exercise.word}".`
+        rule: `Make sure your sentence includes the target vocabulary word "${exercise.word}".`,
+        explanation: `Make sure your sentence includes the target vocabulary word "${exercise.word}".`
       });
     } else {
       strengths.push(`🎯 Great job weaving the target word "${exercise.word}" into your writing.`);
@@ -704,7 +882,8 @@ export async function auditWritingSubmission(text, exercise = {}) {
       category: 'Sentence Count',
       mistake: `Wrote ${sentences.length} sentence(s)`,
       correction: `Aim for at least ${exercise.minSentences} sentences`,
-      rule: `The prompt requests a fuller reflection with at least ${exercise.minSentences} complete thoughts.`
+      rule: `The prompt requests a fuller reflection with at least ${exercise.minSentences} complete thoughts.`,
+      explanation: `The prompt requests a fuller reflection with at least ${exercise.minSentences} complete thoughts.`
     });
   }
 
@@ -713,98 +892,105 @@ export async function auditWritingSubmission(text, exercise = {}) {
       category: 'Word Count',
       mistake: `${wordCount} words written`,
       correction: `Expand to at least ${exercise.minWords} words`,
-      rule: `Expand your ideas with more descriptive adjectives, reasons, and sensory details.`
+      rule: `Expand your ideas with more descriptive adjectives, reasons, and sensory details.`,
+      explanation: `Expand your ideas with more descriptive adjectives, reasons, and sensory details.`
     });
   }
 
-  // 3. AI Grammar & Spell Checking (Gemini AI -> LanguageTool AI -> Local Fallback)
+  // 3. Linguistic & Preposition Audit Engine (Immediate & Accurate)
   let polished = cleanText;
-  let aiSucceeded = false;
+  const lingAudit = runLinguisticAudit(cleanText);
+  if (lingAudit.errors.length > 0) {
+    lingAudit.errors.forEach(err => errors.push(err));
+    polished = lingAudit.polished;
+  }
 
-  // Try Gemini AI first if user has configured API key
+  // 4. Gemini AI Call (if configured by user)
+  let geminiSucceeded = false;
   try {
     const geminiRes = await auditWithGemini(cleanText, exercise);
     if (geminiRes && Array.isArray(geminiRes.errors)) {
-      aiSucceeded = true;
+      geminiSucceeded = true;
       if (geminiRes.polishedText) polished = geminiRes.polishedText;
       if (Array.isArray(geminiRes.strengths)) strengths.push(...geminiRes.strengths);
 
       geminiRes.errors.forEach(err => {
-        // Exclude punctuation errors just in case
         if (!/punctuation|period|comma/i.test(err.category || '') && !/punctuation|period|comma/i.test(err.mistake || '')) {
-          errors.push({
-            category: err.category || 'Grammar',
-            mistake: err.mistake || '',
-            correction: err.correction || '',
-            rule: err.rule || err.explanation || 'Grammatical rule in English',
-            explanation: err.rule || err.explanation || 'Grammatical rule in English'
-          });
+          const already = errors.some(e => e.mistake && e.mistake.toLowerCase().includes((err.mistake || '').toLowerCase()));
+          if (!already) {
+            errors.push({
+              category: err.category || 'Grammar',
+              mistake: err.mistake || '',
+              correction: err.correction || '',
+              rule: err.rule || err.explanation || 'Grammatical rule in English',
+              explanation: err.rule || err.explanation || 'Grammatical rule in English'
+            });
+          }
         }
       });
     }
   } catch (geminiErr) {
-    console.warn('Gemini check error, falling back to LanguageTool:', geminiErr);
+    console.warn('Gemini check error:', geminiErr);
   }
 
-  // If Gemini was not used or failed, use LanguageTool AI
-  if (!aiSucceeded) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6500);
+  // 5. LanguageTool AI (Catches real spelling typos like "drnk" -> "drink", verb tenses, and British English rules)
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6500);
 
-      const body = new URLSearchParams();
-      body.append('text', cleanText);
-      body.append('language', 'en-GB');
+    const body = new URLSearchParams();
+    body.append('text', cleanText);
+    body.append('language', 'en-GB');
 
-      const res = await fetch('https://api.languagetool.org/v2/check', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
+    const res = await fetch('https://api.languagetool.org/v2/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.matches)) {
-          aiSucceeded = true;
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.matches)) {
+        // Filter out punctuation / period / comma rules (NO punctuation penalties as requested!)
+        const validMatches = data.matches.filter(m => {
+          const ruleId = m.rule?.id || '';
+          const issueType = m.rule?.issueType || '';
+          const catId = m.rule?.category?.id || '';
+          if (
+            catId === 'PUNCTUATION' ||
+            catId === 'TYPOGRAPHY' ||
+            issueType === 'whitespace' ||
+            /PUNCTUATION|PERIOD|COMMA|APOSTROPHE|PARAGRAPH_END|WHITESPACE|SENTENCE_END/i.test(ruleId)
+          ) {
+            return false;
+          }
+          return true;
+        });
 
-          // Filter out punctuation / period / comma rules (NO punctuation penalties as requested!)
-          const validMatches = data.matches.filter(m => {
-            const ruleId = m.rule?.id || '';
-            const issueType = m.rule?.issueType || '';
-            const catId = m.rule?.category?.id || '';
-            if (
-              catId === 'PUNCTUATION' ||
-              catId === 'TYPOGRAPHY' ||
-              issueType === 'whitespace' ||
-              /PUNCTUATION|PERIOD|COMMA|APOSTROPHE|PARAGRAPH_END|WHITESPACE|SENTENCE_END/i.test(ruleId)
-            ) {
-              return false;
-            }
-            return true;
-          });
+        // Apply replacements from back to front to construct polished British text
+        const sortedDesc = [...validMatches].sort((a, b) => b.offset - a.offset);
+        for (const m of sortedDesc) {
+          if (m.replacements && m.replacements.length > 0) {
+            const best = m.replacements[0].value;
+            polished = polished.substring(0, m.offset) + best + polished.substring(m.offset + m.length);
+          }
+        }
 
-          // Apply replacements from back to front to construct polished British text
-          const sortedDesc = [...validMatches].sort((a, b) => b.offset - a.offset);
-          for (const m of sortedDesc) {
-            if (m.replacements && m.replacements.length > 0) {
-              const best = m.replacements[0].value;
-              polished = polished.substring(0, m.offset) + best + polished.substring(m.offset + m.length);
-            }
+        // Add each detected error
+        for (const m of validMatches) {
+          const mistakeWord = cleanText.substring(m.offset, m.offset + m.length);
+          const suggested = m.replacements?.[0]?.value || '';
+          const catName = m.rule?.category?.name || (m.rule?.issueType === 'misspelling' ? 'Spelling & Typo' : 'Grammar');
+          let ruleMsg = m.message || m.rule?.description || 'Grammatical rule in British English.';
+
+          if (suggested && !ruleMsg.toLowerCase().includes(suggested.toLowerCase())) {
+            ruleMsg += ` Did you mean "${suggested}"?`;
           }
 
-          // Add each detected error
-          for (const m of validMatches) {
-            const mistakeWord = cleanText.substring(m.offset, m.offset + m.length);
-            const suggested = m.replacements?.[0]?.value || '';
-            const catName = m.rule?.category?.name || (m.rule?.issueType === 'misspelling' ? 'Spelling & Typo' : 'Grammar');
-            let ruleMsg = m.message || m.rule?.description || 'Grammatical rule in British English.';
-
-            if (suggested && !ruleMsg.toLowerCase().includes(suggested.toLowerCase())) {
-              ruleMsg += ` Did you mean "${suggested}"?`;
-            }
-
+          const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(mistakeWord.toLowerCase()));
+          if (!alreadyCaught) {
             errors.push({
               category: catName,
               mistake: mistakeWord,
@@ -815,23 +1001,10 @@ export async function auditWritingSubmission(text, exercise = {}) {
           }
         }
       }
-    } catch (err) {
-      console.warn('LanguageTool AI API call failed or timed out, running local grammar fallback', err);
     }
+  } catch (err) {
+    console.warn('LanguageTool AI API call failed or timed out', err);
   }
-
-  // 4. Secondary Heuristic & Idiom Checks (in case of offline or specific UK idioms)
-  const localErrors = runLocalGrammarChecks(cleanText);
-  localErrors.forEach(loc => {
-    const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(loc.mistake.toLowerCase()));
-    if (!alreadyCaught) {
-      errors.push(loc);
-      // apply to polished text if simple replacement
-      if (loc.correction && typeof loc.correction === 'string') {
-        polished = polished.replace(new RegExp(`\\b${loc.mistake}\\b`, 'gi'), loc.correction);
-      }
-    }
-  });
 
   // Capitalize initial letter and pronoun "I" in polished version
   polished = polished.charAt(0).toUpperCase() + polished.slice(1);
@@ -850,7 +1023,7 @@ export async function auditWritingSubmission(text, exercise = {}) {
   }
 
   // Score calculation (never penalizes missing periods or punctuation)
-  const score = Math.max(20, Math.min(100, 100 - (errors.length * 20)));
+  const score = errors.length === 0 ? 100 : Math.max(20, Math.min(90, 100 - (errors.length * 20)));
 
   return {
     isValid: errors.length === 0,
@@ -860,35 +1033,6 @@ export async function auditWritingSubmission(text, exercise = {}) {
     strengths,
     polishedText: polished
   };
-}
-
-// Offline Heuristic Grammar Checks
-function runLocalGrammarChecks(cleanText) {
-  const localErrors = [];
-
-  const rules = [
-    { regex: /\b(he|she|it)\s+(don't|dont)\b/i, category: 'Subject-Verb Agreement', mistake: "don't", correction: "doesn't", rule: 'In third-person singular (he, she, it), the negative auxiliary verb is "doesn\'t", not "don\'t".' },
-    { regex: /\b(he|she|it)\s+(have)\b/i, category: 'Subject-Verb Agreement', mistake: "have", correction: "has", rule: 'Third-person singular subjects (he, she, it) pair with "has", while plural subjects pair with "have".' },
-    { regex: /\b(they|we|you)\s+(is|was)\b/i, category: 'Subject-Verb Agreement', mistake: "is / was", correction: "are / were", rule: 'Plural pronouns (they, we, you) must agree with plural verbs ("are" or "were").' },
-    { regex: /\bI\s+am\s+agree\b/i, category: 'Verb Usage', mistake: "I am agree", correction: "I agree", rule: '"Agree" is an active verb in English; it does not take the auxiliary "am". Say "I agree".' },
-    { regex: /\bmarried\s+with\b/i, category: 'Preposition Trap', mistake: "married with", correction: "married to", rule: 'In English, one is married "to" someone, rather than "with".' },
-    { regex: /\barrive\s+to\b/i, category: 'Preposition Trap', mistake: "arrive to", correction: "arrive at / in", rule: '"Arrive" pairs with "at" (for venues) or "in" (for cities), never "to".' },
-    { regex: /\bdespite\s+of\b/i, category: 'Preposition Redundancy', mistake: "despite of", correction: "despite", rule: '"Despite" does not take "of". Say "despite" alone or "in spite of".' },
-    { regex: /\b(i)\b/, category: 'Capitalization', mistake: "i", correction: "I", rule: 'The personal pronoun "I" must always be written in uppercase in English.' }
-  ];
-
-  rules.forEach(r => {
-    if (r.regex.test(cleanText)) {
-      localErrors.push({
-        category: r.category,
-        mistake: r.mistake,
-        correction: r.correction,
-        rule: r.rule
-      });
-    }
-  });
-
-  return localErrors;
 }
 
 // ============================================================================
