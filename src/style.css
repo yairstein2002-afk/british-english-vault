@@ -5447,3 +5447,133 @@ button, input, select, textarea {
   border-color: var(--uk-blue);
 }
 
+/* ==========================================================================
+   DAILY PRACTICE - REDESIGNED BUTTONS & WORKBENCH STYLING
+   ========================================================================== */
+.practice-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.6rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: 1px solid rgba(0, 36, 125, 0.2);
+  background: linear-gradient(135deg, var(--uk-blue) 0%, #001C60 100%);
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(0, 36, 125, 0.25);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.practice-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 36, 125, 0.35);
+  background: linear-gradient(135deg, #001C60 0%, #001445 100%);
+}
+
+.practice-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 36, 125, 0.2);
+}
+
+[data-theme="dark"] .practice-btn-primary {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: #0B111E !important;
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 4px 14px rgba(212, 175, 55, 0.25);
+}
+
+[data-theme="dark"] .practice-btn-primary:hover {
+  background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+}
+
+.practice-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.3rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-main);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.practice-btn-secondary:hover {
+  background: var(--input-bg);
+  border-color: var(--uk-blue);
+  color: var(--uk-blue);
+  transform: translateY(-1px);
+}
+
+.practice-btn-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  color: var(--gold-dark);
+  transition: all 0.2s ease;
+}
+
+.practice-btn-hint:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
+
+.practice-mode-card {
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.practice-mode-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+}
+
+.practice-tab-btn {
+  padding: 0.75rem 1.3rem;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.practice-tab-btn:hover {
+  color: var(--text-main);
+  background: rgba(0, 36, 125, 0.03);
+}
+
+.practice-tab-btn.active {
+  font-weight: 800;
+  color: var(--uk-blue);
+  border-bottom-color: var(--uk-blue);
+}
+
+[data-theme="dark"] .practice-tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
