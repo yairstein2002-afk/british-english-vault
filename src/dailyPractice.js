@@ -897,43 +897,9 @@ export async function auditWritingSubmission(text, exercise = {}) {
     });
   }
 
-  // 3. Linguistic & Preposition Audit Engine (Immediate & Accurate)
   let polished = cleanText;
-  const lingAudit = runLinguisticAudit(cleanText);
-  if (lingAudit.errors.length > 0) {
-    lingAudit.errors.forEach(err => errors.push(err));
-    polished = lingAudit.polished;
-  }
 
-  // 4. Gemini AI Call (if configured by user)
-  let geminiSucceeded = false;
-  try {
-    const geminiRes = await auditWithGemini(cleanText, exercise);
-    if (geminiRes && Array.isArray(geminiRes.errors)) {
-      geminiSucceeded = true;
-      if (geminiRes.polishedText) polished = geminiRes.polishedText;
-      if (Array.isArray(geminiRes.strengths)) strengths.push(...geminiRes.strengths);
-
-      geminiRes.errors.forEach(err => {
-        if (!/punctuation|period|comma/i.test(err.category || '') && !/punctuation|period|comma/i.test(err.mistake || '')) {
-          const already = errors.some(e => e.mistake && e.mistake.toLowerCase().includes((err.mistake || '').toLowerCase()));
-          if (!already) {
-            errors.push({
-              category: err.category || 'Grammar',
-              mistake: err.mistake || '',
-              correction: err.correction || '',
-              rule: err.rule || err.explanation || 'Grammatical rule in English',
-              explanation: err.rule || err.explanation || 'Grammatical rule in English'
-            });
-          }
-        }
-      });
-    }
-  } catch (geminiErr) {
-    console.warn('Gemini check error:', geminiErr);
-  }
-
-  // 5. LanguageTool AI (Catches real spelling typos like "drnk" -> "drink", verb tenses, and British English rules)
+  // 3. LanguageTool AI (Catches real spelling typos like "drnk" -> "drink", verb tenses, and British English rules)
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 6500);
@@ -989,21 +955,56 @@ export async function auditWritingSubmission(text, exercise = {}) {
             ruleMsg += ` Did you mean "${suggested}"?`;
           }
 
-          const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(mistakeWord.toLowerCase()));
-          if (!alreadyCaught) {
-            errors.push({
-              category: catName,
-              mistake: mistakeWord,
-              correction: suggested,
-              rule: ruleMsg,
-              explanation: ruleMsg
-            });
-          }
+          errors.push({
+            category: catName,
+            mistake: mistakeWord,
+            correction: suggested,
+            rule: ruleMsg,
+            explanation: ruleMsg
+          });
         }
       }
     }
   } catch (err) {
     console.warn('LanguageTool AI API call failed or timed out', err);
+  }
+
+  // 4. Linguistic & Preposition Audit Engine (Accurately corrects prepositions and idioms on polished text)
+  const lingAudit = runLinguisticAudit(polished);
+  if (lingAudit.errors.length > 0) {
+    lingAudit.errors.forEach(err => {
+      const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(err.mistake.toLowerCase()));
+      if (!alreadyCaught) {
+        errors.push(err);
+      }
+    });
+    polished = lingAudit.polished;
+  }
+
+  // 5. Gemini AI Call (if configured by user)
+  try {
+    const geminiRes = await auditWithGemini(cleanText, exercise);
+    if (geminiRes && Array.isArray(geminiRes.errors)) {
+      if (geminiRes.polishedText) polished = geminiRes.polishedText;
+      if (Array.isArray(geminiRes.strengths)) strengths.push(...geminiRes.strengths);
+
+      geminiRes.errors.forEach(err => {
+        if (!/punctuation|period|comma/i.test(err.category || '') && !/punctuation|period|comma/i.test(err.mistake || '')) {
+          const already = errors.some(e => e.mistake && e.mistake.toLowerCase().includes((err.mistake || '').toLowerCase()));
+          if (!already) {
+            errors.push({
+              category: err.category || 'Grammar',
+              mistake: err.mistake || '',
+              correction: err.correction || '',
+              rule: err.rule || err.explanation || 'Grammatical rule in English',
+              explanation: err.rule || err.explanation || 'Grammatical rule in English'
+            });
+          }
+        }
+      });
+    }
+  } catch (geminiErr) {
+    console.warn('Gemini check error:', geminiErr);
   }
 
   // Capitalize initial letter and pronoun "I" in polished version
