@@ -22,6 +22,7 @@
 
 import { speakText } from './speech.js';
 import { getGeminiApiKey } from './ai.js';
+import { copyTextToClipboard, shareTextContent, showCopyShareToast } from './shareUtils.js';
 
 // STORAGE KEYS
 const STORAGE_KEYS = {
@@ -1796,9 +1797,17 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
 
     <!-- Action Buttons (Modern, Comfortable, NO AI Button) -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
-      <div style="display: flex; gap: 0.8rem; align-items: center;">
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
         <button type="button" id="btn-check-writing" class="practice-btn-primary">
           <i class="fa-solid fa-magnifying-glass-check"></i> <span>Check My Writing & Feedback</span>
+        </button>
+
+        <button type="button" id="btn-copy-practice-writing" class="dw-btn-tool dw-btn-copy" title="Copy written sentence">
+          <i class="fa-regular fa-copy"></i> <span>Copy</span>
+        </button>
+
+        <button type="button" id="btn-share-practice-writing" class="dw-btn-tool dw-btn-share" title="Share sentence">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
         </button>
 
         <button type="button" id="btn-clear-writing" class="practice-btn-secondary">
@@ -2023,6 +2032,31 @@ function bindWorkbenchEvents(container) {
     });
   }
 
+  // Copy & Share for written practice sentence
+  const copyPracticeBtn = document.getElementById('btn-copy-practice-writing');
+  if (copyPracticeBtn && textarea) {
+    copyPracticeBtn.addEventListener('click', () => {
+      const text = textarea.value.trim();
+      if (!text) {
+        showCopyShareToast('Please write your sentence first to copy!', 'fa-circle-exclamation');
+        return;
+      }
+      copyTextToClipboard(text, 'Practice sentence copied to clipboard! 📋');
+    });
+  }
+
+  const sharePracticeBtn = document.getElementById('btn-share-practice-writing');
+  if (sharePracticeBtn && textarea) {
+    sharePracticeBtn.addEventListener('click', () => {
+      const text = textarea.value.trim();
+      if (!text) {
+        showCopyShareToast('Please write your sentence first to share!', 'fa-circle-exclamation');
+        return;
+      }
+      shareTextContent('My British English Writing Practice', text);
+    });
+  }
+
   // Check writing button
   const checkBtn = document.getElementById('btn-check-writing');
   if (checkBtn && textarea) {
@@ -2046,6 +2080,21 @@ function bindWorkbenchEvents(container) {
           fbArea.style.display = 'block';
           fbArea.innerHTML = renderFeedbackCard(feedback, text, curEx, curMode);
           fbArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+          // Bind Copy & Share for Polished Feedback Card
+          const copyPolishedBtn = document.getElementById('btn-copy-practice-polished');
+          if (copyPolishedBtn) {
+            copyPolishedBtn.addEventListener('click', () => {
+              copyTextToClipboard(feedback.polishedText || text, 'Polished British answer copied! 📋');
+            });
+          }
+          const sharePolishedBtn = document.getElementById('btn-share-practice-polished');
+          if (sharePolishedBtn) {
+            sharePolishedBtn.addEventListener('click', () => {
+              const shareContent = `🇬🇧 British English Vault - Writing Practice\n\nOriginal: "${text}"\n\n✨ Polished Version: "${feedback.polishedText}"\n\nQuality Score: ${feedback.score}/100`;
+              shareTextContent('My British English Writing Practice', shareContent);
+            });
+          }
         }
 
         // Record errors if any
@@ -2106,6 +2155,19 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
 
         <button type="button" onclick="this.closest('#writing-feedback-area').style.display='none'" class="icon-btn" aria-label="Close feedback">
           <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Toolbar (Copy & Share) -->
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.6rem 0.9rem; border-radius: 12px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+          Quick Actions:
+        </span>
+        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-practice-polished">
+          <i class="fa-solid fa-copy"></i> <span>Copy Polished Text</span>
+        </button>
+        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-practice-polished">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Polished Answer</span>
         </button>
       </div>
 

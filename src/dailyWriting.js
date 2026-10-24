@@ -15,6 +15,9 @@ import { getGeminiApiKey } from './ai.js';
 import { speakText } from './speech.js';
 import { getSupabaseConfig, upsertItemInSupabase } from './supabase.js';
 import { auditWritingSubmission } from './dailyPractice.js';
+import { showCopyShareToast, copyTextToClipboard, shareTextContent } from './shareUtils.js';
+
+export { showCopyShareToast, copyTextToClipboard, shareTextContent };
 
 // STORAGE KEYS
 const STORAGE_KEYS = {
@@ -586,60 +589,24 @@ function renderDailyWritingLayout(container) {
       </div>
     </div>
 
-    <!-- Mode Selector Navigation Bar (Separate Buttons for Writing, Voice Recording, and Archive) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;">
-      <div style="display: flex; gap: 0.6rem;" id="dw-main-tabs">
-        <button type="button" class="btn-dw-tab ${activeMode === 'write' ? 'active' : ''}" data-mode="write" style="
-          padding: 0.75rem 1.3rem;
-          border: none;
-          background: transparent;
-          font-weight: ${activeMode === 'write' ? '800' : '600'};
-          color: ${activeMode === 'write' ? 'var(--uk-blue)' : 'var(--text-muted)'};
-          border-bottom: 3px solid ${activeMode === 'write' ? 'var(--uk-blue)' : 'transparent'};
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.95rem;
-        ">
-          <i class="fa-solid fa-pen-fancy"></i> <span>Daily Free Writing</span>
+    <!-- Mode Selector Navigation Bar (Redesigned Luxury Segmented Control) -->
+    <div style="margin-bottom: 1.5rem;">
+      <div class="dw-subtab-container" id="dw-main-tabs">
+        <button type="button" class="dw-tab-btn ${activeMode === 'write' ? 'active' : ''}" data-mode="write">
+          <i class="fa-solid fa-pen-nib"></i> <span>Daily Free Writing</span>
         </button>
 
-        <button type="button" class="btn-dw-tab ${activeMode === 'record' ? 'active' : ''}" data-mode="record" style="
-          padding: 0.75rem 1.3rem;
-          border: none;
-          background: transparent;
-          font-weight: ${activeMode === 'record' ? '800' : '600'};
-          color: ${activeMode === 'record' ? '#C8102E' : 'var(--text-muted)'};
-          border-bottom: 3px solid ${activeMode === 'record' ? '#C8102E' : 'transparent'};
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.95rem;
-        ">
+        <button type="button" class="dw-tab-btn ${activeMode === 'record' ? 'active' : ''}" data-mode="record">
           <i class="fa-solid fa-microphone-lines"></i> <span>Voice Recording & Accent Lab</span>
         </button>
 
-        <button type="button" class="btn-dw-tab ${activeMode === 'archive' ? 'active' : ''}" data-mode="archive" style="
-          padding: 0.75rem 1.3rem;
-          border: none;
-          background: transparent;
-          font-weight: ${activeMode === 'archive' ? '800' : '600'};
-          color: ${activeMode === 'archive' ? 'var(--gold-dark, #A6801C)' : 'var(--text-muted)'};
-          border-bottom: 3px solid ${activeMode === 'archive' ? 'var(--gold-dark, #A6801C)' : 'transparent'};
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          font-size: 0.95rem;
-        ">
+        <button type="button" class="dw-tab-btn ${activeMode === 'archive' ? 'active' : ''}" data-mode="archive">
           <i class="fa-solid fa-clock-rotate-left"></i> <span>Past Entries & Date Filter</span>
         </button>
       </div>
 
-      <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
-        <i class="fa-solid fa-database" style="color: #10B981;"></i> Saved to Local Storage & Database
+      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-muted); padding: 0 0.4rem;">
+        <i class="fa-solid fa-shield-check" style="color: #10B981;"></i> Synced to Local Storage & Database
       </div>
     </div>
 
@@ -682,7 +649,7 @@ function renderFreeWritingView(container) {
         </div>
 
         <!-- Quick Inspiration Ideas -->
-        <button type="button" id="btn-inspiration-prompt" class="btn btn-secondary btn-sm" style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem;">
+        <button type="button" id="btn-inspiration-prompt" class="dw-btn-gold">
           <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> <span>Need an idea?</span>
         </button>
       </div>
@@ -714,14 +681,22 @@ function renderFreeWritingView(container) {
         "></textarea>
       </div>
 
-      <!-- Actions -->
+      <!-- Actions Toolbar (Check, Copy, Share, Clear) -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
-        <div style="display: flex; gap: 0.8rem; align-items: center;">
-          <button type="button" id="btn-analyze-text" class="btn btn-primary" style="font-size: 0.95rem; font-weight: 700; padding: 0.7rem 1.5rem; display: flex; align-items: center; gap: 0.5rem; background: var(--uk-blue); border-color: var(--uk-blue);">
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-analyze-text" class="dw-btn-primary">
             <i class="fa-solid fa-magnifying-glass-check"></i> <span>Check & Explain Mistakes</span>
           </button>
 
-          <button type="button" id="btn-clear-text" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.7rem 1rem;">
+          <button type="button" id="btn-copy-writing" class="dw-btn-tool dw-btn-copy" title="Copy written journal text">
+            <i class="fa-regular fa-copy"></i> <span>Copy</span>
+          </button>
+
+          <button type="button" id="btn-share-writing" class="dw-btn-tool dw-btn-share" title="Share journal text">
+            <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+          </button>
+
+          <button type="button" id="btn-clear-text" class="dw-btn-secondary" title="Clear journal text">
             <i class="fa-solid fa-eraser"></i> <span>Clear</span>
           </button>
         </div>
@@ -786,11 +761,36 @@ function bindFreeWritingEvents(container) {
     });
   }
 
+  // Copy & Share written journal text
+  const copyWritingBtn = document.getElementById('btn-copy-writing');
+  if (copyWritingBtn && textarea) {
+    copyWritingBtn.addEventListener('click', () => {
+      const text = textarea.value.trim();
+      if (!text) {
+        showCopyShareToast('Please write something first to copy!', 'fa-circle-exclamation');
+        return;
+      }
+      copyTextToClipboard(text, 'Journal text copied to clipboard! 📋');
+    });
+  }
+
+  const shareWritingBtn = document.getElementById('btn-share-writing');
+  if (shareWritingBtn && textarea) {
+    shareWritingBtn.addEventListener('click', () => {
+      const text = textarea.value.trim();
+      if (!text) {
+        showCopyShareToast('Please write something first to share!', 'fa-circle-exclamation');
+        return;
+      }
+      shareTextContent('My Daily English Journal', text);
+    });
+  }
+
   if (checkBtn && textarea) {
     checkBtn.addEventListener('click', async () => {
       const text = textarea.value.trim();
       if (!text) {
-        alert('Please write something about your day first.');
+        showCopyShareToast('Please write a sentence about your day first.', 'fa-circle-exclamation');
         return;
       }
 
@@ -814,6 +814,21 @@ function bindFreeWritingEvents(container) {
           feedbackArea.style.display = 'block';
           feedbackArea.innerHTML = renderTextFeedbackCard(analysis, text);
           feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+          // Bind Copy & Share for Polished Feedback Card
+          const copyPolishedBtn = document.getElementById('btn-copy-polished');
+          if (copyPolishedBtn) {
+            copyPolishedBtn.addEventListener('click', () => {
+              copyTextToClipboard(analysis.polishedText || text, 'Polished British English copied! 📋');
+            });
+          }
+          const sharePolishedBtn = document.getElementById('btn-share-polished');
+          if (sharePolishedBtn) {
+            sharePolishedBtn.addEventListener('click', () => {
+              const shareContent = `🇬🇧 British English Vault - Daily Journal\n\nOriginal: "${text}"\n\n✨ Polished Version: "${analysis.polishedText}"\n\nQuality Score: ${analysis.score}/100`;
+              shareTextContent('My Polished British English Journal', shareContent);
+            });
+          }
         }
 
         // Save Entry to Database / LocalStorage
@@ -862,6 +877,19 @@ function renderTextFeedbackCard(analysis, rawText) {
 
         <button type="button" onclick="this.closest('#dw-feedback-area').style.display='none'" class="icon-btn" aria-label="Close">
           <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Toolbar (Copy & Share) -->
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.6rem 0.9rem; border-radius: 12px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+          Quick Actions:
+        </span>
+        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-polished">
+          <i class="fa-solid fa-copy"></i> <span>Copy Polished Text</span>
+        </button>
+        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-polished">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Polished Writing</span>
         </button>
       </div>
 
@@ -1026,21 +1054,7 @@ function renderVoiceRecordingView(container) {
         
         <!-- Big Microphone Action Button -->
         <div style="margin-bottom: 1.2rem; position: relative; display: inline-block;">
-          <button type="button" id="btn-toggle-recording" style="
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 4px solid #C8102E;
-            background: #C8102E;
-            color: white;
-            font-size: 2.2rem;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(200, 16, 46, 0.3);
-            transition: all 0.25s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-          ">
+          <button type="button" id="btn-toggle-recording" class="dw-mic-center-btn" title="Click to start/stop speaking">
             <i class="fa-solid fa-microphone" id="mic-icon"></i>
           </button>
         </div>
@@ -1058,11 +1072,21 @@ function renderVoiceRecordingView(container) {
         </div>
       </div>
 
-      <!-- Real-Time Speech Recognition Live Box (NO Word-Repeating) -->
+      <!-- Real-Time Speech Recognition Live Box -->
       <div style="margin-bottom: 1.5rem;">
-        <label style="display: block; font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">
-          🎙️ Live Speech Transcription:
-        </label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            🎙️ Live Speech Transcription:
+          </label>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" id="btn-copy-transcript" class="dw-btn-tool dw-btn-copy" title="Copy spoken transcript">
+              <i class="fa-regular fa-copy"></i> <span>Copy Transcript</span>
+            </button>
+            <button type="button" id="btn-share-transcript" class="dw-btn-tool dw-btn-share" title="Share transcript">
+              <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+            </button>
+          </div>
+        </div>
         <div id="voice-live-transcript-box" style="
           min-height: 90px;
           background: var(--card-bg);
@@ -1090,13 +1114,15 @@ function renderVoiceRecordingView(container) {
 
       <!-- Action Buttons -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
-        <button type="button" id="btn-analyze-recording" class="btn btn-primary" disabled style="font-size: 0.95rem; font-weight: 700; padding: 0.7rem 1.6rem; display: flex; align-items: center; gap: 0.5rem; background: var(--uk-blue); border-color: var(--uk-blue);">
-          <i class="fa-solid fa-chart-line"></i> <span>Analyze Accent, Pronunciation & Grammar</span>
-        </button>
+        <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+          <button type="button" id="btn-analyze-recording" class="dw-btn-primary" disabled>
+            <i class="fa-solid fa-chart-line"></i> <span>Analyze Accent, Pronunciation & Grammar</span>
+          </button>
 
-        <button type="button" id="btn-reset-recording" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.7rem 1rem;">
-          <i class="fa-solid fa-rotate-left"></i> <span>Reset Recording</span>
-        </button>
+          <button type="button" id="btn-reset-recording" class="dw-btn-secondary">
+            <i class="fa-solid fa-rotate-left"></i> <span>Reset Recording</span>
+          </button>
+        </div>
       </div>
 
       <!-- Voice Analysis Result Card -->
@@ -1119,9 +1145,34 @@ function bindVoiceRecordingEvents(container) {
   const audioContainer = document.getElementById('audio-playback-container');
   const audioPlayer = document.getElementById('user-voice-audio-player');
   const resultArea = document.getElementById('voice-analysis-result-area');
+  const copyTranscriptBtn = document.getElementById('btn-copy-transcript');
+  const shareTranscriptBtn = document.getElementById('btn-share-transcript');
 
   let accumulatedFinalText = '';
   let recordedSeconds = 0;
+
+  // Copy & Share for live spoken transcript
+  if (copyTranscriptBtn) {
+    copyTranscriptBtn.addEventListener('click', () => {
+      const text = (currentVoiceTranscript || accumulatedFinalText || '').trim();
+      if (!text) {
+        showCopyShareToast('Speak into the microphone first to copy!', 'fa-circle-exclamation');
+        return;
+      }
+      copyTextToClipboard(text, 'Spoken transcript copied to clipboard! 📋');
+    });
+  }
+
+  if (shareTranscriptBtn) {
+    shareTranscriptBtn.addEventListener('click', () => {
+      const text = (currentVoiceTranscript || accumulatedFinalText || '').trim();
+      if (!text) {
+        showCopyShareToast('Speak into the microphone first to share!', 'fa-circle-exclamation');
+        return;
+      }
+      shareTextContent('My English Spoken Transcript', text);
+    });
+  }
 
   toggleBtn.addEventListener('click', async () => {
     if (!isRecordingActive) {
@@ -1194,6 +1245,7 @@ function bindVoiceRecordingEvents(container) {
         // UI State Updates
         isRecordingActive = true;
         recordingStartTime = Date.now();
+        toggleBtn.classList.add('recording');
         toggleBtn.style.background = '#10B981';
         toggleBtn.style.borderColor = '#10B981';
         micIcon.className = 'fa-solid fa-stop';
@@ -1209,7 +1261,7 @@ function bindVoiceRecordingEvents(container) {
         }, 500);
 
       } catch (err) {
-        alert('Microphone access was denied or not available. Please allow microphone permissions in your browser.');
+        showCopyShareToast('Microphone access denied. Please allow permissions in browser.', 'fa-triangle-exclamation');
       }
     } else {
       // STOP RECORDING
@@ -1226,8 +1278,9 @@ function bindVoiceRecordingEvents(container) {
         try { activeSpeechRecognition.stop(); } catch (e) {}
       }
 
-      toggleBtn.style.background = '#C8102E';
-      toggleBtn.style.borderColor = '#C8102E';
+      toggleBtn.classList.remove('recording');
+      toggleBtn.style.background = '';
+      toggleBtn.style.borderColor = '';
       micIcon.className = 'fa-solid fa-microphone';
       titleEl.innerText = 'Recording Finished!';
       subtitleEl.innerText = 'You can listen back to your recording below, or run the Accent Analysis.';
@@ -1254,8 +1307,9 @@ function bindVoiceRecordingEvents(container) {
     if (resultArea) resultArea.style.display = 'none';
     titleEl.innerText = 'Tap Microphone to Start Speaking';
     subtitleEl.innerText = 'Describe your day, experiences, or thoughts freely in English.';
-    toggleBtn.style.background = '#C8102E';
-    toggleBtn.style.borderColor = '#C8102E';
+    toggleBtn.classList.remove('recording');
+    toggleBtn.style.background = '';
+    toggleBtn.style.borderColor = '';
     micIcon.className = 'fa-solid fa-microphone';
   });
 
@@ -1263,7 +1317,7 @@ function bindVoiceRecordingEvents(container) {
   analyzeBtn.addEventListener('click', async () => {
     const finalTranscript = deduplicateWords(currentVoiceTranscript || '');
     if (!finalTranscript && !recordedAudioBlob) {
-      alert('No speech was detected. Please record a short sentence.');
+      showCopyShareToast('No speech detected. Please speak a sentence first.', 'fa-circle-exclamation');
       return;
     }
 
@@ -1274,6 +1328,22 @@ function bindVoiceRecordingEvents(container) {
       resultArea.style.display = 'block';
       resultArea.innerHTML = renderVoiceAnalysisCard(analysis);
       resultArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Bind Copy & Share for Voice Analysis
+      const copyVoiceBtn = document.getElementById('btn-copy-voice-analysis');
+      if (copyVoiceBtn) {
+        copyVoiceBtn.addEventListener('click', () => {
+          const report = `🎙️ British Accent & Spoken English Report\n\nTranscript: "${analysis.transcript}"\nFluency Score: ${analysis.fluencyScore}/100\nPacing: ${analysis.wpm} WPM (${analysis.pacingBadge})\n\nPolished Version: "${analysis.polishedTranscript || analysis.transcript}"`;
+          copyTextToClipboard(report, 'Voice report copied to clipboard! 📋');
+        });
+      }
+      const shareVoiceBtn = document.getElementById('btn-share-voice-analysis');
+      if (shareVoiceBtn) {
+        shareVoiceBtn.addEventListener('click', () => {
+          const shareContent = `🎙️ British Accent & Spoken English Report\n\nTranscript: "${analysis.transcript}"\n⚡ Pace: ${analysis.wpm} WPM (${analysis.pacingBadge})\nFluency: ${analysis.fluencyScore}/100\n\n✨ Polished: "${analysis.polishedTranscript || analysis.transcript}"`;
+          shareTextContent('My British Accent & Spoken English Report', shareContent);
+        });
+      }
     }
 
     // Save Recording Entry with Audio Blob to IndexedDB & metadata to localStorage
@@ -1303,6 +1373,38 @@ function renderVoiceAnalysisCard(analysis) {
   return `
     <div style="background: var(--card-bg); border: 2px solid var(--uk-blue); border-radius: 16px; padding: 1.6rem; box-shadow: 0 10px 30px rgba(0,0,0,0.06); animation: fade-in 0.3s ease;">
       <!-- Header -->
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(0,36,125,0.1); color: var(--uk-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+            <i class="fa-solid fa-chart-simple"></i>
+          </div>
+          <div>
+            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">
+              🎙️ Accent, Pronunciation & Spoken Grammar Audit
+            </h3>
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Fluency Score: <strong>${analysis.fluencyScore}/100</strong> • Speaking Pace: <strong>${analysis.wpm} WPM</strong> (${analysis.pacingBadge})
+            </div>
+          </div>
+        </div>
+
+        <button type="button" onclick="this.closest('#voice-analysis-result-area').style.display='none'" class="icon-btn" aria-label="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Toolbar (Copy & Share) -->
+      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.6rem 0.9rem; border-radius: 12px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
+          Quick Actions:
+        </span>
+        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-voice-analysis">
+          <i class="fa-solid fa-copy"></i> <span>Copy Spoken Report</span>
+        </button>
+        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-voice-analysis">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Speech Analysis</span>
+        </button>
+      </div>
       <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
         <div style="display: flex; align-items: center; gap: 0.8rem;">
           <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(0,36,125,0.1); color: var(--uk-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
@@ -1577,11 +1679,17 @@ async function applyArchiveFilters() {
                 ${item.wpm ? `<span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600;">• ${item.wpm} WPM</span>` : ''}
               </div>
 
-              <div style="display: flex; align-items: center; gap: 0.8rem;">
-                <span style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.35rem; margin-right: 0.3rem;">
                   <i class="fa-regular fa-clock"></i> ${formattedDate} at ${formattedTime}
                 </span>
-                <button type="button" class="btn-delete-entry" data-entry-id="${item.id}" style="border: none; background: transparent; color: #EF4444; cursor: pointer; font-size: 0.85rem;" title="Delete Entry">
+                <button type="button" class="dw-btn-tool dw-btn-copy btn-archive-copy" data-entry-id="${item.id}" title="Copy entry text">
+                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                </button>
+                <button type="button" class="dw-btn-tool dw-btn-share btn-archive-share" data-entry-id="${item.id}" title="Share entry">
+                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                </button>
+                <button type="button" class="btn-delete-entry" data-entry-id="${item.id}" style="border: 1px solid rgba(239,68,68,0.25); background: rgba(239,68,68,0.06); color: #EF4444; border-radius: 8px; padding: 0.45rem 0.65rem; cursor: pointer; font-size: 0.85rem;" title="Delete Entry">
                   <i class="fa-solid fa-trash-can"></i>
                 </button>
               </div>
@@ -1640,6 +1748,30 @@ async function applyArchiveFilters() {
     }
   });
 
+  // Copy Archive Entry Event
+  container.querySelectorAll('.btn-archive-copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const entryId = btn.getAttribute('data-entry-id');
+      const entry = entries.find(e => e.id === entryId);
+      if (entry) {
+        const textToCopy = entry.polishedText || entry.rawText;
+        copyTextToClipboard(textToCopy, 'Archived entry copied to clipboard! 📋');
+      }
+    });
+  });
+
+  // Share Archive Entry Event
+  container.querySelectorAll('.btn-archive-share').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const entryId = btn.getAttribute('data-entry-id');
+      const entry = entries.find(e => e.id === entryId);
+      if (entry) {
+        const shareContent = `🇬🇧 British English Vault - Entry\n\n"${entry.rawText}"\n\n${entry.polishedText ? `✨ Polished: "${entry.polishedText}"\n` : ''}Score: ${entry.score || 100}/100`;
+        shareTextContent('My British English Journal Entry', shareContent);
+      }
+    });
+  });
+
   // Delete Entry Event
   container.querySelectorAll('.btn-delete-entry').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1656,7 +1788,7 @@ async function applyArchiveFilters() {
 // MAIN TAB SWITCHING
 // ============================================================================
 function bindDailyWritingEvents(container) {
-  container.querySelectorAll('#dw-main-tabs .btn-dw-tab').forEach(btn => {
+  container.querySelectorAll('#dw-main-tabs .dw-tab-btn, #dw-main-tabs .btn-dw-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       const mode = btn.getAttribute('data-mode');
       if (mode && mode !== activeMode) {
