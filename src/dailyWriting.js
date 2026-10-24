@@ -14,6 +14,7 @@
 import { getGeminiApiKey } from './ai.js';
 import { speakText } from './speech.js';
 import { getSupabaseConfig, upsertItemInSupabase } from './supabase.js';
+import { auditWritingSubmission } from './dailyPractice.js';
 
 // STORAGE KEYS
 const STORAGE_KEYS = {
@@ -786,33 +787,58 @@ function bindFreeWritingEvents(container) {
   }
 
   if (checkBtn && textarea) {
-    checkBtn.addEventListener('click', () => {
+    checkBtn.addEventListener('click', async () => {
       const text = textarea.value.trim();
       if (!text) {
         alert('Please write something about your day first.');
         return;
       }
 
-      const analysis = analyzeDailyWriting(text);
-      if (feedbackArea) {
-        feedbackArea.style.display = 'block';
-        feedbackArea.innerHTML = renderTextFeedbackCard(analysis, text);
-        feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      const origHtml = checkBtn.innerHTML;
+      checkBtn.disabled = true;
+      checkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing with AI...';
+
+      try {
+        const feedback = await auditWritingSubmission(text, {});
+        const analysis = {
+          isValid: feedback.isValid,
+          score: feedback.score,
+          wordCount: text.split(/\s+/).filter(Boolean).length,
+          errors: feedback.errors.map(e => ({
+            category: e.category,
+            mistake: e.mistake,
+            correction: e.correction,
+            explanation: e.rule || e.explanation
+          })),
+          polishedText: feedback.polishedText,
+          tips: feedback.strengths || []
+        };
+
+        if (feedbackArea) {
+          feedbackArea.style.display = 'block';
+          feedbackArea.innerHTML = renderTextFeedbackCard(analysis, text);
+          feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Save Entry to Database / LocalStorage
+        saveDailyWritingEntry({
+          type: 'text',
+          rawText: text,
+          polishedText: analysis.polishedText,
+          wordCount: analysis.wordCount,
+          score: analysis.score,
+          errors: analysis.errors
+        });
+
+        // Update Header Streak and Stats
+        const streakEl = document.getElementById('ui-dw-streak');
+        if (streakEl) streakEl.innerHTML = `🔥 ${getDailyStreak()} <span style="font-size: 0.75rem; font-weight: 600;">Days</span>`;
+      } catch (err) {
+        console.error('Error during AI free writing check:', err);
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = origHtml;
       }
-
-      // Save Entry to Database / LocalStorage
-      saveDailyWritingEntry({
-        type: 'text',
-        rawText: text,
-        polishedText: analysis.polishedText,
-        wordCount: analysis.wordCount,
-        score: analysis.score,
-        errors: analysis.errors
-      });
-
-      // Update Header Streak and Stats
-      const streakEl = document.getElementById('ui-dw-streak');
-      if (streakEl) streakEl.innerHTML = `🔥 ${getDailyStreak()} <span style="font-size: 0.75rem; font-weight: 600;">Days</span>`;
     });
   }
 }

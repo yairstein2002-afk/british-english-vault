@@ -21,6 +21,7 @@
  */
 
 import { speakText } from './speech.js';
+import { getGeminiApiKey } from './ai.js';
 
 // STORAGE KEYS
 const STORAGE_KEYS = {
@@ -551,9 +552,89 @@ export function recordDetectedErrors(errorList) {
 }
 
 // ============================================================================
-// DEEP GRAMMAR AUDITING ENGINE (NO PUNCTUATION / PERIOD PENALTY)
+// REAL AI-POWERED GRAMMAR & SPELL AUDITING ENGINE (NO PUNCTUATION PENALTY)
 // ============================================================================
-export function auditWritingSubmission(text, exercise) {
+async function auditWithGemini(cleanText, exercise) {
+  const apiKey = getGeminiApiKey();
+  if (!apiKey) return null;
+
+  const prompt = `You are an expert British English grammar examiner and writing tutor.
+Student's text: "${cleanText}"
+${exercise?.prompt ? `Exercise Prompt: "${exercise.prompt}"` : ''}
+
+CRITICAL RULES:
+1. Detect ALL real spelling mistakes, typos (e.g. "drnk" -> "drink"), incorrect verb tenses, subject-verb disagreements, incorrect prepositions, and improper word choices.
+2. DO NOT flag or penalize missing punctuation, missing commas, or missing periods at the end of sentences.
+3. For each error, provide the exact mistaken word/phrase, the correct British English replacement, the grammatical category, and a clear explanation in English of why it is an error according to the rules of English.
+4. Provide a polished version of the sentence in natural British English.
+
+Return a valid JSON object ONLY:
+{
+  "errors": [
+    {
+      "category": "Spelling & Typo",
+      "mistake": "drnk",
+      "correction": "drink",
+      "rule": "Spelling mistake: 'drnk' is not a recognized English word; the correct spelling is 'drink'."
+    }
+  ],
+  "polishedText": "The fully corrected sentence in natural British English.",
+  "strengths": ["One or two specific positive comments about the student's writing."]
+}`;
+
+  const models = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+  const cachedModel = localStorage.getItem('bev_working_gemini_model');
+  if (cachedModel && models.includes(cachedModel)) {
+    models.splice(models.indexOf(cachedModel), 1);
+    models.unshift(cachedModel);
+  }
+
+  for (const model of models) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 7000);
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.1,
+            maxOutputTokens: 1000
+          }
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      if (res.ok) {
+        const json = await res.json();
+        const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          localStorage.setItem('bev_working_gemini_model', model);
+          let cleaned = text.trim();
+          if (cleaned.startsWith('```')) {
+            cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
+          }
+          const s = cleaned.indexOf('{');
+          const e = cleaned.lastIndexOf('}');
+          if (s !== -1 && e !== -1 && e > s) {
+            cleaned = cleaned.substring(s, e + 1);
+          }
+          const parsed = JSON.parse(cleaned);
+          if (parsed && Array.isArray(parsed.errors)) {
+            return parsed;
+          }
+        }
+      }
+    } catch (e) {
+      // Continue to next model or LanguageTool fallback
+    }
+  }
+  return null;
+}
+
+export async function auditWritingSubmission(text, exercise = {}) {
   const errors = [];
   const suggestions = [];
   const strengths = [];
@@ -578,7 +659,7 @@ export function auditWritingSubmission(text, exercise) {
     };
   }
 
-  // 1. Mandatory Target Words Check
+  // 1. Mandatory Target Words Check (for Sentence Builder)
   if (exercise.words && exercise.words.length > 0) {
     const missingWords = [];
     exercise.words.forEach(w => {
@@ -616,7 +697,7 @@ export function auditWritingSubmission(text, exercise) {
     }
   }
 
-  // 2. Minimum Sentences / Word Count Check (Gentle guide, not punitive on punctuation)
+  // 2. Minimum Sentences / Word Count Check (Gentle guide)
   const sentences = cleanText.split(/[.!?]+/).map(s => s.trim()).filter(Boolean);
   if (exercise.minSentences && sentences.length < exercise.minSentences) {
     errors.push({
@@ -636,186 +717,128 @@ export function auditWritingSubmission(text, exercise) {
     });
   }
 
-  // 3. Subject-Verb Agreement checks
-  const agreementPatterns = [
-    { 
-      regex: /\b(he|she|it)\s+(don't|dont)\b/i, 
-      category: 'Subject-Verb Agreement', 
-      mistake: 'don\'t (with he/she/it)', 
-      correction: 'doesn\'t', 
-      rule: 'In third-person singular (he, she, it), the negative auxiliary verb is "doesn\'t" (does not), not "don\'t".' 
-    },
-    { 
-      regex: /\b(he|she|it)\s+(have)\b/i, 
-      category: 'Subject-Verb Agreement', 
-      mistake: 'have (with he/she/it)', 
-      correction: 'has', 
-      rule: 'Third-person singular subjects (he, she, it) pair with "has", while plural subjects pair with "have".' 
-    },
-    { 
-      regex: /\b(they|we|you)\s+(is|was)\b/i, 
-      category: 'Subject-Verb Agreement', 
-      mistake: 'is / was (with plural subject)', 
-      correction: 'are / were', 
-      rule: 'Plural pronouns (they, we, you) must agree with plural verbs ("are" in the present, "were" in the past).' 
-    },
-    { 
-      regex: /\b(he|she|it)\s+(go|like|want|need|make|take|know|think)\b/i, 
-      category: 'Subject-Verb Agreement', 
-      mistake: 'Missing -s suffix', 
-      correction: 'Add -s or -es (e.g., goes, likes, wants)', 
-      rule: 'In the Present Simple, verbs following "he", "she", or "it" require an "-s" or "-es" suffix.' 
-    },
-    { 
-      regex: /\b(there)\s+is\s+([0-9]+|many|several|multiple|a\s+lot\s+of)\s+([a-z]+s)\b/i, 
-      category: 'Plural Agreement', 
-      mistake: 'there is (before plural)', 
-      correction: 'there are', 
-      rule: 'When describing multiple entities or people, use existential "there are", not "there is".' 
-    }
-  ];
+  // 3. AI Grammar & Spell Checking (Gemini AI -> LanguageTool AI -> Local Fallback)
+  let polished = cleanText;
+  let aiSucceeded = false;
 
-  agreementPatterns.forEach(pat => {
-    if (pat.regex.test(cleanText)) {
-      errors.push({
-        category: pat.category,
-        mistake: pat.mistake,
-        correction: pat.correction,
-        rule: pat.rule
+  // Try Gemini AI first if user has configured API key
+  try {
+    const geminiRes = await auditWithGemini(cleanText, exercise);
+    if (geminiRes && Array.isArray(geminiRes.errors)) {
+      aiSucceeded = true;
+      if (geminiRes.polishedText) polished = geminiRes.polishedText;
+      if (Array.isArray(geminiRes.strengths)) strengths.push(...geminiRes.strengths);
+
+      geminiRes.errors.forEach(err => {
+        // Exclude punctuation errors just in case
+        if (!/punctuation|period|comma/i.test(err.category || '') && !/punctuation|period|comma/i.test(err.mistake || '')) {
+          errors.push({
+            category: err.category || 'Grammar',
+            mistake: err.mistake || '',
+            correction: err.correction || '',
+            rule: err.rule || err.explanation || 'Grammatical rule in English',
+            explanation: err.rule || err.explanation || 'Grammatical rule in English'
+          });
+        }
       });
+    }
+  } catch (geminiErr) {
+    console.warn('Gemini check error, falling back to LanguageTool:', geminiErr);
+  }
+
+  // If Gemini was not used or failed, use LanguageTool AI
+  if (!aiSucceeded) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6500);
+
+      const body = new URLSearchParams();
+      body.append('text', cleanText);
+      body.append('language', 'en-GB');
+
+      const res = await fetch('https://api.languagetool.org/v2/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.matches)) {
+          aiSucceeded = true;
+
+          // Filter out punctuation / period / comma rules (NO punctuation penalties as requested!)
+          const validMatches = data.matches.filter(m => {
+            const ruleId = m.rule?.id || '';
+            const issueType = m.rule?.issueType || '';
+            const catId = m.rule?.category?.id || '';
+            if (
+              catId === 'PUNCTUATION' ||
+              catId === 'TYPOGRAPHY' ||
+              issueType === 'whitespace' ||
+              /PUNCTUATION|PERIOD|COMMA|APOSTROPHE|PARAGRAPH_END|WHITESPACE|SENTENCE_END/i.test(ruleId)
+            ) {
+              return false;
+            }
+            return true;
+          });
+
+          // Apply replacements from back to front to construct polished British text
+          const sortedDesc = [...validMatches].sort((a, b) => b.offset - a.offset);
+          for (const m of sortedDesc) {
+            if (m.replacements && m.replacements.length > 0) {
+              const best = m.replacements[0].value;
+              polished = polished.substring(0, m.offset) + best + polished.substring(m.offset + m.length);
+            }
+          }
+
+          // Add each detected error
+          for (const m of validMatches) {
+            const mistakeWord = cleanText.substring(m.offset, m.offset + m.length);
+            const suggested = m.replacements?.[0]?.value || '';
+            const catName = m.rule?.category?.name || (m.rule?.issueType === 'misspelling' ? 'Spelling & Typo' : 'Grammar');
+            let ruleMsg = m.message || m.rule?.description || 'Grammatical rule in British English.';
+
+            if (suggested && !ruleMsg.toLowerCase().includes(suggested.toLowerCase())) {
+              ruleMsg += ` Did you mean "${suggested}"?`;
+            }
+
+            errors.push({
+              category: catName,
+              mistake: mistakeWord,
+              correction: suggested,
+              rule: ruleMsg,
+              explanation: ruleMsg
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.warn('LanguageTool AI API call failed or timed out, running local grammar fallback', err);
+    }
+  }
+
+  // 4. Secondary Heuristic & Idiom Checks (in case of offline or specific UK idioms)
+  const localErrors = runLocalGrammarChecks(cleanText);
+  localErrors.forEach(loc => {
+    const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(loc.mistake.toLowerCase()));
+    if (!alreadyCaught) {
+      errors.push(loc);
+      // apply to polished text if simple replacement
+      if (loc.correction && typeof loc.correction === 'string') {
+        polished = polished.replace(new RegExp(`\\b${loc.mistake}\\b`, 'gi'), loc.correction);
+      }
     }
   });
 
-  // 4. Common Verbs & Idiomatic Traps
-  const idiomTraps = [
-    { 
-      regex: /\bi\s+am\s+agree\b/i, 
-      category: 'Verb Usage', 
-      mistake: 'I am agree', 
-      correction: 'I agree', 
-      rule: '"Agree" is an active verb in English; it does not take the auxiliary "am". Say "I agree".' 
-    },
-    { 
-      regex: /\bmarried\s+with\b/i, 
-      category: 'Preposition Trap', 
-      mistake: 'married with', 
-      correction: 'married to', 
-      rule: 'In English, one is married "to" someone, rather than "with".' 
-    },
-    { 
-      regex: /\blisten\s+([a-z]+)\b/i, 
-      test: /\blisten\s+(the|music|her|him|to)\b/i, 
-      exception: /\blisten\s+to\b/i, 
-      category: 'Preposition Trap', 
-      mistake: 'listen without "to"', 
-      correction: 'listen to', 
-      rule: 'The verb "listen" requires the dependent preposition "to" before an object (e.g., "listen to music").' 
-    },
-    { 
-      regex: /\barrive\s+to\b/i, 
-      category: 'Preposition Trap', 
-      mistake: 'arrive to', 
-      correction: 'arrive at / in', 
-      rule: '"Arrive" pairs with "at" (for venues and buildings) or "in" (for cities and countries), never "to".' 
-    },
-    { 
-      regex: /\blook\s+forward\s+to\s+([a-z]+)(?!ing)\b/i, 
-      category: 'Gerund after Preposition', 
-      mistake: 'look forward to + base verb', 
-      correction: 'look forward to + [verb]-ing', 
-      rule: 'In "look forward to", "to" functions as a preposition, requiring a gerund noun phrase (-ing).' 
-    },
-    { 
-      regex: /\bdespite\s+of\b/i, 
-      category: 'Preposition Redundancy', 
-      mistake: 'despite of', 
-      correction: 'despite (or in spite of)', 
-      rule: '"Despite" does not take "of". Use either "despite" alone or the phrase "in spite of".' 
-    },
-    { 
-      regex: /\balthough\b.*\bbut\b/i, 
-      category: 'Conjunction Redundancy', 
-      mistake: 'although ... but', 
-      correction: 'Use either "Although" OR "but"', 
-      rule: 'Both "Although" and "but" express contrast; using both in one sentence creates grammatical conflict.' 
-    }
-  ];
+  // Capitalize initial letter and pronoun "I" in polished version
+  polished = polished.charAt(0).toUpperCase() + polished.slice(1);
+  polished = polished.replace(/\bi\b/g, 'I');
+  if (!/[.!?]$/.test(polished)) polished += '.';
 
-  idiomTraps.forEach(trap => {
-    if (trap.regex.test(cleanText)) {
-      if (trap.exception && trap.exception.test(cleanText)) return;
-      errors.push({
-        category: trap.category,
-        mistake: trap.mistake,
-        correction: trap.correction,
-        rule: trap.rule
-      });
-    }
-  });
-
-  // 5. Article Misuse (a vs an)
-  const matchAn = cleanText.match(/\ban\s+([bcdfghjklmnpqrstvwxyz][a-z]+)\b/i);
-  if (matchAn && !/hour|honest|honor/i.test(matchAn[1])) {
-    errors.push({
-      category: 'Article Misuse (a / an)',
-      mistake: `an ${matchAn[1]}`,
-      correction: `a ${matchAn[1]}`,
-      rule: 'Use the indefinite article "a" before words beginning with a consonant sound.'
-    });
-  }
-
-  const matchA = cleanText.match(/\ba\s+([aeiou][a-z]+)\b/i);
-  if (matchA && !/university|unique|uniform|european|user/i.test(matchA[1])) {
-    errors.push({
-      category: 'Article Misuse (a / an)',
-      mistake: `a ${matchA[1]}`,
-      correction: `an ${matchA[1]}`,
-      rule: 'Use the indefinite article "an" before words starting with vowel sounds (a, e, i, o, u).'
-    });
-  }
-
-  // 6. Capitalization of pronoun "I" (NOTE: Punctuation/periods explicitly excluded from errors as requested!)
-  if (/\b(i)\b/.test(cleanText)) {
-    errors.push({
-      category: 'Capitalization',
-      mistake: 'i (lowercase)',
-      correction: 'I (uppercase)',
-      rule: 'The personal pronoun "I" is always written in uppercase in English.'
-    });
-  }
-
-  // 7. Common Typos & Spelling Mistakes
-  const typoDict = {
-    'definately': 'definitely',
-    'seperate': 'separate',
-    'untill': 'until',
-    'goverment': 'government',
-    'recieve': 'receive',
-    'beleive': 'believe',
-    'wich': 'which',
-    'becuase': 'because',
-    'neccessary': 'necessary',
-    'occured': 'occurred',
-    'alot': 'a lot',
-    'tommorow': 'tomorrow',
-    'enviroment': 'environment',
-    'truely': 'truly',
-    'intresting': 'interesting'
-  };
-
-  Object.entries(typoDict).forEach(([typo, fix]) => {
-    const typoRegex = new RegExp(`\\b${typo}\\b`, 'i');
-    if (typoRegex.test(cleanText)) {
-      errors.push({
-        category: 'Spelling & Typo',
-        mistake: typo,
-        correction: fix,
-        rule: `The standard spelling is "${fix}".`
-      });
-    }
-  });
-
-  // Calculate Strengths
+  // Strengths
   if (wordCount >= 14) {
     strengths.push(`Rich sentence length (${wordCount} words) showcasing natural descriptive ability.`);
   }
@@ -826,21 +849,8 @@ export function auditWritingSubmission(text, exercise) {
     strengths.push('Flawless grammar and spelling! No structural or vocabulary mistakes detected.');
   }
 
-  // Clean Polish Text (adds period for presentation without error penalty)
-  let polished = cleanText;
-  polished = polished.charAt(0).toUpperCase() + polished.slice(1);
-  polished = polished.replace(/\bi\b/g, 'I');
-  Object.entries(typoDict).forEach(([typo, fix]) => {
-    polished = polished.replace(new RegExp(`\\b${typo}\\b`, 'gi'), fix);
-  });
-  polished = polished.replace(/\b(she|he|it)\s+(don't|dont)\b/gi, '$1 doesn\'t');
-  polished = polished.replace(/\bI\s+am\s+agree\b/gi, 'I agree');
-  polished = polished.replace(/\bmarried\s+with\b/gi, 'married to');
-  polished = polished.replace(/\bdespite\s+of\b/gi, 'despite');
-  if (!/[.!?]$/.test(polished)) polished += '.';
-
-  // Calculate Score (no deductions for missing periods or punctuation)
-  const score = Math.max(20, Math.min(100, 100 - (errors.length * 15)));
+  // Score calculation (never penalizes missing periods or punctuation)
+  const score = Math.max(20, Math.min(100, 100 - (errors.length * 20)));
 
   return {
     isValid: errors.length === 0,
@@ -850,6 +860,35 @@ export function auditWritingSubmission(text, exercise) {
     strengths,
     polishedText: polished
   };
+}
+
+// Offline Heuristic Grammar Checks
+function runLocalGrammarChecks(cleanText) {
+  const localErrors = [];
+
+  const rules = [
+    { regex: /\b(he|she|it)\s+(don't|dont)\b/i, category: 'Subject-Verb Agreement', mistake: "don't", correction: "doesn't", rule: 'In third-person singular (he, she, it), the negative auxiliary verb is "doesn\'t", not "don\'t".' },
+    { regex: /\b(he|she|it)\s+(have)\b/i, category: 'Subject-Verb Agreement', mistake: "have", correction: "has", rule: 'Third-person singular subjects (he, she, it) pair with "has", while plural subjects pair with "have".' },
+    { regex: /\b(they|we|you)\s+(is|was)\b/i, category: 'Subject-Verb Agreement', mistake: "is / was", correction: "are / were", rule: 'Plural pronouns (they, we, you) must agree with plural verbs ("are" or "were").' },
+    { regex: /\bI\s+am\s+agree\b/i, category: 'Verb Usage', mistake: "I am agree", correction: "I agree", rule: '"Agree" is an active verb in English; it does not take the auxiliary "am". Say "I agree".' },
+    { regex: /\bmarried\s+with\b/i, category: 'Preposition Trap', mistake: "married with", correction: "married to", rule: 'In English, one is married "to" someone, rather than "with".' },
+    { regex: /\barrive\s+to\b/i, category: 'Preposition Trap', mistake: "arrive to", correction: "arrive at / in", rule: '"Arrive" pairs with "at" (for venues) or "in" (for cities), never "to".' },
+    { regex: /\bdespite\s+of\b/i, category: 'Preposition Redundancy', mistake: "despite of", correction: "despite", rule: '"Despite" does not take "of". Say "despite" alone or "in spite of".' },
+    { regex: /\b(i)\b/, category: 'Capitalization', mistake: "i", correction: "I", rule: 'The personal pronoun "I" must always be written in uppercase in English.' }
+  ];
+
+  rules.forEach(r => {
+    if (r.regex.test(cleanText)) {
+      localErrors.push({
+        category: r.category,
+        mistake: r.mistake,
+        correction: r.correction,
+        rule: r.rule
+      });
+    }
+  });
+
+  return localErrors;
 }
 
 // ============================================================================
@@ -1359,42 +1398,53 @@ function bindWorkbenchEvents(container) {
   // Check writing button
   const checkBtn = document.getElementById('btn-check-writing');
   if (checkBtn && textarea) {
-    checkBtn.addEventListener('click', () => {
+    checkBtn.addEventListener('click', async () => {
       const text = textarea.value.trim();
       const exerciseList = getFilteredExerciseList(activeMode);
       const curEx = exerciseList[currentExerciseIndex % exerciseList.length];
       const curMode = WRITING_MODES.find(m => m.id === activeMode);
 
-      const feedback = auditWritingSubmission(text, curEx);
-      lastCheckedFeedback = feedback;
+      const originalHtml = checkBtn.innerHTML;
+      checkBtn.disabled = true;
+      checkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Checking with AI...</span>';
 
-      // Render feedback UI
-      const fbArea = document.getElementById('writing-feedback-area');
-      if (fbArea) {
-        fbArea.style.display = 'block';
-        fbArea.innerHTML = renderFeedbackCard(feedback, text, curEx, curMode);
-        fbArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+      try {
+        const feedback = await auditWritingSubmission(text, curEx);
+        lastCheckedFeedback = feedback;
 
-      // Record errors if any
-      if (feedback.errors && feedback.errors.length > 0) {
-        recordDetectedErrors(feedback.errors);
-      }
+        // Render feedback UI
+        const fbArea = document.getElementById('writing-feedback-area');
+        if (fbArea) {
+          fbArea.style.display = 'block';
+          fbArea.innerHTML = renderFeedbackCard(feedback, text, curEx, curMode);
+          fbArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
 
-      // If valid or decent score, award XP & streak
-      if (feedback.isValid || feedback.score >= 70) {
-        const rewardXP = curMode ? curMode.xpReward : 25;
-        recordWritingSessionSuccess(rewardXP);
-        saveWritingHistoryItem({
-          modeId: curMode.id,
-          modeTitle: curMode.title,
-          inputText: text,
-          polishedText: feedback.polishedText,
-          score: feedback.score,
-          xpEarned: rewardXP,
-          errorsCount: feedback.errors.length
-        });
-        updateStatsHeader();
+        // Record errors if any
+        if (feedback.errors && feedback.errors.length > 0) {
+          recordDetectedErrors(feedback.errors);
+        }
+
+        // If valid or decent score, award XP & streak
+        if (feedback.isValid || feedback.score >= 70) {
+          const rewardXP = curMode ? curMode.xpReward : 25;
+          recordWritingSessionSuccess(rewardXP);
+          saveWritingHistoryItem({
+            modeId: curMode.id,
+            modeTitle: curMode.title,
+            inputText: text,
+            polishedText: feedback.polishedText,
+            score: feedback.score,
+            xpEarned: rewardXP,
+            errorsCount: feedback.errors.length
+          });
+          updateStatsHeader();
+        }
+      } catch (err) {
+        console.error('Error during AI writing check:', err);
+      } finally {
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = originalHtml;
       }
     });
   }
