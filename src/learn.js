@@ -4,6 +4,7 @@
 
 import { LEARN_CATEGORIES, LEARN_TOPICS, GRAMMAR_CHECKLIST, WHERE_TO_START_GUIDE } from './learnData.js';
 import { speakText } from './speech.js';
+import { copyTextToClipboard, shareTextContent } from './shareUtils.js';
 
 let activeCategory = 'all';
 let activeTopicId = null;
@@ -690,6 +691,29 @@ function renderTopicDetailContent(topic) {
       renderTopicDetailContent(topic);
     });
   }
+
+  // Bind Copy & Share for Learn Practice
+  const copyLearnPractice = document.getElementById('btn-copy-learn-practice');
+  if (copyLearnPractice) {
+    copyLearnPractice.addEventListener('click', () => {
+      const questions = topic.practice || [];
+      const correct = Object.keys(practiceAnswers).filter(k => questions[k] && questions[k].correctIndex === practiceAnswers[k]).length;
+      const scorePct = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+      const summary = `🇬🇧 British English Vault - Grammar Practice: ${topic.title}\nScore: ${correct}/${questions.length} (${scorePct}%)\nMaster British English!`;
+      copyTextToClipboard(summary, 'Practice score copied to clipboard! 📋');
+    });
+  }
+
+  const shareLearnPractice = document.getElementById('btn-share-learn-practice');
+  if (shareLearnPractice) {
+    shareLearnPractice.addEventListener('click', () => {
+      const questions = topic.practice || [];
+      const correct = Object.keys(practiceAnswers).filter(k => questions[k] && questions[k].correctIndex === practiceAnswers[k]).length;
+      const scorePct = questions.length ? Math.round((correct / questions.length) * 100) : 0;
+      const summary = `🇬🇧 British English Vault - Grammar Practice: ${topic.title}\nScore: ${correct}/${questions.length} (${scorePct}%)\nMaster British English!`;
+      shareTextContent(`Grammar Practice: ${topic.title}`, summary);
+    });
+  }
 }
 
 function renderPracticeQuestions(topic) {
@@ -769,6 +793,14 @@ function renderPracticeQuestions(topic) {
       </div>
       <h3>Practice Complete!</h3>
       <p style="font-size: 1.1rem; font-weight: 700; margin: 0.5rem 0;">Score: ${correctCount} / ${questions.length} (${scorePct}%)</p>
+      <div style="display: flex; gap: 0.6rem; justify-content: center; margin: 1rem 0; flex-wrap: wrap;">
+        <button type="button" class="practice-btn-copy" id="btn-copy-learn-practice" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;" title="Copy quiz score">
+          <i class="fa-regular fa-copy"></i> <span>Copy Score</span>
+        </button>
+        <button type="button" class="practice-btn-share" id="btn-share-learn-practice" style="padding: 0.55rem 1.1rem; font-size: 0.88rem;" title="Share quiz score">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Score</span>
+        </button>
+      </div>
       <button class="btn btn-primary" id="btn-retry-topic-practice">
         <i class="fa-solid fa-rotate-right"></i> Retry Practice
       </button>

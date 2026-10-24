@@ -1699,6 +1699,28 @@ function getFilteredExerciseList(modeId) {
   return filtered.length > 0 ? filtered : list;
 }
 
+function getExercisePromptText(exercise, mode) {
+  if (!exercise) return '';
+  let txt = '';
+  if (mode && mode.title) txt += `🇬🇧 British English Practice - ${mode.title}\n\n`;
+  if (exercise.badText) {
+    txt += `Challenge: Rewrite this sentence correctly:\n"${exercise.badText}"`;
+  } else if (exercise.prompt) {
+    txt += `Challenge Prompt:\n${exercise.prompt}`;
+  } else if (exercise.topic) {
+    txt += `Paragraph Topic: ${exercise.topic}`;
+  } else if (exercise.word) {
+    txt += `Featured Vocabulary: ${exercise.word} (${exercise.partOfSpeech || 'Word'})`;
+  }
+  if (exercise.starter) {
+    txt += `\nOpening Line: "${exercise.starter}"`;
+  }
+  if (exercise.words && exercise.words.length) {
+    txt += `\nTarget Words to Include: ${exercise.words.join(', ')}`;
+  }
+  return txt;
+}
+
 function renderExerciseWorkbench(mode, exercise, totalAvailable) {
   if (!exercise) {
     return `<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No exercises found for this level. Please select "All Levels".</div>`;
@@ -1721,7 +1743,13 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
         </div>
       </div>
 
-      <div style="display: flex; gap: 0.5rem;">
+      <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-copy-practice-prompt" class="practice-btn-copy" style="font-size: 0.85rem; padding: 0.55rem 1.05rem;" title="Copy exercise prompt">
+          <i class="fa-regular fa-copy"></i> <span>Copy Prompt</span>
+        </button>
+        <button type="button" id="btn-share-practice-prompt" class="practice-btn-share" style="font-size: 0.85rem; padding: 0.55rem 1.05rem;" title="Share exercise challenge">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Challenge</span>
+        </button>
         <button type="button" id="btn-next-prompt" class="practice-btn-secondary" style="font-size: 0.85rem; padding: 0.55rem 1.1rem;">
           <i class="fa-solid fa-shuffle"></i> <span>Next Prompt</span>
         </button>
@@ -1774,10 +1802,20 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
 
     <!-- Writing Input Textarea Area -->
     <div style="margin-bottom: 1.2rem; position: relative;">
-      <label for="practice-textarea" style="display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.4rem;">
-        <span>✍️ Write your English response:</span>
-        <span id="char-word-counter" style="font-weight: 500; color: var(--text-muted);">0 words • 0 characters</span>
-      </label>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; flex-wrap: wrap; gap: 0.5rem;">
+        <label for="practice-textarea" style="font-size: 0.88rem; font-weight: 700; color: var(--text-main); margin: 0; display: flex; align-items: center; gap: 0.4rem;">
+          <span>✍️ Write your English response:</span>
+          <span id="char-word-counter" style="font-weight: 500; color: var(--text-muted); font-size: 0.82rem; margin-left: 0.4rem;">0 words • 0 characters</span>
+        </label>
+        <div style="display: flex; gap: 0.45rem; align-items: center;">
+          <button type="button" id="btn-copy-practice-writing-top" class="practice-btn-copy" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; border-radius: 10px;" title="Copy written sentence">
+            <i class="fa-regular fa-copy"></i> <span>Copy</span>
+          </button>
+          <button type="button" id="btn-share-practice-writing-top" class="practice-btn-share" style="padding: 0.35rem 0.85rem; font-size: 0.82rem; border-radius: 10px;" title="Share sentence">
+            <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+          </button>
+        </div>
+      </div>
       <textarea id="practice-textarea" rows="4" placeholder="${getPlaceholderForMode(mode.id, exercise)}" style="
         width: 100%;
         box-sizing: border-box;
@@ -1795,18 +1833,18 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
       "></textarea>
     </div>
 
-    <!-- Action Buttons (Modern, Comfortable, NO AI Button) -->
+    <!-- Action Buttons (Modern, Comfortable, Distinct Copy & Share) -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
         <button type="button" id="btn-check-writing" class="practice-btn-primary">
           <i class="fa-solid fa-magnifying-glass-check"></i> <span>Check My Writing & Feedback</span>
         </button>
 
-        <button type="button" id="btn-copy-practice-writing" class="dw-btn-tool dw-btn-copy" title="Copy written sentence">
+        <button type="button" id="btn-copy-practice-writing" class="practice-btn-copy" title="Copy written sentence">
           <i class="fa-regular fa-copy"></i> <span>Copy</span>
         </button>
 
-        <button type="button" id="btn-share-practice-writing" class="dw-btn-tool dw-btn-share" title="Share sentence">
+        <button type="button" id="btn-share-practice-writing" class="practice-btn-share" title="Share sentence">
           <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
         </button>
 
@@ -2032,30 +2070,64 @@ function bindWorkbenchEvents(container) {
     });
   }
 
-  // Copy & Share for written practice sentence
-  const copyPracticeBtn = document.getElementById('btn-copy-practice-writing');
-  if (copyPracticeBtn && textarea) {
-    copyPracticeBtn.addEventListener('click', () => {
-      const text = textarea.value.trim();
-      if (!text) {
-        showCopyShareToast('Please write your sentence first to copy!', 'fa-circle-exclamation');
-        return;
+  // Copy & Share for Prompt
+  const copyPromptBtn = document.getElementById('btn-copy-practice-prompt');
+  if (copyPromptBtn) {
+    copyPromptBtn.addEventListener('click', () => {
+      const exerciseList = getFilteredExerciseList(activeMode);
+      const curEx = exerciseList[currentExerciseIndex % exerciseList.length];
+      const curMode = WRITING_MODES.find(m => m.id === activeMode);
+      const promptText = getExercisePromptText(curEx, curMode);
+      if (promptText) {
+        copyTextToClipboard(promptText, 'Challenge prompt copied to clipboard! 📋');
       }
-      copyTextToClipboard(text, 'Practice sentence copied to clipboard! 📋');
     });
   }
 
-  const sharePracticeBtn = document.getElementById('btn-share-practice-writing');
-  if (sharePracticeBtn && textarea) {
-    sharePracticeBtn.addEventListener('click', () => {
-      const text = textarea.value.trim();
-      if (!text) {
-        showCopyShareToast('Please write your sentence first to share!', 'fa-circle-exclamation');
-        return;
+  const sharePromptBtn = document.getElementById('btn-share-practice-prompt');
+  if (sharePromptBtn) {
+    sharePromptBtn.addEventListener('click', () => {
+      const exerciseList = getFilteredExerciseList(activeMode);
+      const curEx = exerciseList[currentExerciseIndex % exerciseList.length];
+      const curMode = WRITING_MODES.find(m => m.id === activeMode);
+      const promptText = getExercisePromptText(curEx, curMode);
+      if (promptText) {
+        shareTextContent(`British English Practice: ${curMode ? curMode.title : 'Writing Challenge'}`, promptText);
       }
-      shareTextContent('My British English Writing Practice', text);
     });
   }
+
+  // Copy & Share for written practice sentence (both top and bottom buttons)
+  const handleCopyWriting = () => {
+    const text = textarea ? textarea.value.trim() : '';
+    if (!text) {
+      showCopyShareToast('Please write your sentence first to copy!', 'fa-circle-exclamation');
+      return;
+    }
+    copyTextToClipboard(text, 'Practice sentence copied to clipboard! 📋');
+  };
+
+  const handleShareWriting = () => {
+    const text = textarea ? textarea.value.trim() : '';
+    if (!text) {
+      showCopyShareToast('Please write your sentence first to share!', 'fa-circle-exclamation');
+      return;
+    }
+    const curMode = WRITING_MODES.find(m => m.id === activeMode);
+    shareTextContent(`My British English Practice (${curMode ? curMode.title : 'Writing'})`, text);
+  };
+
+  const copyPracticeBtn = document.getElementById('btn-copy-practice-writing');
+  if (copyPracticeBtn) copyPracticeBtn.addEventListener('click', handleCopyWriting);
+
+  const copyPracticeTopBtn = document.getElementById('btn-copy-practice-writing-top');
+  if (copyPracticeTopBtn) copyPracticeTopBtn.addEventListener('click', handleCopyWriting);
+
+  const sharePracticeBtn = document.getElementById('btn-share-practice-writing');
+  if (sharePracticeBtn) sharePracticeBtn.addEventListener('click', handleShareWriting);
+
+  const sharePracticeTopBtn = document.getElementById('btn-share-practice-writing-top');
+  if (sharePracticeTopBtn) sharePracticeTopBtn.addEventListener('click', handleShareWriting);
 
   // Check writing button
   const checkBtn = document.getElementById('btn-check-writing');
@@ -2093,6 +2165,32 @@ function bindWorkbenchEvents(container) {
             sharePolishedBtn.addEventListener('click', () => {
               const shareContent = `🇬🇧 British English Vault - Writing Practice\n\nOriginal: "${text}"\n\n✨ Polished Version: "${feedback.polishedText}"\n\nQuality Score: ${feedback.score}/100`;
               shareTextContent('My British English Writing Practice', shareContent);
+            });
+          }
+
+          // Bind Comparison Card direct buttons
+          const copyCardPolished = document.getElementById('btn-copy-card-polished');
+          if (copyCardPolished) {
+            copyCardPolished.addEventListener('click', () => {
+              copyTextToClipboard(feedback.polishedText, 'Polished British answer copied! 📋');
+            });
+          }
+          const shareCardPolished = document.getElementById('btn-share-card-polished');
+          if (shareCardPolished) {
+            shareCardPolished.addEventListener('click', () => {
+              shareTextContent('Polished British English Answer', feedback.polishedText);
+            });
+          }
+          const copyCardOrig = document.getElementById('btn-copy-card-original');
+          if (copyCardOrig) {
+            copyCardOrig.addEventListener('click', () => {
+              copyTextToClipboard(text, 'Original sentence copied! 📋');
+            });
+          }
+          const shareCardOrig = document.getElementById('btn-share-card-original');
+          if (shareCardOrig) {
+            shareCardOrig.addEventListener('click', () => {
+              shareTextContent('My Practice Sentence', text);
             });
           }
         }
@@ -2158,15 +2256,15 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
         </button>
       </div>
 
-      <!-- Quick Action Toolbar (Copy & Share) -->
-      <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.6rem 0.9rem; border-radius: 12px; border: 1px solid var(--border-color);">
-        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
-          Quick Actions:
+      <!-- Quick Action Toolbar (Distinct Copy & Share) -->
+      <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.75rem 1.1rem; border-radius: 12px; border: 1px solid var(--border-color);">
+        <span style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
+          Actions:
         </span>
-        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-practice-polished">
-          <i class="fa-solid fa-copy"></i> <span>Copy Polished Text</span>
+        <button type="button" class="practice-btn-copy" id="btn-copy-practice-polished" title="Copy polished British English text">
+          <i class="fa-regular fa-copy"></i> <span>Copy Polished Text</span>
         </button>
-        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-practice-polished">
+        <button type="button" class="practice-btn-share" id="btn-share-practice-polished" title="Share polished British English answer">
           <i class="fa-solid fa-share-nodes"></i> <span>Share Polished Answer</span>
         </button>
       </div>
@@ -2178,8 +2276,18 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
           <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.22); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-pen"></i> Your Original Text:
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; display: flex; align-items: center; gap: 0.35rem;">
+                <i class="fa-solid fa-pen"></i> Your Original Text:
+              </div>
+              <div style="display: flex; gap: 0.35rem;">
+                <button type="button" id="btn-copy-card-original" class="practice-btn-copy" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Copy original text">
+                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                </button>
+                <button type="button" id="btn-share-card-original" class="practice-btn-share" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Share original text">
+                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                </button>
+              </div>
             </div>
             <div style="font-size: 0.98rem; color: var(--text-main); line-height: 1.5;">
               "${originalText}"
@@ -2187,8 +2295,18 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
           </div>
 
           <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English Version:
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem;">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; display: flex; align-items: center; gap: 0.35rem;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English Version:
+              </div>
+              <div style="display: flex; gap: 0.35rem;">
+                <button type="button" id="btn-copy-card-polished" class="practice-btn-copy" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Copy polished answer">
+                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                </button>
+                <button type="button" id="btn-share-card-polished" class="practice-btn-share" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Share polished answer">
+                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                </button>
+              </div>
             </div>
             <div style="font-size: 0.98rem; font-weight: 600; color: var(--text-main); line-height: 1.5;">
               "${feedback.polishedText}"
@@ -2421,8 +2539,16 @@ function renderHistoryItemsList(history) {
                 </span>
               </div>
 
-              <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
-                <i class="fa-regular fa-calendar"></i> ${formattedDate} at ${formattedTime}
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
+                  <i class="fa-regular fa-calendar"></i> ${formattedDate} at ${formattedTime}
+                </div>
+                <button type="button" class="practice-btn-copy btn-practice-history-copy" data-time="${item.timestamp}" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Copy entry text">
+                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
+                </button>
+                <button type="button" class="practice-btn-share btn-practice-history-share" data-time="${item.timestamp}" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Share entry">
+                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
+                </button>
               </div>
             </div>
 
@@ -2485,9 +2611,36 @@ function bindHistoryEvents(container) {
     const listEl = document.getElementById('history-items-list');
     if (listEl) {
       listEl.innerHTML = renderHistoryItemsList(filtered);
+      bindHistoryActionButtons();
     }
   }
 
+  function bindHistoryActionButtons() {
+    container.querySelectorAll('.btn-practice-history-copy').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const time = btn.getAttribute('data-time');
+        const history = getWritingHistory();
+        const item = history.find(h => String(h.timestamp) === String(time));
+        if (item) {
+          copyTextToClipboard(item.polishedText || item.inputText, 'Practice entry copied to clipboard! 📋');
+        }
+      });
+    });
+
+    container.querySelectorAll('.btn-practice-history-share').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const time = btn.getAttribute('data-time');
+        const history = getWritingHistory();
+        const item = history.find(h => String(h.timestamp) === String(time));
+        if (item) {
+          const shareContent = `🇬🇧 British English Practice - ${item.modeTitle || 'Challenge'}\n\n"${item.polishedText || item.inputText}"\nScore: ${item.score || 100}/100`;
+          shareTextContent('My British English Writing Practice', shareContent);
+        }
+      });
+    });
+  }
+
+  bindHistoryActionButtons();
   if (dateFilter) dateFilter.addEventListener('change', applyFilters);
   if (modeFilter) modeFilter.addEventListener('change', applyFilters);
   if (searchInput) searchInput.addEventListener('input', applyFilters);
@@ -2513,9 +2666,19 @@ function renderErrorTrackerView(container) {
           </p>
         </div>
 
-        <button type="button" id="btn-reset-error-stats" class="practice-btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
-          <i class="fa-solid fa-arrows-rotate"></i> Reset Error Stats
-        </button>
+        <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+          ${totalErrors > 0 ? `
+            <button type="button" id="btn-copy-error-stats" class="practice-btn-copy" style="font-size: 0.8rem; padding: 0.5rem 1rem;" title="Copy error statistics">
+              <i class="fa-regular fa-copy"></i> <span>Copy Stats</span>
+            </button>
+            <button type="button" id="btn-share-error-stats" class="practice-btn-share" style="font-size: 0.8rem; padding: 0.5rem 1rem;" title="Share error statistics">
+              <i class="fa-solid fa-share-nodes"></i> <span>Share Stats</span>
+            </button>
+          ` : ''}
+          <button type="button" id="btn-reset-error-stats" class="practice-btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
+            <i class="fa-solid fa-arrows-rotate"></i> Reset Error Stats
+          </button>
+        </div>
       </div>
 
       ${totalErrors === 0 ? `
@@ -2555,6 +2718,24 @@ function renderErrorTrackerView(container) {
         localStorage.removeItem(STORAGE_KEYS.ERROR_STATS);
         renderErrorTrackerView(container);
       }
+    });
+  }
+
+  const copyStatsBtn = document.getElementById('btn-copy-error-stats');
+  if (copyStatsBtn) {
+    copyStatsBtn.addEventListener('click', () => {
+      const statsSummary = `🇬🇧 British English Vault - Personal Error Analysis\n\nTotal Errors Analyzed: ${totalErrors}\n` +
+        entries.sort((a,b) => b[1] - a[1]).map(([c, cnt]) => `• ${c}: ${cnt} time(s)`).join('\n');
+      copyTextToClipboard(statsSummary, 'Error statistics copied to clipboard! 📋');
+    });
+  }
+
+  const shareStatsBtn = document.getElementById('btn-share-error-stats');
+  if (shareStatsBtn) {
+    shareStatsBtn.addEventListener('click', () => {
+      const statsSummary = `🇬🇧 British English Vault - Personal Error Analysis\n\nTotal Errors Analyzed: ${totalErrors}\n` +
+        entries.sort((a,b) => b[1] - a[1]).map(([c, cnt]) => `• ${c}: ${cnt} time(s)`).join('\n');
+      shareTextContent('My British English Error Analysis', statsSummary);
     });
   }
 }
