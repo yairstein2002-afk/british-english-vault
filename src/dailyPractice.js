@@ -2153,44 +2153,21 @@ function bindWorkbenchEvents(container) {
           fbArea.innerHTML = renderFeedbackCard(feedback, text, curEx, curMode);
           fbArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-          // Bind Copy & Share for Polished Feedback Card
-          const copyPolishedBtn = document.getElementById('btn-copy-practice-polished');
-          if (copyPolishedBtn) {
-            copyPolishedBtn.addEventListener('click', () => {
-              copyTextToClipboard(feedback.polishedText || text, 'Polished British answer copied! 📋');
+          // Bind Copy & Share for Feedback Card
+          const copySubBtn = document.getElementById('btn-copy-practice-submission');
+          if (copySubBtn) {
+            copySubBtn.addEventListener('click', () => {
+              copyTextToClipboard(text, 'My practice sentence copied! 📋');
             });
           }
-          const sharePolishedBtn = document.getElementById('btn-share-practice-polished');
-          if (sharePolishedBtn) {
-            sharePolishedBtn.addEventListener('click', () => {
-              const shareContent = `🇬🇧 British English Vault - Writing Practice\n\nOriginal: "${text}"\n\n✨ Polished Version: "${feedback.polishedText}"\n\nQuality Score: ${feedback.score}/100`;
+          const shareSubBtn = document.getElementById('btn-share-practice-submission');
+          if (shareSubBtn) {
+            shareSubBtn.addEventListener('click', () => {
+              const errorsSummary = feedback.errors && feedback.errors.length > 0 
+                ? `\nIdentified Mistakes: ${feedback.errors.length}\n` + feedback.errors.map((e, i) => `${i+1}. ${e.category} - ${e.rule}`).join('\n')
+                : '\nFlawless writing - Zero mistakes!';
+              const shareContent = `🇬🇧 British English Practice (${curMode ? curMode.title : 'Writing'})\n\nMy Text: "${text}"\nQuality Score: ${feedback.score}/100${errorsSummary}`;
               shareTextContent('My British English Writing Practice', shareContent);
-            });
-          }
-
-          // Bind Comparison Card direct buttons
-          const copyCardPolished = document.getElementById('btn-copy-card-polished');
-          if (copyCardPolished) {
-            copyCardPolished.addEventListener('click', () => {
-              copyTextToClipboard(feedback.polishedText, 'Polished British answer copied! 📋');
-            });
-          }
-          const shareCardPolished = document.getElementById('btn-share-card-polished');
-          if (shareCardPolished) {
-            shareCardPolished.addEventListener('click', () => {
-              shareTextContent('Polished British English Answer', feedback.polishedText);
-            });
-          }
-          const copyCardOrig = document.getElementById('btn-copy-card-original');
-          if (copyCardOrig) {
-            copyCardOrig.addEventListener('click', () => {
-              copyTextToClipboard(text, 'Original sentence copied! 📋');
-            });
-          }
-          const shareCardOrig = document.getElementById('btn-share-card-original');
-          if (shareCardOrig) {
-            shareCardOrig.addEventListener('click', () => {
-              shareTextContent('My Practice Sentence', text);
             });
           }
         }
@@ -2256,62 +2233,40 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
         </button>
       </div>
 
-      <!-- Quick Action Toolbar (Distinct Copy & Share) -->
+      <!-- Quick Action Toolbar (My Writing & Diagnosis) -->
       <div style="display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.2rem; background: var(--input-bg); padding: 0.75rem 1.1rem; border-radius: 12px; border: 1px solid var(--border-color);">
         <span style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em;">
           Actions:
         </span>
-        <button type="button" class="practice-btn-copy" id="btn-copy-practice-polished" title="Copy polished British English text">
-          <i class="fa-regular fa-copy"></i> <span>Copy Polished Text</span>
+        <button type="button" class="practice-btn-copy" id="btn-copy-practice-submission" title="Copy my written response">
+          <i class="fa-regular fa-copy"></i> <span>Copy My Sentence</span>
         </button>
-        <button type="button" class="practice-btn-share" id="btn-share-practice-polished" title="Share polished British English answer">
-          <i class="fa-solid fa-share-nodes"></i> <span>Share Polished Answer</span>
+        <button type="button" class="practice-btn-share" id="btn-share-practice-submission" title="Share my practice response and feedback">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Sentence & Feedback</span>
         </button>
       </div>
 
-      <!-- Before & After Comparison Card -->
+      <!-- Your Submitted Writing Card (Active Self-Correction, No Spoon-fed Answer) -->
       <div style="margin-bottom: 1.5rem;">
-        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-code-compare" style="color: var(--uk-blue);"></i> Before & After Comparison
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-          <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.22); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem;">
-              <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; display: flex; align-items: center; gap: 0.35rem;">
-                <i class="fa-solid fa-pen"></i> Your Original Text:
-              </div>
-              <div style="display: flex; gap: 0.35rem;">
-                <button type="button" id="btn-copy-card-original" class="practice-btn-copy" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Copy original text">
-                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
-                </button>
-                <button type="button" id="btn-share-card-original" class="practice-btn-share" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Share original text">
-                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
-                </button>
-              </div>
+        <div style="background: rgba(0,36,125,0.04); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.2rem 1.4rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-pen" style="color: var(--uk-blue);"></i> Your Submitted Writing:
             </div>
-            <div style="font-size: 0.98rem; color: var(--text-main); line-height: 1.5;">
-              "${originalText}"
-            </div>
+            ${feedback.errors && feedback.errors.length > 0 ? `
+              <button type="button" class="practice-btn-primary" style="font-size: 0.82rem; padding: 0.4rem 0.9rem;" onclick="const ta=document.getElementById('practice-textarea'); if(ta){ta.scrollIntoView({behavior:'smooth'}); ta.focus();}">
+                <i class="fa-solid fa-pen-to-square"></i> <span>Edit & Fix It Yourself</span>
+              </button>
+            ` : ''}
           </div>
-
-          <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; flex-wrap: wrap; gap: 0.4rem;">
-              <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; display: flex; align-items: center; gap: 0.35rem;">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English Version:
-              </div>
-              <div style="display: flex; gap: 0.35rem;">
-                <button type="button" id="btn-copy-card-polished" class="practice-btn-copy" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Copy polished answer">
-                  <i class="fa-regular fa-copy"></i> <span>Copy</span>
-                </button>
-                <button type="button" id="btn-share-card-polished" class="practice-btn-share" style="padding: 0.25rem 0.65rem; font-size: 0.75rem; border-radius: 8px;" title="Share polished answer">
-                  <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
-                </button>
-              </div>
-            </div>
-            <div style="font-size: 0.98rem; font-weight: 600; color: var(--text-main); line-height: 1.5;">
-              "${feedback.polishedText}"
-            </div>
+          <div style="font-size: 1.05rem; color: var(--text-main); line-height: 1.6; font-weight: 500; background: var(--card-bg); padding: 0.85rem 1.1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+            "${originalText}"
           </div>
+          ${feedback.errors && feedback.errors.length > 0 ? `
+            <div style="margin-top: 0.7rem; font-size: 0.85rem; color: var(--gold-dark); font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-lightbulb"></i> Study the explanations and rules below, then edit your sentence above to fix it yourself — no ready-made answers!
+            </div>
+          ` : ''}
         </div>
       </div>
 
@@ -2355,17 +2310,11 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
                   </span>
                 </div>
 
-                <!-- Diff row -->
-                <div class="pedagogy-diff-row">
-                  <span style="color: #EF4444; font-weight: 700;">
-                    ❌ What you wrote: <code>${err.mistake || err.issue}</code>
+                <!-- Issue Flagged in Text (No ready-made corrected sentence) -->
+                <div class="pedagogy-diff-row" style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); padding: 0.6rem 0.9rem; border-radius: 8px;">
+                  <span style="color: #EF4444; font-weight: 800; font-size: 0.92rem;">
+                    ❌ Flagged in your sentence: <code>${err.mistake || err.issue}</code>
                   </span>
-                  ${err.correction ? `
-                    <span style="color: var(--text-muted); font-size: 0.8rem;">➔</span>
-                    <span style="color: #10B981; font-weight: 700;">
-                      ✅ Correct form: <code>${err.correction}</code>
-                    </span>
-                  ` : ''}
                 </div>
 
                 <!-- Explanation in simple English -->
@@ -2383,7 +2332,7 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
                 ${err.examples && err.examples.length > 0 ? `
                   <div class="pedagogy-examples">
                     <div class="pedagogy-examples-title">
-                      <i class="fa-solid fa-lightbulb"></i> More Examples:
+                      <i class="fa-solid fa-lightbulb"></i> Rule in Action (General Examples):
                     </div>
                     <ul class="pedagogy-examples-list">
                       ${err.examples.map(ex => `<li>${ex}</li>`).join('')}
@@ -2395,7 +2344,7 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
                 <div class="pedagogy-your-turn">
                   <i class="fa-solid fa-pen-to-square" style="color: #10B981;"></i>
                   <div>
-                    <strong>Your turn:</strong> ${err.yourTurn || `Write a new sentence using the correct form "${err.correction}".`}
+                    <strong>Your turn:</strong> Apply this rule to edit your sentence above and check again!
                   </div>
                 </div>
               </div>

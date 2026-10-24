@@ -815,18 +815,21 @@ function bindFreeWritingEvents(container) {
           feedbackArea.innerHTML = renderTextFeedbackCard(analysis, text);
           feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-          // Bind Copy & Share for Polished Feedback Card
-          const copyPolishedBtn = document.getElementById('btn-copy-polished');
-          if (copyPolishedBtn) {
-            copyPolishedBtn.addEventListener('click', () => {
-              copyTextToClipboard(analysis.polishedText || text, 'Polished British English copied! 📋');
+          // Bind Copy & Share for Feedback Card
+          const copyWritingFb = document.getElementById('btn-copy-writing-fb');
+          if (copyWritingFb) {
+            copyWritingFb.addEventListener('click', () => {
+              copyTextToClipboard(text, 'Journal text copied to clipboard! 📋');
             });
           }
-          const sharePolishedBtn = document.getElementById('btn-share-polished');
-          if (sharePolishedBtn) {
-            sharePolishedBtn.addEventListener('click', () => {
-              const shareContent = `🇬🇧 British English Vault - Daily Journal\n\nOriginal: "${text}"\n\n✨ Polished Version: "${analysis.polishedText}"\n\nQuality Score: ${analysis.score}/100`;
-              shareTextContent('My Polished British English Journal', shareContent);
+          const shareWritingFb = document.getElementById('btn-share-writing-fb');
+          if (shareWritingFb) {
+            shareWritingFb.addEventListener('click', () => {
+              const errsText = analysis.errors && analysis.errors.length > 0 
+                ? `\nIdentified Mistakes: ${analysis.errors.length}\n` + analysis.errors.map((e, i) => `${i+1}. ${e.category} - ${e.rule}`).join('\n')
+                : '\nFlawless British English journal entry!';
+              const shareContent = `🇬🇧 British English Vault - Daily Journal\n\n"${text}"\nQuality Score: ${analysis.score}/100${errsText}`;
+              shareTextContent('My British English Journal', shareContent);
             });
           }
         }
@@ -885,37 +888,35 @@ function renderTextFeedbackCard(analysis, rawText) {
         <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">
           Quick Actions:
         </span>
-        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-polished">
-          <i class="fa-solid fa-copy"></i> <span>Copy Polished Text</span>
+        <button type="button" class="dw-btn-tool dw-btn-copy" id="btn-copy-writing-fb" title="Copy my journal text">
+          <i class="fa-regular fa-copy"></i> <span>Copy My Journal</span>
         </button>
-        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-polished">
-          <i class="fa-solid fa-share-nodes"></i> <span>Share Polished Writing</span>
+        <button type="button" class="dw-btn-tool dw-btn-share" id="btn-share-writing-fb" title="Share journal text and feedback">
+          <i class="fa-solid fa-share-nodes"></i> <span>Share Journal & Feedback</span>
         </button>
       </div>
 
-      <!-- Before & After Comparison -->
+      <!-- Your Submitted Journal Card (Active Self-Correction, No Spoon-fed Answer) -->
       <div style="margin-bottom: 1.5rem;">
-        <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-code-compare" style="color: var(--uk-blue);"></i> Before & After Comparison
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
-          <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-pen"></i> Your Original Writing:
+        <div style="background: rgba(0,36,125,0.04); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.2rem 1.4rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="font-size: 0.82rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-pen" style="color: var(--uk-blue);"></i> Your Original Journal Writing:
             </div>
-            <div style="font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">
-              "${rawText}"
-            </div>
+            ${analysis.errors && analysis.errors.length > 0 ? `
+              <button type="button" class="dw-btn-primary" style="font-size: 0.82rem; padding: 0.4rem 0.9rem;" onclick="const ta=document.getElementById('dw-textarea'); if(ta){ta.scrollIntoView({behavior:'smooth'}); ta.focus();}">
+                <i class="fa-solid fa-pen-to-square"></i> <span>Edit & Fix It Yourself</span>
+              </button>
+            ` : ''}
           </div>
-
-          <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English:
-            </div>
-            <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); line-height: 1.5;">
-              "${analysis.polishedText}"
-            </div>
+          <div style="font-size: 1.05rem; color: var(--text-main); line-height: 1.6; font-weight: 500; background: var(--card-bg); padding: 0.85rem 1.1rem; border-radius: 10px; border: 1px solid var(--border-color);">
+            "${rawText}"
           </div>
+          ${analysis.errors && analysis.errors.length > 0 ? `
+            <div style="margin-top: 0.7rem; font-size: 0.85rem; color: var(--gold-dark); font-weight: 700; display: flex; align-items: center; gap: 0.4rem;">
+              <i class="fa-solid fa-lightbulb"></i> Study the explanations and rules below, then edit your text above to fix it yourself — no ready-made answers!
+            </div>
+          ` : ''}
         </div>
       </div>
 
@@ -959,17 +960,11 @@ function renderTextFeedbackCard(analysis, rawText) {
                   </span>
                 </div>
 
-                <!-- Diff row -->
-                <div class="pedagogy-diff-row">
-                  <span style="color: #EF4444; font-weight: 700;">
-                    ❌ What you wrote: <code>${err.mistake}</code>
+                <!-- Issue Flagged in Text (No spoon-fed answer) -->
+                <div class="pedagogy-diff-row" style="background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); padding: 0.6rem 0.9rem; border-radius: 8px;">
+                  <span style="color: #EF4444; font-weight: 800; font-size: 0.92rem;">
+                    ❌ Flagged in your journal: <code>${err.mistake}</code>
                   </span>
-                  ${err.correction ? `
-                    <span style="color: var(--text-muted); font-size: 0.8rem;">➔</span>
-                    <span style="color: #10B981; font-weight: 700;">
-                      ✅ Correct form: <code>${err.correction}</code>
-                    </span>
-                  ` : ''}
                 </div>
 
                 <!-- Explanation in simple English -->
@@ -999,7 +994,7 @@ function renderTextFeedbackCard(analysis, rawText) {
                 <div class="pedagogy-your-turn">
                   <i class="fa-solid fa-pen-to-square" style="color: #10B981;"></i>
                   <div>
-                    <strong>Your turn:</strong> ${err.yourTurn || `Write a new sentence using the correct form "${err.correction}".`}
+                    <strong>Your Turn:</strong> Apply this rule to edit your journal text above and try checking again!
                   </div>
                 </div>
               </div>
@@ -1405,26 +1400,6 @@ function renderVoiceAnalysisCard(analysis) {
           <i class="fa-solid fa-share-nodes"></i> <span>Share Speech Analysis</span>
         </button>
       </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
-        <div style="display: flex; align-items: center; gap: 0.8rem;">
-          <div style="width: 44px; height: 44px; border-radius: 50%; background: rgba(0,36,125,0.1); color: var(--uk-blue); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
-            <i class="fa-solid fa-chart-simple"></i>
-          </div>
-          <div>
-            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800; color: var(--text-main);">
-              🎙️ Accent, Pronunciation & Spoken Grammar Audit
-            </h3>
-            <div style="font-size: 0.85rem; color: var(--text-muted);">
-              Fluency Score: <strong>${analysis.fluencyScore}/100</strong> • Speaking Pace: <strong>${analysis.wpm} WPM</strong> (${analysis.pacingBadge})
-            </div>
-          </div>
-        </div>
-
-        <button type="button" onclick="this.closest('#voice-analysis-result-area').style.display='none'" class="icon-btn" aria-label="Close">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
       <!-- Spoken Transcript Box -->
       <div style="background: var(--input-bg); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 1.2rem;">
         <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.3rem;">
@@ -1465,9 +1440,9 @@ function renderVoiceAnalysisCard(analysis) {
             ${analysis.grammarErrors.map(err => `
               <div style="background: var(--input-bg); border-left: 3px solid #EF4444; border-radius: 0 8px 8px 0; padding: 0.7rem 0.9rem;">
                 <div style="font-size: 0.88rem; font-weight: 700; color: #EF4444; margin-bottom: 0.2rem;">
-                  "${err.mistake}" → ${err.correction}
+                  ❌ Flagged in speech: "${err.mistake}"
                 </div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">${err.explanation}</div>
+                <div style="font-size: 0.82rem; color: var(--text-main); margin-bottom: 0.2rem;"><strong>Rule & Explanation:</strong> ${err.explanation}</div>
               </div>
             `).join('')}
           </div>
