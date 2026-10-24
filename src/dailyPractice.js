@@ -1092,26 +1092,25 @@ function renderDailyPracticeLayout(container) {
       </div>
     </div>
 
-    <!-- Navigation Tabs Bar (Redesigned Ergonomic Buttons) -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border-color); margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.8rem;">
-      <div style="display: flex; gap: 0.6rem;" id="practice-subtab-bar">
+    <!-- Navigation Tabs Bar (Modern 2-Button Segmented Control) -->
+    <div style="margin-bottom: 1.2rem;">
+      <div class="practice-subtab-container" id="practice-subtab-bar">
         <button type="button" class="practice-tab-btn active" data-subtab="challenges">
-          <i class="fa-solid fa-gamepad"></i> <span>Writing Challenges (8 Modes)</span>
-        </button>
-        <button type="button" class="practice-tab-btn" data-subtab="history">
-          <i class="fa-solid fa-clock-rotate-left"></i> <span>Writing History & Portfolio</span>
+          <i class="fa-solid fa-shapes"></i>
+          <span>Writing Challenges <span class="tab-badge">8 Modes</span></span>
         </button>
         <button type="button" class="practice-tab-btn" data-subtab="error-tracker">
-          <i class="fa-solid fa-chart-pie"></i> <span>Personal Error Tracker</span>
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Personal Error Tracker</span>
         </button>
       </div>
 
       <!-- Difficulty Level Pill Selector -->
-      <div id="level-pill-container" style="display: flex; gap: 0.35rem; background: var(--input-bg); padding: 0.3rem 0.4rem; border-radius: 20px; border: 1px solid var(--border-color);">
-        <button type="button" class="btn-level-filter active" data-level="all" style="border: none; background: var(--card-bg); color: var(--text-main); font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">All Levels</button>
-        <button type="button" class="btn-level-filter" data-level="beginner" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌱 Beginner</button>
-        <button type="button" class="btn-level-filter" data-level="intermediate" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌿 Intermediate</button>
-        <button type="button" class="btn-level-filter" data-level="advanced" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌲 Advanced</button>
+      <div id="level-pill-container" style="display: flex; gap: 0.35rem; background: var(--input-bg); padding: 0.35rem 0.5rem; border-radius: 20px; border: 1px solid var(--border-color); width: fit-content; margin: 0.6rem auto 0 auto; flex-wrap: wrap; justify-content: center;">
+        <button type="button" class="btn-level-filter active" data-level="all" style="border: none; background: var(--card-bg); color: var(--text-main); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">All Levels</button>
+        <button type="button" class="btn-level-filter" data-level="beginner" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌱 Beginner</button>
+        <button type="button" class="btn-level-filter" data-level="intermediate" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌿 Intermediate</button>
+        <button type="button" class="btn-level-filter" data-level="advanced" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌲 Advanced</button>
       </div>
     </div>
 
@@ -1126,11 +1125,13 @@ function renderCurrentSubTab() {
   const container = document.getElementById('practice-subview-content');
   if (!container) return;
 
+  const levelPills = document.getElementById('level-pill-container');
+
   if (activeSubTab === 'challenges') {
+    if (levelPills) levelPills.style.display = 'flex';
     renderChallengesView(container);
-  } else if (activeSubTab === 'history') {
-    renderHistoryView(container);
   } else if (activeSubTab === 'error-tracker') {
+    if (levelPills) levelPills.style.display = 'none';
     renderErrorTrackerView(container);
   }
 }
