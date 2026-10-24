@@ -589,34 +589,72 @@ function renderDailyWritingLayout(container) {
       </div>
     </div>
 
-    <!-- Mode Selector Navigation Bar (Redesigned Luxury Segmented Control) -->
+    <!-- Mode Selector Navigation Bar (Ergonomic Segmented Control) -->
     <div style="margin-bottom: 1.5rem;">
-      <div class="dw-subtab-container" id="dw-main-tabs">
-        <button type="button" class="dw-tab-btn ${activeMode === 'write' ? 'active' : ''}" data-mode="write">
-          <i class="fa-solid fa-pen-nib"></i> <span>Daily Free Writing</span>
+      <div class="dw-subtab-container" id="dw-main-tabs" role="tablist" aria-label="Writing and Speaking Modes">
+        <button type="button" class="dw-tab-btn ${activeMode === 'write' ? 'active' : ''}" data-mode="write" role="tab" aria-selected="${activeMode === 'write'}" id="dw-tab-write" title="Daily Free Writing (Press 1 or Left Arrow)">
+          <i class="fa-solid fa-pen-nib"></i>
+          <span class="dw-tab-text-full">Daily Free Writing</span>
+          <span class="dw-tab-text-short">Free Writing</span>
         </button>
 
-        <button type="button" class="dw-tab-btn ${activeMode === 'record' ? 'active' : ''}" data-mode="record">
-          <i class="fa-solid fa-microphone-lines"></i> <span>Voice Recording & Accent Lab</span>
+        <button type="button" class="dw-tab-btn ${activeMode === 'record' ? 'active' : ''}" data-mode="record" role="tab" aria-selected="${activeMode === 'record'}" id="dw-tab-record" title="Voice Recording & Accent Lab (Press 2)">
+          <i class="fa-solid fa-microphone-lines"></i>
+          <span class="dw-tab-text-full">Voice & Accent Lab</span>
+          <span class="dw-tab-text-short">Voice Lab</span>
         </button>
 
-        <button type="button" class="dw-tab-btn ${activeMode === 'archive' ? 'active' : ''}" data-mode="archive">
-          <i class="fa-solid fa-clock-rotate-left"></i> <span>Past Entries & Date Filter</span>
+        <button type="button" class="dw-tab-btn ${activeMode === 'archive' ? 'active' : ''}" data-mode="archive" role="tab" aria-selected="${activeMode === 'archive'}" id="dw-tab-archive" title="Past Entries & Archive (Press 3 or Right Arrow)">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span class="dw-tab-text-full">Past Entries & Archive</span>
+          <span class="dw-tab-text-short">Past Entries</span>
         </button>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--text-muted); padding: 0 0.4rem;">
-        <i class="fa-solid fa-shield-check" style="color: #10B981;"></i> Synced to Local Storage & Database
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--text-muted); padding: 0 0.4rem; flex-wrap: wrap;">
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <i class="fa-solid fa-arrows-left-right" style="color: var(--uk-blue); font-size: 0.75rem;"></i>
+          <span>Switch tabs seamlessly or swipe left/right</span>
+        </span>
+        <span style="display: flex; align-items: center; gap: 0.35rem;">
+          <i class="fa-solid fa-shield-check" style="color: #10B981;"></i> Synced to Local Storage & Database
+        </span>
       </div>
     </div>
 
     <!-- SUBVIEW CONTENT CONTAINER -->
-    <div id="dw-subview-content">
+    <div id="dw-subview-content" class="dw-subview-enter">
       <!-- Loaded dynamically via renderActiveModeView() -->
     </div>
   `;
 
   renderActiveModeView();
+}
+
+const MODES_LIST = ['write', 'record', 'archive'];
+
+export function switchDailyWritingSubtab(mode) {
+  if (!mode || mode === activeMode) return;
+  activeMode = mode;
+
+  // 1. Instantly update active states on the segmented pill buttons
+  const tabBtns = document.querySelectorAll('#dw-main-tabs .dw-tab-btn');
+  tabBtns.forEach(btn => {
+    const isTarget = btn.getAttribute('data-mode') === mode;
+    btn.classList.toggle('active', isTarget);
+    btn.setAttribute('aria-selected', isTarget ? 'true' : 'false');
+  });
+
+  // 2. Smoothly update only the content area without full DOM destruction
+  const contentContainer = document.getElementById('dw-subview-content');
+  if (contentContainer) {
+    contentContainer.classList.remove('dw-subview-enter');
+    void contentContainer.offsetWidth; // force reflow for smooth animation replay
+    renderActiveModeView();
+    contentContainer.classList.add('dw-subview-enter');
+  } else {
+    renderActiveModeView();
+  }
 }
 
 function renderActiveModeView() {
@@ -708,6 +746,16 @@ function renderFreeWritingView(container) {
 
       <!-- Feedback Area -->
       <div id="dw-feedback-area" style="margin-top: 1.8rem; display: none;"></div>
+    </div>
+
+    <!-- Quick Navigation Bottom Footer -->
+    <div class="dw-subview-nav-footer">
+      <span class="dw-subview-nav-hint">
+        <i class="fa-solid fa-microphone-lines" style="color: #C8102E;"></i> Want to practice speaking and accent cadence?
+      </span>
+      <button type="button" class="dw-btn-nav-switch" data-switch-to="record" title="Switch to Voice Recording & Accent Lab">
+        <span>Go to Voice Recording Lab 🎙️</span> <i class="fa-solid fa-arrow-right"></i>
+      </button>
     </div>
   `;
 
@@ -1123,6 +1171,16 @@ function renderVoiceRecordingView(container) {
       <!-- Voice Analysis Result Card -->
       <div id="voice-analysis-result-area" style="margin-top: 1.8rem; display: none;"></div>
     </div>
+
+    <!-- Quick Navigation Bottom Footer -->
+    <div class="dw-subview-nav-footer dw-subview-nav-split">
+      <button type="button" class="dw-btn-nav-switch dw-btn-nav-secondary" data-switch-to="write" title="Back to Daily Free Writing">
+        <i class="fa-solid fa-arrow-left"></i> <span>Daily Free Writing ✍️</span>
+      </button>
+      <button type="button" class="dw-btn-nav-switch" data-switch-to="archive" title="View Past Entries & Archive">
+        <span>Past Entries & Archive 📜</span> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
   `;
 
   bindVoiceRecordingEvents(container);
@@ -1530,6 +1588,16 @@ function renderArchiveView(container) {
         <!-- Rendered via applyArchiveFilters() -->
       </div>
     </div>
+
+    <!-- Quick Navigation Bottom Footer -->
+    <div class="dw-subview-nav-footer dw-subview-nav-split">
+      <button type="button" class="dw-btn-nav-switch dw-btn-nav-secondary" data-switch-to="record" title="Switch to Voice Recording Lab">
+        <i class="fa-solid fa-arrow-left"></i> <span>Voice Recording Lab 🎙️</span>
+      </button>
+      <button type="button" class="dw-btn-nav-switch" data-switch-to="write" title="Write New Journal Entry">
+        <span>Write New Entry ✍️</span> <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
   `;
 
   bindArchiveEvents(container);
@@ -1760,16 +1828,104 @@ async function applyArchiveFilters() {
 }
 
 // ============================================================================
-// MAIN TAB SWITCHING
+// MAIN TAB SWITCHING & GESTURES
 // ============================================================================
 function bindDailyWritingEvents(container) {
-  container.querySelectorAll('#dw-main-tabs .dw-tab-btn, #dw-main-tabs .btn-dw-tab').forEach(btn => {
-    btn.addEventListener('click', () => {
+  // Tab Button Click & Keyboard Navigation
+  const tabButtons = Array.from(container.querySelectorAll('#dw-main-tabs .dw-tab-btn'));
+  tabButtons.forEach((btn, idx) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
       const mode = btn.getAttribute('data-mode');
-      if (mode && mode !== activeMode) {
-        activeMode = mode;
-        renderDailyWritingLayout(container);
+      if (mode) switchDailyWritingSubtab(mode);
+    });
+
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+        e.preventDefault();
+        const nextIdx = (idx + 1) % tabButtons.length;
+        tabButtons[nextIdx].focus();
+        const nextMode = tabButtons[nextIdx].getAttribute('data-mode');
+        if (nextMode) switchDailyWritingSubtab(nextMode);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prevIdx = (idx - 1 + tabButtons.length) % tabButtons.length;
+        tabButtons[prevIdx].focus();
+        const prevMode = tabButtons[prevIdx].getAttribute('data-mode');
+        if (prevMode) switchDailyWritingSubtab(prevMode);
+      } else if (e.key === '1') {
+        e.preventDefault();
+        switchDailyWritingSubtab('write');
+      } else if (e.key === '2') {
+        e.preventDefault();
+        switchDailyWritingSubtab('record');
+      } else if (e.key === '3') {
+        e.preventDefault();
+        switchDailyWritingSubtab('archive');
       }
     });
   });
+
+  // Delegated Clicks for Quick-Switch Buttons [data-switch-to]
+  container.addEventListener('click', (e) => {
+    const switchBtn = e.target.closest('[data-switch-to]');
+    if (switchBtn) {
+      e.preventDefault();
+      const targetMode = switchBtn.getAttribute('data-switch-to');
+      if (targetMode) {
+        switchDailyWritingSubtab(targetMode);
+        const tabsEl = document.getElementById('dw-main-tabs');
+        if (tabsEl) {
+          tabsEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }
+    }
+  });
+
+  // Touch Swipe Navigation for mobile
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+
+  container.addEventListener('touchend', (e) => {
+    if (e.changedTouches.length !== 1) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const timeDelta = Date.now() - touchStartTime;
+
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+
+    if (timeDelta > 600) return; // Too slow
+    if (Math.abs(deltaY) > Math.abs(deltaX) * 0.75) return; // Vertical scroll
+    if (Math.abs(deltaX) < 50) return; // Minimum swipe distance
+
+    // Ignore swipe when interacting with textarea or text input
+    const activeEl = document.activeElement;
+    if (activeEl && (activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'INPUT')) {
+      return;
+    }
+
+    const currentIdx = MODES_LIST.indexOf(activeMode);
+    if (currentIdx === -1) return;
+
+    if (deltaX < 0) {
+      // Swipe Left -> next tab
+      if (currentIdx < MODES_LIST.length - 1) {
+        switchDailyWritingSubtab(MODES_LIST[currentIdx + 1]);
+      }
+    } else {
+      // Swipe Right -> previous tab
+      if (currentIdx > 0) {
+        switchDailyWritingSubtab(MODES_LIST[currentIdx - 1]);
+      }
+    }
+  }, { passive: true });
 }
