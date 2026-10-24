@@ -635,178 +635,613 @@ Return a valid JSON object ONLY:
 }
 
 // ============================================================================
-// COMPREHENSIVE LINGUISTIC & PREPOSITION AUDIT ENGINE
+// COMPREHENSIVE LINGUISTIC & PEDAGOGICAL AUDIT ENGINE (100% ENGLISH)
 // ============================================================================
+export function makeGerund(verb) {
+  const v = (verb || '').toLowerCase().trim();
+  if (v === 'swim') return 'swimming';
+  if (v === 'run') return 'running';
+  if (v === 'sit') return 'sitting';
+  if (v === 'get') return 'getting';
+  if (v === 'travel') return 'travelling';
+  if (v.endsWith('ie')) return v.slice(0, -2) + 'ying';
+  if (v.endsWith('e') && !v.endsWith('ee')) return v.slice(0, -1) + 'ing';
+  return v + 'ing';
+}
+
 export function runLinguisticAudit(cleanText) {
-  const localErrors = [];
+  return runDeepPedagogicalAudit(cleanText);
+}
+
+export function runDeepPedagogicalAudit(cleanText) {
   let polished = cleanText;
+  const errors = [];
 
-  const rules = [
-    // Preposition & Time of day expressions
-    {
-      regex: /\b(and|at|on|to)\s+(the\s+)?(morning)\b/i,
-      matchWord: (m) => m[0],
+  function addError(err) {
+    if (!errors.some(e => e.mistake.toLowerCase() === err.mistake.toLowerCase() && e.category === err.category)) {
+      errors.push(err);
+    }
+  }
+
+  // 1. Verb Form: Auxiliary (doesn't/don't/didn't) + [verb]s -> base verb
+  const auxS = cleanText.match(/\b(doesn't|doesnt|don't|dont|didn't|didnt)\s+([a-z]+)s\b/i);
+  if (auxS) {
+    addError({
+      category: 'Verb Form',
+      classification: 'Incorrect',
+      mistake: auxS[2] + 's',
+      correction: auxS[2],
+      explanation: 'After auxiliary verbs like "doesn\'t", "don\'t", or "didn\'t", the main verb must always appear in its bare base form without an "-s" ending.',
+      rule: 'Auxiliary (do / does / did) + bare base verb.',
+      examples: [
+        'She doesn\'t like coffee (not: doesn\'t likes).',
+        'He doesn\'t want to leave early.',
+        'She didn\'t know the secret.'
+      ],
+      yourTurn: 'Write a negative sentence using "doesn\'t" and the base verb "want" or "like".',
+      offset: auxS.index + auxS[1].length + 1
+    });
+    polished = polished.replace(new RegExp(`\\b(${auxS[1]})\\s+(${auxS[2]})s\\b`, 'i'), '$1 $2');
+  }
+
+  // 2. Past Auxiliary Form: didn't + [past verb] -> didn't + base verb
+  const pastAux = cleanText.match(/\b(didn't|didnt)\s+(went|saw|bought|ate|took|made|came|drank|wrote|spoke)\b/i);
+  if (pastAux) {
+    const map = { went: 'go', saw: 'see', bought: 'buy', ate: 'eat', took: 'take', made: 'make', came: 'come', drank: 'drink', wrote: 'write', spoke: 'speak' };
+    const baseVerb = map[pastAux[2].toLowerCase()] || pastAux[2];
+    addError({
+      category: 'Verb Form',
+      classification: 'Incorrect',
+      mistake: pastAux[2],
+      correction: baseVerb,
+      explanation: 'The auxiliary "didn\'t" already signals the past tense. Therefore, the main verb must remain in its bare infinitive form.',
+      rule: 'Didn\'t + base verb (never use a past tense verb after didn\'t).',
+      examples: [
+        'He didn\'t go to London (not: didn\'t went).',
+        'I didn\'t see him yesterday at the office.'
+      ],
+      yourTurn: 'Write a negative past sentence using "didn\'t" with "go" or "see".',
+      offset: pastAux.index + pastAux[1].length + 1
+    });
+    polished = polished.replace(new RegExp(`\\b(${pastAux[1]})\\s+(${pastAux[2]})\\b`, 'i'), `$1 ${baseVerb}`);
+  }
+
+  // 3. Subject-Verb Agreement: he/she/it don't -> doesn't
+  const subjNeg = cleanText.match(/\b(he|she|it)\s+(don't|dont)\b/i);
+  if (subjNeg) {
+    addError({
+      category: 'Subject–Verb Agreement',
+      classification: 'Incorrect',
+      mistake: subjNeg[0],
+      correction: `${subjNeg[1]} doesn't`,
+      explanation: 'With third-person singular subjects ("he", "she", and "it"), always use "doesn\'t" instead of "don\'t" in the present simple negative.',
+      rule: 'Doesn\'t + base verb.',
+      examples: [
+        'He doesn\'t work here on Mondays.',
+        'She doesn\'t drink black coffee.',
+        'It doesn\'t seem right to me.'
+      ],
+      yourTurn: 'Write a new sentence using "doesn\'t" with a different person and verb.',
+      offset: subjNeg.index
+    });
+    polished = polished.replace(new RegExp(`\\b${subjNeg[1]}\\s+${subjNeg[2]}\\b`, 'i'), `${subjNeg[1]} doesn't`);
+  }
+
+  // 4. Subject-Verb Agreement: he/she/it have -> has
+  const subjHave = cleanText.match(/\b(he|she|it)\s+(have)\b/i);
+  if (subjHave) {
+    addError({
+      category: 'Subject–Verb Agreement',
+      classification: 'Incorrect',
+      mistake: subjHave[0],
+      correction: `${subjHave[1]} has`,
+      explanation: 'Third-person singular subjects ("he", "she", "it") require the singular verb form "has", whereas plural subjects take "have".',
+      rule: 'He / She / It + has.',
+      examples: [
+        'She has an impressive vocabulary.',
+        'He has a meeting in London tomorrow.'
+      ],
+      yourTurn: 'Write a sentence starting with "She has..."',
+      offset: subjHave.index
+    });
+    polished = polished.replace(new RegExp(`\\b${subjHave[1]}\\s+have\\b`, 'i'), `${subjHave[1]} has`);
+  }
+
+  // 5. Subject-Verb Agreement: they/we/you is/was -> are/were
+  const pluralBe = cleanText.match(/\b(they|we|you)\s+(is|was)\b/i);
+  if (pluralBe) {
+    const corrBe = pluralBe[2].toLowerCase() === 'is' ? 'are' : 'were';
+    addError({
+      category: 'Subject–Verb Agreement',
+      classification: 'Incorrect',
+      mistake: pluralBe[0],
+      correction: `${pluralBe[1]} ${corrBe}`,
+      explanation: 'Plural pronouns ("they", "we", "you") must agree with plural verb forms ("are" in the present, "were" in the past).',
+      rule: 'They / We / You + are (or were).',
+      examples: [
+        'They are arriving at five o\'clock.',
+        'We were very pleased with the outcome.'
+      ],
+      yourTurn: 'Write a sentence starting with "They are..." or "We were..."',
+      offset: pluralBe.index
+    });
+    polished = polished.replace(new RegExp(`\\b${pluralBe[1]}\\s+${pluralBe[2]}\\b`, 'i'), `${pluralBe[1]} ${corrBe}`);
+  }
+
+  // 6. Subject-Verb Agreement: he/she/it + base verb without -s
+  const singularBase = cleanText.match(/\b(he|she|it)\s+(go|like|want|need|work|look|feel|come|live|play|speak)\b/i);
+  if (singularBase) {
+    const v = singularBase[2].toLowerCase();
+    const sForm = v === 'go' ? 'goes' : v + 's';
+    addError({
+      category: 'Subject–Verb Agreement',
+      classification: 'Incorrect',
+      mistake: singularBase[0],
+      correction: `${singularBase[1]} ${sForm}`,
+      explanation: 'In the Present Simple tense, when the subject is third-person singular ("he", "she", "it"), you must add "-s" or "-es" to the verb.',
+      rule: 'He / She / It + verb(-s / -es).',
+      examples: [
+        'He goes to Oxford every Thursday.',
+        'She speaks British English fluently.',
+        'It looks brilliant in the morning light.'
+      ],
+      yourTurn: 'Write a sentence with "He" or "She" and a verb with an "-s" ending.',
+      offset: singularBase.index
+    });
+    polished = polished.replace(new RegExp(`\\b${singularBase[1]}\\s+${singularBase[2]}\\b`, 'i'), `${singularBase[1]} ${sForm}`);
+  }
+
+  // 7. Preposition of Time: and/at/on/to the morning -> in the morning
+  const prepMorning = cleanText.match(/\b(and|at|on|to)\s+(the\s+)?morning\b/i);
+  if (prepMorning) {
+    addError({
+      category: 'Preposition Error',
+      classification: 'Incorrect',
+      mistake: prepMorning[0],
       correction: 'in the morning',
+      explanation: 'In English, to express a time of day, use the preposition "in" ("in the morning"). The conjunction "and" links words, but cannot act as a time preposition.',
+      rule: 'In + the morning / afternoon / evening.',
+      examples: [
+        'I always drink a fresh cup of coffee in the morning.',
+        'She goes for a brisk run in the morning.'
+      ],
+      yourTurn: 'Write a sentence describing an activity you do "in the morning".',
+      offset: prepMorning.index
+    });
+    polished = polished.replace(new RegExp(`\\b${prepMorning[0]}\\b`, 'i'), 'in the morning');
+  }
+
+  // 8. Preposition of Time: afternoon
+  const prepAfternoon = cleanText.match(/\b(and|at|on|to)\s+(the\s+)?afternoon\b/i);
+  if (prepAfternoon) {
+    addError({
       category: 'Preposition Error',
-      rule: 'In English, to express a time of day, use the preposition "in" ("in the morning"), not "and the morning" or "at the morning". You cannot drink "the morning".'
-    },
-    {
-      regex: /\b(and|at|on|to)\s+(the\s+)?(afternoon)\b/i,
-      matchWord: (m) => m[0],
+      classification: 'Incorrect',
+      mistake: prepAfternoon[0],
       correction: 'in the afternoon',
+      explanation: 'To express that an event happens during the day, use "in the afternoon", never "and the afternoon" or "at the afternoon".',
+      rule: 'In + the afternoon.',
+      examples: [
+        'We have our departmental briefing in the afternoon.',
+        'I enjoy having afternoon tea in the afternoon.'
+      ],
+      yourTurn: 'Write a sentence about your schedule using "in the afternoon".',
+      offset: prepAfternoon.index
+    });
+    polished = polished.replace(new RegExp(`\\b${prepAfternoon[0]}\\b`, 'i'), 'in the afternoon');
+  }
+
+  // 9. Preposition of Time: evening
+  const prepEvening = cleanText.match(/\b(and|at|on|to)\s+(the\s+)?evening\b/i);
+  if (prepEvening) {
+    addError({
       category: 'Preposition Error',
-      rule: 'To indicate when an event occurs during the day, use "in the afternoon", never "and the afternoon" or "at the afternoon".'
-    },
-    {
-      regex: /\b(and|at|on|to)\s+(the\s+)?(evening)\b/i,
-      matchWord: (m) => m[0],
+      classification: 'Incorrect',
+      mistake: prepEvening[0],
       correction: 'in the evening',
+      explanation: 'The natural British English expression is "in the evening", not "and the evening" or "at the evening".',
+      rule: 'In + the evening.',
+      examples: [
+        'They relax with a good book in the evening.',
+        'Dinner is served at seven in the evening.'
+      ],
+      yourTurn: 'Write a sentence using "in the evening".',
+      offset: prepEvening.index
+    });
+    polished = polished.replace(new RegExp(`\\b${prepEvening[0]}\\b`, 'i'), 'in the evening');
+  }
+
+  // 10. Preposition of Time: at night
+  const prepNight = cleanText.match(/\b(and|in|on)\s+(the\s+)?night\b/i);
+  if (prepNight) {
+    addError({
       category: 'Preposition Error',
-      rule: 'In English, the correct time phrase is "in the evening", not "and the evening" or "at the evening".'
-    },
-    {
-      regex: /\b(and|in|on)\s+(the\s+)?night\b/i,
-      matchWord: (m) => m[0],
+      classification: 'Incorrect',
+      mistake: prepNight[0],
       correction: 'at night',
+      explanation: 'For recurring or habitual night times, English pairs with "at" ("at night"), not "and night" or "in the night".',
+      rule: 'At + night (for habitual night times).',
+      examples: [
+        'The stars look magnificent at night.',
+        'I prefer listening to audiobooks at night.'
+      ],
+      yourTurn: 'Write a sentence using "at night".',
+      offset: prepNight.index
+    });
+    polished = polished.replace(new RegExp(`\\b${prepNight[0]}\\b`, 'i'), 'at night');
+  }
+
+  // 11. Preposition with Days: on Monday
+  const prepDays = cleanText.match(/\b(in|at|and)\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i);
+  if (prepDays) {
+    addError({
       category: 'Preposition Error',
-      rule: 'For general time of day at night, English pairs with "at" ("at night"), not "and night" or "in the night".'
-    },
-    {
-      regex: /\b(in|at|and)\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => 'on ' + m[2],
+      classification: 'Incorrect',
+      mistake: prepDays[0],
+      correction: `on ${prepDays[2]}`,
+      explanation: 'Days of the week always take the preposition "on" (e.g. "on Monday"), never "in", "at", or "and".',
+      rule: 'On + specific day of the week.',
+      examples: [
+        'Our project kicks off on Monday morning.',
+        'I am meeting my colleague on Friday.'
+      ],
+      yourTurn: 'Write a sentence about your weekly plans using "on Friday" or "on Monday".',
+      offset: prepDays.index
+    });
+    polished = polished.replace(new RegExp(`\\b${prepDays[0]}\\b`, 'i'), `on ${prepDays[2]}`);
+  }
+
+  // 12. Verb Pattern: enjoy to [verb] -> enjoy [verb]-ing
+  const enjoyTo = cleanText.match(/\benjoy\s+to\s+([a-z]+)\b/i);
+  if (enjoyTo) {
+    const gerund = makeGerund(enjoyTo[1]);
+    addError({
+      category: 'Verb Pattern',
+      classification: 'Incorrect',
+      mistake: enjoyTo[0],
+      correction: `enjoy ${gerund}`,
+      explanation: 'The verb "enjoy" must be followed by a gerund (an "-ing" form), never by an infinitive with "to".',
+      rule: 'Enjoy + [verb]-ing.',
+      examples: [
+        'I enjoy swimming in the open sea (not: enjoy to swim).',
+        'She enjoys reading classic literature in the library.'
+      ],
+      yourTurn: 'Write a sentence about a favourite pastime using "I enjoy" followed by an "-ing" verb.',
+      offset: enjoyTo.index
+    });
+    polished = polished.replace(new RegExp(`\\b${enjoyTo[0]}\\b`, 'i'), `enjoy ${gerund}`);
+  }
+
+  // 13. Verb Pattern: avoid to [verb] -> avoid [verb]-ing
+  const avoidTo = cleanText.match(/\bavoid\s+to\s+([a-z]+)\b/i);
+  if (avoidTo) {
+    const gerund = makeGerund(avoidTo[1]);
+    addError({
+      category: 'Verb Pattern',
+      classification: 'Incorrect',
+      mistake: avoidTo[0],
+      correction: `avoid ${gerund}`,
+      explanation: 'The verb "avoid" takes a gerund ("-ing"), not an infinitive with "to".',
+      rule: 'Avoid + [verb]-ing.',
+      examples: [
+        'I avoid travelling during peak hours.',
+        'He avoids eating late at night.'
+      ],
+      yourTurn: 'Write a sentence with "avoid" and an "-ing" verb.',
+      offset: avoidTo.index
+    });
+    polished = polished.replace(new RegExp(`\\b${avoidTo[0]}\\b`, 'i'), `avoid ${gerund}`);
+  }
+
+  // 14. Verb Pattern & Preposition: look forward to [verb] -> look forward to [verb]-ing
+  const lookFwd = cleanText.match(/\blook\s+forward\s+to\s+([a-z]+)(?!ing\b)\b/i);
+  if (lookFwd) {
+    const gerund = makeGerund(lookFwd[1]);
+    addError({
+      category: 'Verb Pattern & Preposition',
+      classification: 'Incorrect',
+      mistake: lookFwd[0],
+      correction: `look forward to ${gerund}`,
+      explanation: 'In the expression "look forward to", the word "to" is a preposition, which requires a gerund ("-ing") form.',
+      rule: 'Look forward to + [verb]-ing.',
+      examples: [
+        'I look forward to meeting you next week in Manchester.',
+        'We look forward to hearing your thoughts.'
+      ],
+      yourTurn: 'Write a polite closing email sentence using "I look forward to" + "-ing".',
+      offset: lookFwd.index
+    });
+    polished = polished.replace(new RegExp(`\\b${lookFwd[0]}\\b`, 'i'), `look forward to ${gerund}`);
+  }
+
+  // 15. Collocation: do a mistake -> make a mistake
+  const doMistake = cleanText.match(/\b(do|doing|did|done)\s+(a\s+|some\s+)?mistake(s)?\b/i);
+  if (doMistake) {
+    const corr = doMistake[0].toLowerCase().replace(/\bdo\b/, 'make').replace(/\bdoing\b/, 'making').replace(/\bdid\b/, 'made').replace(/\bdone\b/, 'made');
+    addError({
+      category: 'Collocation & Word Choice',
+      classification: 'Incorrect',
+      mistake: doMistake[0],
+      correction: corr,
+      explanation: 'In English, we say "make a mistake", never "do a mistake". "Do" and "make" have fixed partner nouns.',
+      rule: 'Make + a mistake (fixed English collocation).',
+      examples: [
+        'Everyone makes mistakes when learning something new.',
+        'I made a mistake in my initial calculations.'
+      ],
+      yourTurn: 'Write a sentence using "made a mistake".',
+      offset: doMistake.index
+    });
+    polished = polished.replace(new RegExp(`\\b${doMistake[0]}\\b`, 'i'), corr);
+  }
+
+  // 16. Collocation: make homework -> do homework
+  const makeHw = cleanText.match(/\b(make|making|made)\s+(my\s+|the\s+)?homework\b/i);
+  if (makeHw) {
+    const corrHw = makeHw[0].toLowerCase().replace(/\bmake\b/, 'do').replace(/\bmaking\b/, 'doing').replace(/\bmade\b/, 'did');
+    addError({
+      category: 'Collocation & Word Choice',
+      classification: 'Incorrect',
+      mistake: makeHw[0],
+      correction: corrHw,
+      explanation: 'In English, tasks and study activities take "do": we say "do homework", not "make homework".',
+      rule: 'Do + homework (action / task).',
+      examples: [
+        'I always do my homework before dinner.',
+        'The students did their homework diligently.'
+      ],
+      yourTurn: 'Write a sentence with "do my homework".',
+      offset: makeHw.index
+    });
+    polished = polished.replace(new RegExp(`\\b${makeHw[0]}\\b`, 'i'), corrHw);
+  }
+
+  // 17. Dependent Preposition: married with -> married to
+  const marriedWith = cleanText.match(/\bmarried\s+with\b/i);
+  if (marriedWith) {
+    addError({
       category: 'Preposition Error',
-      rule: 'Specific days of the week always take the preposition "on" (e.g. "on Monday"), never "in", "at", or "and".'
-    },
-    {
-      regex: /\bmarried\s+with\b/i,
-      matchWord: () => 'married with',
+      classification: 'Incorrect',
+      mistake: 'married with',
       correction: 'married to',
+      explanation: 'In English, someone is married "to" their partner, not "with".',
+      rule: 'Married + to (person).',
+      examples: [
+        'He has been happily married to Charlotte for fifteen years.',
+        'She is married to a talented musician.'
+      ],
+      yourTurn: 'Write a sentence using the phrase "married to".',
+      offset: marriedWith.index
+    });
+    polished = polished.replace(/\bmarried\s+with\b/gi, 'married to');
+  }
+
+  // 18. Dependent Preposition: arrive to -> arrive at / in
+  const arriveTo = cleanText.match(/\barrive\s+to\b/i);
+  if (arriveTo) {
+    addError({
       category: 'Preposition Error',
-      rule: 'In English, one is married "to" someone, rather than "with".'
-    },
-    {
-      regex: /\barrive\s+to\b/i,
-      matchWord: () => 'arrive to',
+      classification: 'Incorrect',
+      mistake: 'arrive to',
       correction: 'arrive at / in',
-      category: 'Preposition Error',
-      rule: 'The verb "arrive" pairs with "at" (for venues and buildings) or "in" (for cities and countries), never "to".'
-    },
-    {
-      regex: /\bgo\s+to\s+home\b/i,
-      matchWord: () => 'go to home',
-      correction: 'go home',
+      explanation: 'The verb "arrive" pairs with "at" (for venues, buildings, airports) or "in" (for towns, cities, countries), never "to".',
+      rule: 'Arrive at (a venue/airport) / Arrive in (a city/country).',
+      examples: [
+        'We arrived at Heathrow Airport early in the morning.',
+        'The train arrived in Edinburgh right on time.'
+      ],
+      yourTurn: 'Write a sentence using "arrived at" or "arrived in".',
+      offset: arriveTo.index
+    });
+    polished = polished.replace(/\barrive\s+to\b/gi, 'arrive at');
+  }
+
+  // 19. Direction Adverb: go/went to home -> go/went home
+  const goToHome = cleanText.match(/\b(go|went|going|gone)\s+to\s+home\b/i);
+  if (goToHome) {
+    addError({
       category: 'Preposition Redundancy',
-      rule: '"Home" functions as an adverb of direction here and does not take the preposition "to". Say "go home".'
-    },
-    {
-      regex: /\blisten\s+(the\s+music|music|the\s+radio|him|her|them|me)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => 'listen to ' + m[1],
-      category: 'Preposition Error',
-      rule: 'The verb "listen" requires the preposition "to" before an object (e.g. "listen to music", "listen to me").'
-    },
-    {
-      regex: /\bexplain\s+(me|him|her|us|them)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => 'explain to ' + m[1],
-      category: 'Preposition Error',
-      rule: 'In English, you explain something "to" someone (e.g. "explain to me"), not "explain me".'
-    },
-    {
-      regex: /\blook\s+forward\s+to\s+([a-z]+)(?!ing\b)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => 'look forward to ' + m[1] + 'ing',
-      category: 'Gerund after Preposition',
-      rule: 'In the idiom "look forward to", "to" is a preposition, which requires a gerund (-ing) verb form.'
-    },
-    {
-      regex: /\bdespite\s+of\b/i,
-      matchWord: () => 'despite of',
-      correction: 'despite',
-      category: 'Preposition Redundancy',
-      rule: '"Despite" does not take "of". Say "despite" alone or "in spite of".'
-    },
-    {
-      regex: /\balthough\b.*\bbut\b/i,
-      matchWord: () => 'although ... but',
-      correction: 'Although (without "but")',
-      category: 'Conjunction Redundancy',
-      rule: '"Although" and "but" are both contrast connectors. Using both creates grammatical conflict in one sentence.'
-    },
-    {
-      regex: /\bI\s+am\s+agree\b/i,
-      matchWord: () => 'I am agree',
-      correction: 'I agree',
+      classification: 'Incorrect',
+      mistake: goToHome[0],
+      correction: `${goToHome[1]} home`,
+      explanation: 'In English, "home" acts as an adverb of direction; it does not take the preposition "to". Say "go home" or "went home".',
+      rule: 'Go / went + home (no preposition).',
+      examples: [
+        'It is getting late, let us go home.',
+        'He went home immediately after work.'
+      ],
+      yourTurn: 'Write a sentence using "went home".',
+      offset: goToHome.index
+    });
+    polished = polished.replace(/\b(go|went|going|gone)\s+to\s+home\b/i, (m, v) => `${v} home`);
+  }
+
+  // 20. Verb Usage: I am agree -> I agree
+  const amAgree = cleanText.match(/\bI\s+am\s+agree\b/i);
+  if (amAgree) {
+    addError({
       category: 'Verb Usage',
-      rule: '"Agree" is an active verb, not an adjective. Say "I agree", without auxiliary "am".'
-    },
-    {
-      regex: /\b(he|she|it)\s+(don't|dont)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => m[1] + " doesn't",
-      category: 'Subject-Verb Agreement',
-      rule: 'Third-person singular subjects (he, she, it) require the negative auxiliary "doesn\'t", not "don\'t".'
-    },
-    {
-      regex: /\b(he|she|it)\s+(have)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => m[1] + ' has',
-      category: 'Subject-Verb Agreement',
-      rule: 'Third-person singular subjects (he, she, it) pair with "has", while plural subjects pair with "have".'
-    },
-    {
-      regex: /\b(they|we|you)\s+(is|was)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => m[1] + ' ' + (m[2].toLowerCase() === 'is' ? 'are' : 'were'),
-      category: 'Subject-Verb Agreement',
-      rule: 'Plural pronouns (they, we, you) must agree with plural verb forms ("are" or "were").'
-    },
-    {
-      regex: /\b(he|she|it)\s+(make|take|think|feel|want|like|need|know|seem)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => m[1] + ' ' + m[2] + 's',
-      category: 'Subject-Verb Agreement',
-      rule: 'In the Present Simple, verbs following third-person singular (he, she, it) require an "-s" suffix.'
-    },
-    {
-      regex: /\byesterday\s+I\s+(go|see|buy|eat|make|meet|take|drink)\b/i,
-      matchWord: (m) => m[0],
-      correction: (m) => {
-        const map = { go: 'went', see: 'saw', buy: 'bought', eat: 'ate', make: 'made', meet: 'met', take: 'took', drink: 'drank' };
-        return 'yesterday I ' + (map[m[1].toLowerCase()] || m[1]);
-      },
+      classification: 'Incorrect',
+      mistake: 'I am agree',
+      correction: 'I agree',
+      explanation: '"Agree" is an active verb, not an adjective. Therefore, you do not need the auxiliary verb "am". Simply say "I agree".',
+      rule: 'Subject + agree (active verb without "am").',
+      examples: [
+        'I agree with your analysis completely.',
+        'I agree that we need more practice.'
+      ],
+      yourTurn: 'Write a sentence starting with "I agree with..."',
+      offset: amAgree.index
+    });
+    polished = polished.replace(/\bI\s+am\s+agree\b/gi, 'I agree');
+  }
+
+  // 21. Conjunction Redundancy: although ... but
+  const althoughBut = cleanText.match(/\balthough\b(.*?)\bbut\b/i);
+  if (althoughBut) {
+    addError({
+      category: 'Conjunction Redundancy',
+      classification: 'Incorrect',
+      mistake: 'although ... but',
+      correction: 'Although (remove "but")',
+      explanation: '"Although" and "but" are both contrastive connectors. Using both in one sentence creates a grammatical clash.',
+      rule: 'Use "Although [clause], [main clause]" OR "[clause], but [main clause]". Never both.',
+      examples: [
+        'Although it was raining, we went for a lovely walk.',
+        'It was raining, but we still went for a walk.'
+      ],
+      yourTurn: 'Write a sentence starting with "Although" without using "but".',
+      offset: althoughBut.index
+    });
+    polished = polished.replace(/\bbut\b/gi, ',');
+  }
+
+  // 22. Preposition Redundancy: despite of -> despite
+  const despiteOf = cleanText.match(/\bdespite\s+of\b/i);
+  if (despiteOf) {
+    addError({
+      category: 'Preposition Redundancy',
+      classification: 'Incorrect',
+      mistake: 'despite of',
+      correction: 'despite',
+      explanation: '"Despite" is a single preposition that never takes "of". Alternatively, you can use the three-word phrase "in spite of".',
+      rule: 'Despite + noun phrase (OR: in spite of).',
+      examples: [
+        'Despite the heavy traffic, we reached the theatre on time.',
+        'In spite of the cold breeze, the walk was delightful.'
+      ],
+      yourTurn: 'Write a sentence beginning with "Despite the..."',
+      offset: despiteOf.index
+    });
+    polished = polished.replace(/\bdespite\s+of\b/gi, 'despite');
+  }
+
+  // 23. Dependent Preposition: listen the / listen me -> listen to
+  const listenPrep = cleanText.match(/\blisten\s+(the\s+music|music|the\s+radio|him|her|them|me)\b/i);
+  if (listenPrep) {
+    addError({
+      category: 'Preposition Error',
+      classification: 'Incorrect',
+      mistake: listenPrep[0],
+      correction: `listen to ${listenPrep[1]}`,
+      explanation: 'The verb "listen" requires the preposition "to" before an object (e.g. "listen to music", "listen to me").',
+      rule: 'Listen + to + object.',
+      examples: [
+        'I love to listen to podcasts while cooking.',
+        'Please listen to the teacher carefully.'
+      ],
+      yourTurn: 'Write a sentence with "listen to".',
+      offset: listenPrep.index
+    });
+    polished = polished.replace(new RegExp(`\\b${listenPrep[0]}\\b`, 'i'), `listen to ${listenPrep[1]}`);
+  }
+
+  // 24. Dependent Preposition: explain me -> explain to me
+  const explainMe = cleanText.match(/\bexplain\s+(me|him|her|us|them)\b/i);
+  if (explainMe) {
+    addError({
+      category: 'Preposition Error',
+      classification: 'Incorrect',
+      mistake: explainMe[0],
+      correction: `explain to ${explainMe[1]}`,
+      explanation: 'In English, you explain something "to" a person; you cannot place the person directly after "explain".',
+      rule: 'Explain + something + to + person (e.g. explain this to me).',
+      examples: [
+        'Could you please explain this grammar rule to me?',
+        'The doctor explained the procedure to him.'
+      ],
+      yourTurn: 'Write a sentence asking someone to "explain" something "to me".',
+      offset: explainMe.index
+    });
+    polished = polished.replace(new RegExp(`\\b${explainMe[0]}\\b`, 'i'), `explain to ${explainMe[1]}`);
+  }
+
+  // 25. Articles before vowel: a apple -> an apple
+  const aVowel = cleanText.match(/\b(a)\s+([aeiou][a-z]+)\b/i);
+  if (aVowel && !/^(uni|eu|one)/i.test(aVowel[2])) {
+    addError({
+      category: 'Articles (a / an)',
+      classification: 'Incorrect',
+      mistake: aVowel[0],
+      correction: `an ${aVowel[2]}`,
+      explanation: 'Use the indefinite article "an" before words starting with a vowel sound (a, e, i, o, u) to make speech flow smoothly.',
+      rule: 'An + vowel sound (e.g. an apple, an engineer, an orange).',
+      examples: [
+        'She is an exceptional British author.',
+        'I had an apple and a cup of tea for breakfast.'
+      ],
+      yourTurn: 'Write a sentence using "an" before a word starting with a vowel.',
+      offset: aVowel.index
+    });
+    polished = polished.replace(new RegExp(`\\b${aVowel[0]}\\b`, 'i'), `an ${aVowel[2]}`);
+  }
+
+  // 26. Articles before consonant: an book -> a book
+  const anCons = cleanText.match(/\b(an)\s+([bcdfghjklmnpqrstvwxyz][a-z]+)\b/i);
+  if (anCons && !/^(hour|honest|honor)/i.test(anCons[2])) {
+    addError({
+      category: 'Articles (a / an)',
+      classification: 'Incorrect',
+      mistake: anCons[0],
+      correction: `a ${anCons[2]}`,
+      explanation: 'Use the indefinite article "a" before words starting with a consonant sound.',
+      rule: 'A + consonant sound (e.g. a book, a university, a doctor).',
+      examples: [
+        'He is a dedicated teacher.',
+        'She bought a lovely new coat in London.'
+      ],
+      yourTurn: 'Write a sentence using "a" before a noun.',
+      offset: anCons.index
+    });
+    polished = polished.replace(new RegExp(`\\b${anCons[0]}\\b`, 'i'), `a ${anCons[2]}`);
+  }
+
+  // 27. Past Tense with Time Marker: yesterday I go -> yesterday I went
+  const pastMarker = cleanText.match(/\b(yesterday|last\s+night|last\s+week|last\s+year|two\s+days\s+ago)\b.*?\b(I|he|she|they|we)\s+(go|see|buy|eat|make|meet|take|drink|write)\b/i);
+  if (pastMarker) {
+    const map = { go: 'went', see: 'saw', buy: 'bought', ate: 'ate', make: 'made', meet: 'met', take: 'took', drink: 'drank', write: 'wrote' };
+    const pastV = map[pastMarker[3].toLowerCase()] || pastMarker[3];
+    addError({
       category: 'Past Tense Consistency',
-      rule: 'Actions completed in the past (such as "yesterday") must use the Past Simple form of the verb.'
-    },
-    {
-      regex: /\b(i)\b/,
-      matchWord: () => 'i',
-      correction: 'I',
+      classification: 'Incorrect',
+      mistake: `${pastMarker[2]} ${pastMarker[3]}`,
+      correction: `${pastMarker[2]} ${pastV}`,
+      explanation: 'When describing finished events with past time markers like "yesterday", use the Past Simple form of the verb.',
+      rule: 'Past time marker + Past Simple verb form.',
+      examples: [
+        'Yesterday I went to the British Museum.',
+        'Last night we ate a delicious traditional dinner.'
+      ],
+      yourTurn: 'Write a sentence about yesterday using the past simple verb "went" or "bought".',
+      offset: pastMarker.index
+    });
+    polished = polished.replace(new RegExp(`\\b${pastMarker[2]}\\s+${pastMarker[3]}\\b`, 'i'), `${pastMarker[2]} ${pastV}`);
+  }
+
+  // 28. Pronoun Capitalization: i -> I
+  const smallI = cleanText.match(/\b(i)\b/);
+  if (smallI) {
+    addError({
       category: 'Capitalization',
-      rule: 'The personal pronoun "I" must always be written in uppercase in English.'
-    }
-  ];
+      classification: 'Incorrect',
+      mistake: 'i',
+      correction: 'I',
+      explanation: 'In English, the personal pronoun "I" must always be capitalized, regardless of where it appears in the sentence.',
+      rule: 'The pronoun "I" is always an uppercase capital letter.',
+      examples: [
+        'My friend and I went to Oxford.',
+        'Every morning, I drink English breakfast tea.'
+      ],
+      yourTurn: 'Write a sentence containing the pronoun "I".',
+      offset: smallI.index
+    });
+    polished = polished.replace(/\bi\b/g, 'I');
+  }
 
-  rules.forEach(rule => {
-    const match = cleanText.match(rule.regex);
-    if (match) {
-      const mist = typeof rule.matchWord === 'function' ? rule.matchWord(match) : match[0];
-      const corr = typeof rule.correction === 'function' ? rule.correction(match) : rule.correction;
-      localErrors.push({
-        category: rule.category,
-        mistake: mist,
-        correction: corr,
-        rule: rule.rule,
-        explanation: rule.rule
-      });
-      if (typeof corr === 'string' && !/\bor\b/i.test(corr) && !corr.includes('(')) {
-        polished = polished.replace(new RegExp(mist.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), corr);
-      }
-    }
-  });
+  // Sort errors by order of appearance in original text
+  errors.sort((a, b) => (a.offset || 0) - (b.offset || 0));
 
-  return { errors: localErrors, polished };
+  return { errors, polished };
 }
 
 export async function auditWritingSubmission(text, exercise = {}) {
@@ -944,23 +1379,43 @@ export async function auditWritingSubmission(text, exercise = {}) {
           }
         }
 
-        // Add each detected error
+        // Add each detected error with pedagogical explanation fields
         for (const m of validMatches) {
           const mistakeWord = cleanText.substring(m.offset, m.offset + m.length);
           const suggested = m.replacements?.[0]?.value || '';
-          const catName = m.rule?.category?.name || (m.rule?.issueType === 'misspelling' ? 'Spelling & Typo' : 'Grammar');
+          const isSpelling = m.rule?.issueType === 'misspelling' || /spelling|typo/i.test(m.rule?.category?.name || '');
+          const catName = isSpelling ? 'Spelling & Typo' : (m.rule?.category?.name || 'Grammar');
           let ruleMsg = m.message || m.rule?.description || 'Grammatical rule in British English.';
 
           if (suggested && !ruleMsg.toLowerCase().includes(suggested.toLowerCase())) {
             ruleMsg += ` Did you mean "${suggested}"?`;
           }
 
+          const explanation = isSpelling
+            ? `The word "${mistakeWord}" is misspelled. In British English, the correct spelling is "${suggested}".`
+            : ruleMsg;
+
+          const ruleFormula = isSpelling
+            ? `Standard British English orthography: "${suggested}".`
+            : (m.rule?.description || 'Follow standard British English grammar.');
+
+          const examples = suggested
+            ? [`Correct British usage: "${suggested}".`, `Always ensure accurate spelling in formal and daily writing.`]
+            : ['Review the sentence structure carefully.'];
+
+          const yourTurn = suggested
+            ? `Write a new sentence correctly spelling or using "${suggested}".`
+            : 'Write a sentence applying this grammar rule.';
+
           errors.push({
             category: catName,
+            classification: 'Incorrect',
             mistake: mistakeWord,
             correction: suggested,
-            rule: ruleMsg,
-            explanation: ruleMsg
+            explanation: explanation,
+            rule: ruleFormula,
+            examples: examples,
+            yourTurn: yourTurn
           });
         }
       }
@@ -970,7 +1425,7 @@ export async function auditWritingSubmission(text, exercise = {}) {
   }
 
   // 4. Linguistic & Preposition Audit Engine (Accurately corrects prepositions and idioms on polished text)
-  const lingAudit = runLinguisticAudit(polished);
+  const lingAudit = runLinguisticAudit(cleanText);
   if (lingAudit.errors.length > 0) {
     lingAudit.errors.forEach(err => {
       const alreadyCaught = errors.some(e => e.mistake && e.mistake.toLowerCase().includes(err.mistake.toLowerCase()));
@@ -979,6 +1434,12 @@ export async function auditWritingSubmission(text, exercise = {}) {
       }
     });
     polished = lingAudit.polished;
+  }
+
+  // Also verify polished text against lingAudit to catch chained fixes
+  const secondPass = runLinguisticAudit(polished);
+  if (secondPass.polished) {
+    polished = secondPass.polished;
   }
 
   // 5. Gemini AI Call (if configured by user)
@@ -994,10 +1455,13 @@ export async function auditWritingSubmission(text, exercise = {}) {
           if (!already) {
             errors.push({
               category: err.category || 'Grammar',
+              classification: err.classification || 'Incorrect',
               mistake: err.mistake || '',
               correction: err.correction || '',
-              rule: err.rule || err.explanation || 'Grammatical rule in English',
-              explanation: err.rule || err.explanation || 'Grammatical rule in English'
+              explanation: err.explanation || err.rule || 'Grammatical rule in English.',
+              rule: err.rule || err.explanation || 'Grammatical rule in English.',
+              examples: err.examples || [`Correct usage: ${err.correction || 'accurate form'}.`],
+              yourTurn: err.yourTurn || `Write a new sentence using "${err.correction || 'the correct form'}".`
             });
           }
         }
@@ -1012,7 +1476,7 @@ export async function auditWritingSubmission(text, exercise = {}) {
   polished = polished.replace(/\bi\b/g, 'I');
   if (!/[.!?]$/.test(polished)) polished += '.';
 
-  // Strengths
+  // Strengths & Highlights
   if (wordCount >= 14) {
     strengths.push(`Rich sentence length (${wordCount} words) showcasing natural descriptive ability.`);
   }
@@ -1023,13 +1487,31 @@ export async function auditWritingSubmission(text, exercise = {}) {
     strengths.push('Flawless grammar and spelling! No structural or vocabulary mistakes detected.');
   }
 
+  // 6. Identify Repeated Mistakes & Recurring Patterns
+  const errorStats = getErrorStats();
+  const recurringPatterns = [];
+  errors.forEach(err => {
+    const cat = err.category;
+    const prevCount = errorStats[cat] || 0;
+    if (prevCount >= 2 && !recurringPatterns.some(r => r.category === cat)) {
+      recurringPatterns.push({
+        category: cat,
+        previousCount: prevCount,
+        explanation: err.explanation,
+        rule: err.rule,
+        targetedExercise: err.yourTurn || `Write 2 practice sentences focusing on ${cat}.`
+      });
+    }
+  });
+
   // Score calculation (never penalizes missing periods or punctuation)
-  const score = errors.length === 0 ? 100 : Math.max(20, Math.min(90, 100 - (errors.length * 20)));
+  const score = errors.length === 0 ? 100 : Math.max(20, Math.min(90, 100 - (errors.length * 15)));
 
   return {
     isValid: errors.length === 0,
     score,
     errors,
+    recurringPatterns,
     suggestions,
     strengths,
     polishedText: polished
@@ -1597,10 +2079,11 @@ function bindWorkbenchEvents(container) {
 }
 
 // ============================================================================
-// BEAUTIFUL FEEDBACK CARD (BEFORE & AFTER + EXPLANATIONS)
+// BEAUTIFUL FEEDBACK CARD (7 PEDAGOGICAL FIELDS + RECURRING PATTERNS)
 // ============================================================================
-function renderFeedbackCard(feedback, originalText, exercise, mode) {
-  const isPerfect = feedback.isValid && feedback.errors.length === 0;
+function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
+  const isPerfect = feedback.isValid && (!feedback.errors || feedback.errors.length === 0);
+  const xpReward = mode.xpReward || 25;
 
   return `
     <div style="background: var(--card-bg); border: 2px solid ${isPerfect ? '#10B981' : 'var(--gold)'}; border-radius: 16px; padding: 1.6rem; box-shadow: 0 10px 30px rgba(0,0,0,0.06); animation: fade-in 0.3s ease;">
@@ -1616,7 +2099,7 @@ function renderFeedbackCard(feedback, originalText, exercise, mode) {
             </h3>
             <div style="font-size: 0.85rem; color: var(--text-muted);">
               Quality Score: <strong>${feedback.score}/100</strong>
-              ${feedback.score >= 70 ? `• <span style="color: #10B981; font-weight: 700;">+${mode.xpReward} XP Earned!</span>` : ''}
+              ${feedback.score >= 70 ? `• <span style="color: #10B981; font-weight: 700;">+${xpReward} XP Earned!</span>` : ''}
             </div>
           </div>
         </div>
@@ -1633,7 +2116,7 @@ function renderFeedbackCard(feedback, originalText, exercise, mode) {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
           <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.22); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.4rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
               <i class="fa-solid fa-pen"></i> Your Original Text:
             </div>
             <div style="font-size: 0.98rem; color: var(--text-main); line-height: 1.5;">
@@ -1642,7 +2125,7 @@ function renderFeedbackCard(feedback, originalText, exercise, mode) {
           </div>
 
           <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.4rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English Version:
             </div>
             <div style="font-size: 0.98rem; font-weight: 600; color: var(--text-main); line-height: 1.5;">
@@ -1652,30 +2135,105 @@ function renderFeedbackCard(feedback, originalText, exercise, mode) {
         </div>
       </div>
 
-      <!-- Mistakes & Clear Explanations (Why this is an error) -->
-      ${feedback.errors && feedback.errors.length > 0 ? `
-        <div style="margin-bottom: 1.4rem;">
-          <div style="font-size: 0.82rem; font-weight: 700; color: #EF4444; text-transform: uppercase; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-triangle-exclamation"></i> Identified Mistakes & Explanations (${feedback.errors.length}):
+      <!-- Recurring Pattern Alert (If user repeatedly makes the same mistake) -->
+      ${feedback.recurringPatterns && feedback.recurringPatterns.length > 0 ? `
+        <div class="pedagogy-pattern-alert">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #D97706; font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Recurring Error Pattern Detected!
           </div>
-          <div style="display: flex; flex-direction: column; gap: 0.7rem;">
-            ${feedback.errors.map(err => `
-              <div style="background: var(--input-bg); border-left: 4px solid #EF4444; border-radius: 0 10px 10px 0; padding: 0.85rem 1.1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.35rem; flex-wrap: wrap; gap: 0.4rem;">
-                  <span style="font-size: 0.92rem; font-weight: 700; color: #EF4444;">
-                    ❌ Mistake: <code style="background: rgba(239,68,68,0.1); padding: 0.15rem 0.4rem; border-radius: 4px;">${err.mistake || err.issue}</code>
-                    ${err.correction ? `➔ Correct: <strong style="color: #10B981;">${err.correction}</strong>` : ''}
-                  </span>
-                  <span style="font-size: 0.72rem; font-weight: 700; color: var(--uk-blue); background: rgba(0,36,125,0.08); padding: 0.15rem 0.45rem; border-radius: 6px;">${err.category}</span>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+            ${feedback.recurringPatterns.map(p => `
+              <div style="font-size: 0.88rem; color: var(--text-main); line-height: 1.5;">
+                You have previously encountered mistakes with <strong>${p.category}</strong> (${p.previousCount} recorded occurrences).
+                <div style="margin-top: 0.3rem;">
+                  <strong>Core Rule:</strong> ${p.rule}
                 </div>
-                <div style="font-size: 0.84rem; color: var(--text-main); line-height: 1.4;">
-                  <strong>Why this was an error:</strong> ${err.rule}
+                <div style="margin-top: 0.4rem; padding: 0.5rem 0.8rem; background: rgba(245,158,11,0.12); border-radius: 6px; font-size: 0.84rem; color: var(--text-main);">
+                  🎯 <strong>Targeted Weakness Practice:</strong> ${p.targetedExercise}
                 </div>
               </div>
             `).join('')}
           </div>
         </div>
       ` : ''}
+
+      <!-- Detailed Explanations of Mistakes (7 Pedagogical Fields) -->
+      ${feedback.errors && feedback.errors.length > 0 ? `
+        <div style="margin-bottom: 1.4rem;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: #EF4444; text-transform: uppercase; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-list-check"></i> Identified Mistakes & Explanations (${feedback.errors.length}):
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+            ${feedback.errors.map((err, idx) => `
+              <div class="pedagogy-error-card ${err.classification === 'More natural' ? 'natural' : ''}">
+                <div class="pedagogy-header-row">
+                  <span class="pedagogy-mistake-title">
+                    Mistake ${idx + 1} — ${err.category}
+                  </span>
+                  <span class="pedagogy-badge ${err.classification === 'More natural' ? 'natural' : 'incorrect'}">
+                    ${err.classification || 'Incorrect'}
+                  </span>
+                </div>
+
+                <!-- Diff row -->
+                <div class="pedagogy-diff-row">
+                  <span style="color: #EF4444; font-weight: 700;">
+                    ❌ What you wrote: <code>${err.mistake || err.issue}</code>
+                  </span>
+                  ${err.correction ? `
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">➔</span>
+                    <span style="color: #10B981; font-weight: 700;">
+                      ✅ Correct form: <code>${err.correction}</code>
+                    </span>
+                  ` : ''}
+                </div>
+
+                <!-- Explanation in simple English -->
+                <div class="pedagogy-explanation">
+                  <strong>Why it is an error:</strong> ${err.explanation || err.rule}
+                </div>
+
+                <!-- Short Grammar or Vocabulary Rule Box -->
+                <div class="pedagogy-rule-box">
+                  <i class="fa-solid fa-book-open"></i>
+                  <span><strong>Rule:</strong> ${err.rule}</span>
+                </div>
+
+                <!-- More Examples showing correct usage -->
+                ${err.examples && err.examples.length > 0 ? `
+                  <div class="pedagogy-examples">
+                    <div class="pedagogy-examples-title">
+                      <i class="fa-solid fa-lightbulb"></i> More Examples:
+                    </div>
+                    <ul class="pedagogy-examples-list">
+                      ${err.examples.map(ex => `<li>${ex}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+
+                <!-- Try Again / Your Turn -->
+                <div class="pedagogy-your-turn">
+                  <i class="fa-solid fa-pen-to-square" style="color: #10B981;"></i>
+                  <div>
+                    <strong>Your turn:</strong> ${err.yourTurn || `Write a new sentence using the correct form "${err.correction}".`}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : `
+        <!-- When Sentence is Correct -->
+        <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.2rem; text-align: center;">
+          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">🎉</div>
+          <h4 style="margin: 0 0 0.3rem 0; font-size: 1.1rem; color: #10B981; font-weight: 800;">
+            Your sentence is completely correct!
+          </h4>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-main);">
+            No grammatical, spelling, or prepositional errors detected. Your sentence reads naturally in British English.
+          </p>
+        </div>
+      `}
 
       <!-- Strengths & Praises -->
       ${feedback.strengths && feedback.strengths.length > 0 ? `
@@ -1689,8 +2247,8 @@ function renderFeedbackCard(feedback, originalText, exercise, mode) {
         </div>
       ` : ''}
 
-      <!-- Ideal British Reference (if available in exercise) -->
-      ${exercise.idealExample ? `
+      <!-- Native British Model Answer (if available in exercise) -->
+      ${exercise && exercise.idealExample ? `
         <div style="background: rgba(0,36,125,0.04); border-radius: 10px; padding: 0.85rem 1.1rem; border: 1px dashed var(--border-color); margin-top: 1rem;">
           <div style="font-size: 0.8rem; font-weight: 700; color: var(--uk-blue); margin-bottom: 0.3rem;">
             <i class="fa-solid fa-crown" style="color: var(--gold);"></i> Native British Model Answer:

@@ -5646,3 +5646,161 @@ button, input, select, textarea {
   }
 }
 
+/* ==========================================================================
+   PEDAGOGICAL ERROR CARD & EXPLANATION SYSTEM (100% ENGLISH)
+   ========================================================================== */
+.pedagogy-error-card {
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-left: 5px solid #EF4444;
+  border-radius: 12px;
+  padding: 1.1rem 1.3rem;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.pedagogy-error-card.natural {
+  border-left-color: #3B82F6;
+}
+
+.pedagogy-error-card.style-sugg {
+  border-left-color: #8B5CF6;
+}
+
+.pedagogy-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.pedagogy-mistake-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pedagogy-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pedagogy-badge.incorrect {
+  background: rgba(239, 68, 68, 0.12);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.pedagogy-badge.natural {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563EB;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.pedagogy-diff-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.8rem;
+  background: rgba(0, 0, 0, 0.025);
+  border-radius: 8px;
+  margin-bottom: 0.65rem;
+}
+
+[data-theme="dark"] .pedagogy-diff-row {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.pedagogy-explanation {
+  font-size: 0.88rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+}
+
+.pedagogy-rule-box {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.65rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.pedagogy-rule-box i {
+  color: var(--gold-dark, #A6801C);
+}
+
+.pedagogy-examples {
+  background: rgba(0, 36, 125, 0.03);
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  margin-bottom: 0.65rem;
+}
+
+[data-theme="dark"] .pedagogy-examples {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.pedagogy-examples-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--uk-blue);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+
+[data-theme="dark"] .pedagogy-examples-title {
+  color: var(--gold);
+}
+
+.pedagogy-examples-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.84rem;
+  color: var(--text-main);
+  line-height: 1.45;
+}
+
+.pedagogy-your-turn {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02));
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--text-main);
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.pedagogy-your-turn strong {
+  color: #10B981;
+}
+
+.pedagogy-pattern-alert {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.06));
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+

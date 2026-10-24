@@ -804,12 +804,8 @@ function bindFreeWritingEvents(container) {
           isValid: feedback.isValid,
           score: feedback.score,
           wordCount: text.split(/\s+/).filter(Boolean).length,
-          errors: feedback.errors.map(e => ({
-            category: e.category,
-            mistake: e.mistake,
-            correction: e.correction,
-            explanation: e.rule || e.explanation
-          })),
+          errors: feedback.errors || [],
+          recurringPatterns: feedback.recurringPatterns || [],
           polishedText: feedback.polishedText,
           tips: feedback.strengths || []
         };
@@ -844,7 +840,7 @@ function bindFreeWritingEvents(container) {
 }
 
 function renderTextFeedbackCard(analysis, rawText) {
-  const isPerfect = analysis.errors.length === 0;
+  const isPerfect = (!analysis.errors || analysis.errors.length === 0);
 
   return `
     <div style="background: var(--card-bg); border: 2px solid ${isPerfect ? '#10B981' : 'var(--gold)'}; border-radius: 16px; padding: 1.6rem; box-shadow: 0 10px 30px rgba(0,0,0,0.06); animation: fade-in 0.3s ease;">
@@ -876,7 +872,7 @@ function renderTextFeedbackCard(analysis, rawText) {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
           <div style="background: rgba(239,68,68,0.05); border: 1px solid rgba(239,68,68,0.2); border-radius: 12px; padding: 1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.3rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #EF4444; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
               <i class="fa-solid fa-pen"></i> Your Original Writing:
             </div>
             <div style="font-size: 0.95rem; color: var(--text-main); line-height: 1.5;">
@@ -885,7 +881,7 @@ function renderTextFeedbackCard(analysis, rawText) {
           </div>
 
           <div style="background: rgba(16,185,129,0.06); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1rem 1.2rem;">
-            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.3rem;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #10B981; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.35rem;">
               <i class="fa-solid fa-wand-magic-sparkles"></i> Polished British English:
             </div>
             <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-main); line-height: 1.5;">
@@ -895,24 +891,21 @@ function renderTextFeedbackCard(analysis, rawText) {
         </div>
       </div>
 
-      <!-- Mistakes & Why There Was an Error -->
-      ${analysis.errors.length > 0 ? `
-        <div style="margin-bottom: 1.3rem;">
-          <div style="font-size: 0.82rem; font-weight: 700; color: #EF4444; text-transform: uppercase; margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.4rem;">
-            <i class="fa-solid fa-triangle-exclamation"></i> Explanations of Mistakes (${analysis.errors.length}):
+      <!-- Recurring Pattern Alert (If user repeatedly makes the same mistake) -->
+      ${analysis.recurringPatterns && analysis.recurringPatterns.length > 0 ? `
+        <div class="pedagogy-pattern-alert">
+          <div style="display: flex; align-items: center; gap: 0.5rem; color: #D97706; font-weight: 800; font-size: 0.95rem; margin-bottom: 0.5rem;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Recurring Error Pattern Detected!
           </div>
-          <div style="display: flex; flex-direction: column; gap: 0.7rem;">
-            ${analysis.errors.map(err => `
-              <div style="background: var(--input-bg); border-left: 4px solid #EF4444; border-radius: 0 10px 10px 0; padding: 0.8rem 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem;">
-                  <span style="font-size: 0.92rem; font-weight: 700; color: #EF4444;">
-                    ❌ Mistake: <code style="background: rgba(239,68,68,0.1); padding: 0.1rem 0.35rem; border-radius: 4px;">${err.mistake}</code>
-                    → Correct: <strong style="color: #10B981;">${err.correction}</strong>
-                  </span>
-                  <span style="font-size: 0.72rem; font-weight: 700; color: var(--uk-blue); background: rgba(0,36,125,0.08); padding: 0.15rem 0.4rem; border-radius: 6px;">${err.category}</span>
+          <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+            ${analysis.recurringPatterns.map(p => `
+              <div style="font-size: 0.88rem; color: var(--text-main); line-height: 1.5;">
+                You have repeatedly made mistakes in <strong>${p.category}</strong> (${p.previousCount} recorded occurrences).
+                <div style="margin-top: 0.3rem;">
+                  <strong>Core Rule:</strong> ${p.rule}
                 </div>
-                <div style="font-size: 0.82rem; color: var(--text-main); line-height: 1.4;">
-                  <strong>Why this was an error:</strong> ${err.explanation}
+                <div style="margin-top: 0.4rem; padding: 0.5rem 0.8rem; background: rgba(245,158,11,0.12); border-radius: 6px; font-size: 0.84rem; color: var(--text-main);">
+                  🎯 <strong>Targeted Practice:</strong> ${p.targetedExercise}
                 </div>
               </div>
             `).join('')}
@@ -920,11 +913,89 @@ function renderTextFeedbackCard(analysis, rawText) {
         </div>
       ` : ''}
 
-      <!-- Nuance Tips -->
-      ${analysis.tips.length > 0 ? `
+      <!-- Detailed Explanations of Mistakes (7 Pedagogical Fields) -->
+      ${analysis.errors && analysis.errors.length > 0 ? `
+        <div style="margin-bottom: 1.4rem;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: #EF4444; text-transform: uppercase; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-list-check"></i> Explanations of Mistakes (${analysis.errors.length}):
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.9rem;">
+            ${analysis.errors.map((err, idx) => `
+              <div class="pedagogy-error-card ${err.classification === 'More natural' ? 'natural' : ''}">
+                <div class="pedagogy-header-row">
+                  <span class="pedagogy-mistake-title">
+                    Mistake ${idx + 1} — ${err.category}
+                  </span>
+                  <span class="pedagogy-badge ${err.classification === 'More natural' ? 'natural' : 'incorrect'}">
+                    ${err.classification || 'Incorrect'}
+                  </span>
+                </div>
+
+                <!-- Diff row -->
+                <div class="pedagogy-diff-row">
+                  <span style="color: #EF4444; font-weight: 700;">
+                    ❌ What you wrote: <code>${err.mistake}</code>
+                  </span>
+                  ${err.correction ? `
+                    <span style="color: var(--text-muted); font-size: 0.8rem;">➔</span>
+                    <span style="color: #10B981; font-weight: 700;">
+                      ✅ Correct form: <code>${err.correction}</code>
+                    </span>
+                  ` : ''}
+                </div>
+
+                <!-- Explanation in simple English -->
+                <div class="pedagogy-explanation">
+                  <strong>Why it is an error:</strong> ${err.explanation || err.rule}
+                </div>
+
+                <!-- Short Grammar or Vocabulary Rule Box -->
+                <div class="pedagogy-rule-box">
+                  <i class="fa-solid fa-book-open"></i>
+                  <span><strong>Rule:</strong> ${err.rule}</span>
+                </div>
+
+                <!-- More Examples showing correct usage -->
+                ${err.examples && err.examples.length > 0 ? `
+                  <div class="pedagogy-examples">
+                    <div class="pedagogy-examples-title">
+                      <i class="fa-solid fa-lightbulb"></i> More Examples:
+                    </div>
+                    <ul class="pedagogy-examples-list">
+                      ${err.examples.map(ex => `<li>${ex}</li>`).join('')}
+                    </ul>
+                  </div>
+                ` : ''}
+
+                <!-- Try Again / Your Turn -->
+                <div class="pedagogy-your-turn">
+                  <i class="fa-solid fa-pen-to-square" style="color: #10B981;"></i>
+                  <div>
+                    <strong>Your turn:</strong> ${err.yourTurn || `Write a new sentence using the correct form "${err.correction}".`}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : `
+        <!-- When Sentence is Correct -->
+        <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: 12px; padding: 1.2rem; margin-bottom: 1.2rem; text-align: center;">
+          <div style="font-size: 1.8rem; margin-bottom: 0.3rem;">🎉</div>
+          <h4 style="margin: 0 0 0.3rem 0; font-size: 1.1rem; color: #10B981; font-weight: 800;">
+            Your writing is completely correct!
+          </h4>
+          <p style="margin: 0; font-size: 0.88rem; color: var(--text-main);">
+            No grammatical, spelling, or prepositional errors detected. Excellent expression in British English.
+          </p>
+        </div>
+      `}
+
+      <!-- Writing Highlights / Tips -->
+      ${analysis.tips && analysis.tips.length > 0 ? `
         <div style="background: rgba(0,36,125,0.04); border-radius: 10px; padding: 0.8rem 1rem; border: 1px dashed var(--border-color);">
           <div style="font-size: 0.78rem; font-weight: 700; color: var(--uk-blue); margin-bottom: 0.3rem;">
-            <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> British Vocabulary & Fluency Notes:
+            <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> British Vocabulary & Fluency Highlights:
           </div>
           <ul style="margin: 0; padding-left: 1.2rem; font-size: 0.85rem; color: var(--text-main); line-height: 1.4;">
             ${analysis.tips.map(t => `<li>${t}</li>`).join('')}
