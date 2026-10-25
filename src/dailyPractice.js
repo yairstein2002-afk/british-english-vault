@@ -672,8 +672,8 @@ export const WRITING_EXERCISES = {
 // ============================================================================
 let activeMode = 'sentence-builder';
 let currentExerciseIndex = 0;
-let activeLevelFilter = 'all'; // 'all', 'beginner', 'intermediate', 'advanced'
-let activeSubTab = 'challenges'; // 'challenges', 'history', 'error-tracker'
+let activeDifficultyLevel = (typeof localStorage !== 'undefined' && localStorage.getItem('bev_practice_difficulty')) || 'beginner';
+let activeSubTab = 'challenges'; // 'challenges', 'error-tracker'
 let hintStage = 0; // 0: none, 1, 2, 3
 let lastCheckedFeedback = null;
 
@@ -1906,20 +1906,27 @@ export async function loadFreshPracticeChallenge(modeId) {
 
   if (apiKey) {
     try {
-      const systemPrompt = `You are an elite British English curriculum author. Generate ONE brand new writing challenge with fresh questions and words for mode: "${mode.title}" (${mode.desc}).
+      const systemPrompt = `You are an elite British English curriculum author. Generate ONE brand new writing challenge tailored specifically for difficulty level: ${activeDifficultyLevel.toUpperCase()} for mode: "${mode.title}" (${mode.desc}).
+
+DIFFICULTY LEVEL GUIDANCE (${activeDifficultyLevel.toUpperCase()}):
+- BEGINNER: Use accessible everyday vocabulary, standard present/past simple tenses, clear situational context, and gentle scaffolding.
+- INTERMEDIATE: Include phrasal verbs, idioms, conjunctions of contrast (although, despite), compound sentences, and realistic workplace/travel themes.
+- ADVANCED: Feature sophisticated British vocabulary (bespoke, meticulous, reluctant, adversity, nevertheless), nuanced clauses, third conditionals, and intellectual/professional topics.
+
 Requirements for "${modeId}":
-- If "sentence-builder": Pick 3 distinct, high-impact British English words (adverbs, conjunctions, advanced verbs, or idioms) that the student must combine.
-- If "daily-journal": Provide an original, engaging daily reflection question about everyday life, culture, or personal growth.
-- If "story-challenge": Provide an intriguing opening narrative line (starter) set in Britain or a fascinating situation.
-- If "fix-my-writing": Provide an authentic flawed English sentence ("badText") containing 2 realistic grammatical or spelling mistakes for the student to rewrite.
+- If "sentence-builder": Pick 3 distinct British English words matching the ${activeDifficultyLevel} level.
+- If "daily-journal": Provide an engaging daily reflection question suitable for ${activeDifficultyLevel} level.
+- If "story-challenge": Provide an intriguing opening narrative line (starter) suited for ${activeDifficultyLevel} level.
+- If "fix-my-writing": Provide a flawed English sentence ("badText") containing realistic grammatical or spelling mistakes appropriate for ${activeDifficultyLevel} level.
 - If "real-life-writing": Provide an authentic UK communication scenario (e.g. email, letter, polite request).
-- If "word-to-writing": Pick an authentic British English word (e.g. "Chuffed", "Bespoke", "Fortnight", "Gobsmacked", "Knackered", "Skint", "Dodgy", "Posh", "Proper", "Cuppa", "Brolly", "Gutted"), its part of speech and definition.
-- If "expand-sentence": Provide a simple 4-6 word base sentence and instructions to expand it.
+- If "word-to-writing": Pick an authentic British English word suited for ${activeDifficultyLevel} level, its part of speech and definition.
+- If "expand-sentence": Provide a base sentence and instructions to expand it.
 - If "paragraph-master": Provide a rich topic for a 3-sentence structured paragraph (Topic, Support, Conclusion).
 
 Return ONLY raw JSON matching:
 {
   "id": "ai-${Date.now()}",
+  "level": "${activeDifficultyLevel}",
   "prompt": "challenge prompt instructions",
   "words": ["w1", "w2", "w3"],
   "word": "word",
@@ -2057,16 +2064,32 @@ function renderDailyPracticeLayout(container) {
       </div>
     </div>
 
-    <!-- Navigation Tabs Bar (Modern 2-Button Segmented Control) -->
-    <div style="margin-bottom: 1.2rem;">
+    <!-- Navigation Tabs Bar & Difficulty Level Selector -->
+    <div style="margin-bottom: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem;">
       <div class="practice-subtab-container" id="practice-subtab-bar">
-        <button type="button" class="practice-tab-btn active" data-subtab="challenges">
+        <button type="button" class="practice-tab-btn ${activeSubTab === 'challenges' ? 'active' : ''}" data-subtab="challenges">
           <i class="fa-solid fa-shapes"></i>
           <span>Writing Challenges <span class="tab-badge">8 Modes</span></span>
         </button>
-        <button type="button" class="practice-tab-btn" data-subtab="error-tracker">
+        <button type="button" class="practice-tab-btn ${activeSubTab === 'error-tracker' ? 'active' : ''}" data-subtab="error-tracker">
           <i class="fa-solid fa-chart-pie"></i>
           <span>Personal Error Tracker</span>
+        </button>
+      </div>
+
+      <!-- 3 English Difficulty Levels (🌱 Beginner, 🌿 Intermediate, 🌲 Advanced) -->
+      <div class="practice-level-container" id="practice-level-selector" role="radiogroup" aria-label="Difficulty Levels" style="${activeSubTab === 'challenges' ? 'display: flex;' : 'display: none;'}">
+        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 0.35rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <i class="fa-solid fa-signal" style="color: var(--gold);"></i> Level:
+        </span>
+        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'beginner' ? 'active' : ''}" data-level="beginner" title="Beginner Level">
+          <span>🌱 Beginner</span>
+        </button>
+        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'intermediate' ? 'active' : ''}" data-level="intermediate" title="Intermediate Level">
+          <span>🌿 Intermediate</span>
+        </button>
+        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'advanced' ? 'active' : ''}" data-level="advanced" title="Advanced Level">
+          <span>🌲 Advanced</span>
         </button>
       </div>
     </div>
@@ -2081,6 +2104,11 @@ function renderDailyPracticeLayout(container) {
 function renderCurrentSubTab() {
   const container = document.getElementById('practice-subview-content');
   if (!container) return;
+
+  const levelSelector = document.getElementById('practice-level-selector');
+  if (levelSelector) {
+    levelSelector.style.display = activeSubTab === 'challenges' ? 'flex' : 'none';
+  }
 
   if (activeSubTab === 'challenges') {
     renderChallengesView(container);
@@ -2162,7 +2190,9 @@ function renderChallengesView(container) {
 }
 
 function getFilteredExerciseList(modeId) {
-  return WRITING_EXERCISES[modeId] || [];
+  const allExercises = WRITING_EXERCISES[modeId] || [];
+  const matching = allExercises.filter(item => item.level === activeDifficultyLevel || item.level === 'all' || !item.level);
+  return matching.length > 0 ? matching : allExercises;
 }
 
 function getExercisePromptText(exercise, mode) {
@@ -2202,7 +2232,11 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
           <h2 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: var(--text-main);">
             ${mode.title}
           </h2>
-          <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.5rem; margin-top: 0.2rem; flex-wrap: wrap;">
+            <span class="badge-difficulty-pill ${activeDifficultyLevel}">
+              <i class="fa-solid fa-signal"></i> ${activeDifficultyLevel.toUpperCase()}
+            </span>
+            <span>•</span>
             <span><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> AI Contextual Evaluation</span>
             <span>•</span>
             <span style="color: var(--uk-blue); font-weight: 700;">Dynamic Practice</span>
@@ -3244,6 +3278,25 @@ function bindDailyPracticeEvents(container) {
 
       activeSubTab = btn.getAttribute('data-subtab');
       renderCurrentSubTab();
+    });
+  });
+
+  // Difficulty Level Selection (Beginner, Intermediate, Advanced)
+  container.querySelectorAll('#practice-level-selector .btn-difficulty-level').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newLevel = btn.getAttribute('data-level');
+      if (newLevel && newLevel !== activeDifficultyLevel) {
+        activeDifficultyLevel = newLevel;
+        localStorage.setItem('bev_practice_difficulty', newLevel);
+        container.querySelectorAll('#practice-level-selector .btn-difficulty-level').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-level') === newLevel);
+        });
+        currentExerciseIndex = 0;
+        hintStage = 0;
+        lastCheckedFeedback = null;
+        renderCurrentSubTab();
+        showCopyShareToast(`Difficulty set to ${newLevel.toUpperCase()}! 🎯`);
+      }
     });
   });
 }

@@ -6406,5 +6406,98 @@ button, input, select, textarea {
   font-size: 1.1rem;
 }
 
+/* ============================================================================
+   DAILY PRACTICE - 3 ENGLISH DIFFICULTY LEVELS SELECTOR (BEGINNER, INTERMEDIATE, ADVANCED)
+   ============================================================================ */
+.practice-level-container {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.85rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.btn-difficulty-level {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  border-radius: 20px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--card-bg);
+  color: var(--text-muted);
+  border: 1.5px solid var(--border-color);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  user-select: none;
+}
+
+.btn-difficulty-level:hover {
+  transform: translateY(-1px);
+  color: var(--text-main);
+  border-color: var(--gold);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.btn-difficulty-level.active[data-level="beginner"] {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #ffffff !important;
+  border-color: #10B981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.btn-difficulty-level.active[data-level="intermediate"] {
+  background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+  color: #ffffff !important;
+  border-color: #3B82F6;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}
+
+.btn-difficulty-level.active[data-level="advanced"] {
+  background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+  color: #ffffff !important;
+  border-color: #8B5CF6;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.badge-difficulty-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.badge-difficulty-pill.beginner {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-difficulty-pill.intermediate {
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563EB;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-difficulty-pill.advanced {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7C3AED;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+
 
 

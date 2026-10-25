@@ -14,7 +14,7 @@
 import { getGeminiApiKey } from './ai.js';
 import { speakText } from './speech.js';
 import { getSupabaseConfig, upsertItemInSupabase } from './supabase.js';
-import { auditWritingSubmission } from './dailyPractice.js';
+import { auditWritingSubmission, auditWritingSubmissionWithAI } from './dailyPractice.js';
 import { showCopyShareToast, copyTextToClipboard, shareTextContent } from './shareUtils.js';
 
 export { showCopyShareToast, copyTextToClipboard, shareTextContent };
@@ -719,11 +719,11 @@ function renderFreeWritingView(container) {
         "></textarea>
       </div>
 
-      <!-- Actions Toolbar (Check, Copy, Share, Clear) -->
+      <!-- Actions Toolbar (Check with AI, Copy, Share, Clear) -->
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
         <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-          <button type="button" id="btn-analyze-text" class="dw-btn-primary">
-            <i class="fa-solid fa-magnifying-glass-check"></i> <span>Check & Explain Mistakes</span>
+          <button type="button" id="btn-analyze-text" class="dw-btn-primary practice-btn-ai-check" title="Check your journal writing with Gemini AI">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Check with AI</span>
           </button>
 
           <button type="button" id="btn-copy-writing" class="dw-btn-tool dw-btn-copy" title="Copy written journal text">
@@ -740,7 +740,7 @@ function renderFreeWritingView(container) {
         </div>
 
         <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
-          <i class="fa-solid fa-shield-halved" style="color: #10B981;"></i> Automatic Grammar, Spelling & Syntax Diagnosis
+          <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> AI Grammar, Spelling & Syntax Diagnosis
         </div>
       </div>
 
@@ -842,12 +842,14 @@ function bindFreeWritingEvents(container) {
         return;
       }
 
-      const origHtml = checkBtn.innerHTML;
       checkBtn.disabled = true;
-      checkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analyzing with AI...';
+      checkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Checking with AI...';
 
       try {
-        const feedback = await auditWritingSubmission(text, {});
+        const feedback = await auditWritingSubmissionWithAI(text, {}, {
+          title: 'Daily Free Writing Journal',
+          desc: 'Daily personal reflection, thoughts and journal writing'
+        });
         const analysis = {
           isValid: feedback.isValid,
           score: feedback.score,
@@ -899,7 +901,7 @@ function bindFreeWritingEvents(container) {
         console.error('Error during AI free writing check:', err);
       } finally {
         checkBtn.disabled = false;
-        checkBtn.innerHTML = origHtml;
+        checkBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Check with AI</span>';
       }
     });
   }
