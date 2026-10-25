@@ -2077,20 +2077,27 @@ function renderDailyPracticeLayout(container) {
         </button>
       </div>
 
-      <!-- 3 English Difficulty Levels (🌱 Beginner, 🌿 Intermediate, 🌲 Advanced) -->
-      <div class="practice-level-container" id="practice-level-selector" role="radiogroup" aria-label="Difficulty Levels" style="${activeSubTab === 'challenges' ? 'display: flex;' : 'display: none;'}">
-        <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 0.35rem; display: inline-flex; align-items: center; gap: 0.35rem;">
-          <i class="fa-solid fa-signal" style="color: var(--gold);"></i> Level:
-        </span>
-        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'beginner' ? 'active' : ''}" data-level="beginner" title="Beginner Level">
-          <span>🌱 Beginner</span>
-        </button>
-        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'intermediate' ? 'active' : ''}" data-level="intermediate" title="Intermediate Level">
-          <span>🌿 Intermediate</span>
-        </button>
-        <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'advanced' ? 'active' : ''}" data-level="advanced" title="Advanced Level">
-          <span>🌲 Advanced</span>
-        </button>
+      <!-- 3 English Difficulty Levels (🌱 Beginner, 🌿 Intermediate, 🌲 Advanced) in 1 SINGLE ROW -->
+      <div class="practice-level-wrapper" id="practice-level-selector" role="radiogroup" aria-label="Difficulty Levels" style="${activeSubTab === 'challenges' ? 'display: block;' : 'display: none;'}">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem; padding: 0 0.2rem;">
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: inline-flex; align-items: center; gap: 0.35rem; letter-spacing: 0.04em;">
+            <i class="fa-solid fa-signal" style="color: var(--gold);"></i> Difficulty Level:
+          </span>
+          <span id="current-diff-label" style="font-size: 0.74rem; color: var(--uk-blue); font-weight: 800; text-transform: uppercase; background: rgba(0,36,125,0.08); padding: 0.15rem 0.55rem; border-radius: 8px;">
+            ${activeDifficultyLevel}
+          </span>
+        </div>
+        <div class="practice-level-container">
+          <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'beginner' ? 'active' : ''}" data-level="beginner" title="Beginner Level">
+            <span>🌱 Beginner</span>
+          </button>
+          <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'intermediate' ? 'active' : ''}" data-level="intermediate" title="Intermediate Level">
+            <span>🌿 Intermediate</span>
+          </button>
+          <button type="button" class="btn-difficulty-level ${activeDifficultyLevel === 'advanced' ? 'active' : ''}" data-level="advanced" title="Advanced Level">
+            <span>🌲 Advanced</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -2107,7 +2114,7 @@ function renderCurrentSubTab() {
 
   const levelSelector = document.getElementById('practice-level-selector');
   if (levelSelector) {
-    levelSelector.style.display = activeSubTab === 'challenges' ? 'flex' : 'none';
+    levelSelector.style.display = activeSubTab === 'challenges' ? 'block' : 'none';
   }
 
   if (activeSubTab === 'challenges') {
@@ -3288,6 +3295,8 @@ function bindDailyPracticeEvents(container) {
       if (newLevel && newLevel !== activeDifficultyLevel) {
         activeDifficultyLevel = newLevel;
         localStorage.setItem('bev_practice_difficulty', newLevel);
+        const lbl = document.getElementById('current-diff-label');
+        if (lbl) lbl.textContent = newLevel;
         container.querySelectorAll('#practice-level-selector .btn-difficulty-level').forEach(b => {
           b.classList.toggle('active', b.getAttribute('data-level') === newLevel);
         });
