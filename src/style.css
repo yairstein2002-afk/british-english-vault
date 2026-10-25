@@ -5479,6 +5479,65 @@ button, input, select, textarea {
   box-shadow: 0 2px 8px rgba(0, 36, 125, 0.2);
 }
 
+.practice-btn-ai-check {
+  background: linear-gradient(135deg, var(--uk-blue, #00247D) 0%, #1E3A8A 50%, #312E81 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid var(--gold, #D4AF37) !important;
+  box-shadow: 0 4px 18px rgba(0, 36, 125, 0.35) !important;
+}
+
+.practice-btn-ai-check i {
+  color: var(--gold, #D4AF37) !important;
+  transition: transform 0.25s ease;
+}
+
+.practice-btn-ai-check:hover i {
+  transform: scale(1.22) rotate(12deg);
+}
+
+.practice-btn-refresh {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.18));
+  color: #059669 !important;
+  transition: all 0.22s ease;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+}
+
+.practice-btn-refresh:hover {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #FFFFFF !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+}
+
+.practice-btn-refresh i {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.practice-btn-refresh:hover i {
+  transform: rotate(180deg);
+}
+
+[data-theme="dark"] .practice-btn-refresh {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(5, 150, 105, 0.25));
+  color: #34D399 !important;
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+[data-theme="dark"] .practice-btn-refresh:hover {
+  background: linear-gradient(135deg, #10B981, #059669);
+  color: #0B111E !important;
+}
+
 [data-theme="dark"] .practice-btn-primary {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
   color: #0B111E !important;

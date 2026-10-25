@@ -20,7 +20,7 @@ export function saveGeminiApiKey(key) {
   localStorage.setItem(GEMINI_API_KEY_STORAGE, key.trim());
 }
 
-function extractJSON(text) {
+export function extractJSON(text) {
   let cleaned = text.trim();
   if (cleaned.startsWith('```')) {
     cleaned = cleaned.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
@@ -431,6 +431,10 @@ Return JSON:
 
   // List of models to try. Prioritize gemini-3-flash-preview to prevent exceeding quota on unsupported models.
   const modelsToTry = [
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-1.5-pro',
     'gemini-3.5-flash',
     'gemini-3.1-flash-lite',
     'gemini-3-flash-preview'

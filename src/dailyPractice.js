@@ -21,7 +21,7 @@
  */
 
 import { speakText } from './speech.js';
-import { getGeminiApiKey } from './ai.js';
+import { getGeminiApiKey, extractJSON } from './ai.js';
 import { copyTextToClipboard, shareTextContent, showCopyShareToast } from './shareUtils.js';
 
 // STORAGE KEYS
@@ -165,6 +165,66 @@ export const WRITING_EXERCISES = {
         'Hint 3: Model layout: "Both delegates were initially reluctant to compromise during the tense negotiation."'
       ],
       idealExample: 'Although the directors were initially reluctant to compromise, the negotiation ultimately reached a constructive resolution.'
+    },
+    {
+      id: 'sb-6',
+      level: 'intermediate',
+      words: ['initially', 'hesitate', 'opportunity'],
+      prompt: 'Write a sentence using the words: "initially", "hesitate", and "opportunity".',
+      hints: [
+        'Hint 1: "Initially" sets the past timeframe at the beginning ("Initially, I was unsure...").',
+        'Hint 2: Pair with infinitive: "hesitate to seize" or "did not hesitate to take".',
+        'Hint 3: Model layout: "Although she initially felt nervous, she did not hesitate to embrace the career opportunity."'
+      ],
+      idealExample: 'Although he initially hesitated because of the relocation, he soon realized it was a remarkable career opportunity.'
+    },
+    {
+      id: 'sb-7',
+      level: 'intermediate',
+      words: ['frequently', 'recommend', 'delightful'],
+      prompt: 'Write a sentence using the words: "frequently", "recommend", and "delightful".',
+      hints: [
+        'Hint 1: Adverb of frequency "frequently" modifies the verb "recommend".',
+        'Hint 2: "Delightful" is an expressive British adjective meaning charming and pleasant.',
+        'Hint 3: Model layout: "My London colleagues frequently recommend that delightful tearoom in Marylebone."'
+      ],
+      idealExample: 'Local residents frequently recommend that delightful vintage cafe tucked away near Covent Garden.'
+    },
+    {
+      id: 'sb-8',
+      level: 'advanced',
+      words: ['seldom', 'commute', 'crowded'],
+      prompt: 'Write a sentence using the words: "seldom", "commute", and "crowded".',
+      hints: [
+        'Hint 1: "Seldom" means rarely. Notice the word placement before the main verb.',
+        'Hint 2: Pair with daily travel in Britain: "morning commute on the Underground".',
+        'Hint 3: Model layout: "He seldom complains about his morning commute, even when the carriages are intensely crowded."'
+      ],
+      idealExample: 'During the summer holidays, the morning commute is seldom as crowded as it is throughout the winter term.'
+    },
+    {
+      id: 'sb-9',
+      level: 'advanced',
+      words: ['thoroughly', 'investigate', 'incident'],
+      prompt: 'Write a sentence using the words: "thoroughly", "investigate", and "incident".',
+      hints: [
+        'Hint 1: "Thoroughly" is a strong British collocate for "investigate" (carefully and completely).',
+        'Hint 2: Frame within a workplace, railway, or academic scenario.',
+        'Hint 3: Model layout: "The transport authorities promised to thoroughly investigate the signaling incident."'
+      ],
+      idealExample: 'The management team promised to thoroughly investigate the security incident before publishing their official report.'
+    },
+    {
+      id: 'sb-10',
+      level: 'intermediate',
+      words: ['promptly', 'acknowledge', 'inquiry'],
+      prompt: 'Write a sentence using the words: "promptly", "acknowledge", and "inquiry".',
+      hints: [
+        'Hint 1: "Promptly" means without delay, swiftly.',
+        'Hint 2: "Acknowledge" means to confirm receipt or recognize.',
+        'Hint 3: Model layout: "The customer service team promptly acknowledged my formal inquiry."'
+      ],
+      idealExample: 'The admissions office promptly acknowledged my email inquiry regarding the British literature curriculum.'
     }
   ],
 
@@ -204,6 +264,42 @@ export const WRITING_EXERCISES = {
         'Sentence 3: Wrap up with your evening dinner or scenic spot along the Thames.'
       ],
       idealExample: 'I would begin Saturday morning with fresh pastries and coffee at Borough Market before heading to the British Museum. In the afternoon, I would take a leisurely stroll through Covent Garden and catch a play in the West End. Finally, I would wrap up the weekend with traditional fish and chips by the Thames.'
+    },
+    {
+      id: 'dj-4',
+      level: 'all',
+      prompt: 'Describe an English cultural habit or tradition (like tea time, apologising politely, or talking about the weather) that you find interesting.',
+      minSentences: 3,
+      hints: [
+        'Sentence 1: Name the British custom clearly and what people do.',
+        'Sentence 2: Contrast it with habits from your own background.',
+        'Sentence 3: Explain why you find it amusing, charming, or sensible.'
+      ],
+      idealExample: 'The British habit of discussing the weather in almost every casual conversation is something I find delightfully charming. Even a slight hint of drizzle sparks spirited debates at bus stops and cafes. It serves as an effortless social icebreaker that instantly brings people together.'
+    },
+    {
+      id: 'dj-5',
+      level: 'all',
+      prompt: 'Reflect on a challenging conversation you had recently and how you handled your choice of words.',
+      minSentences: 3,
+      hints: [
+        'Sentence 1: Set the scene and state who the conversation was with.',
+        'Sentence 2: Explain how you chose calm, respectful vocabulary.',
+        'Sentence 3: Reflect on the outcome and what it taught you about communication.'
+      ],
+      idealExample: 'Yesterday I had a rather sensitive discussion with my project lead regarding unrealistic deadlines. Instead of expressing frustration, I carefully selected polite diplomatic phrases like "I would appreciate your guidance" and "Could we review the scope together?". As a result, we reached a constructive compromise without any friction.'
+    },
+    {
+      id: 'dj-6',
+      level: 'all',
+      prompt: 'What was an unexpected compliment or kind gesture you received recently that brightened your day?',
+      minSentences: 3,
+      hints: [
+        'Sentence 1: Describe who offered the gesture and where it took place.',
+        'Sentence 2: Detail what they said or did.',
+        'Sentence 3: Explain why it resonated with you and changed your outlook.'
+      ],
+      idealExample: 'Earlier this week, a colleague unexpectedly thanked me for my patience during a complex client onboarding session. She remarked that my calm demeanor made everyone feel reassured under intense pressure. Her thoughtful feedback reminded me that small acts of appreciation leave lasting impressions.'
     }
   ],
 
@@ -233,6 +329,32 @@ export const WRITING_EXERCISES = {
         'Hint 3: Conclude with an adventurous choice made by your character.'
       ],
       idealExample: 'I froze in place holding my teacup as dust drifted into the dim candle light. Behind the oak panel lay a narrow stone corridor leading downward beneath the manor. Without hesitating, I picked up the silver lantern and took my first cautious step into the darkness.'
+    },
+    {
+      id: 'sc-3',
+      level: 'intermediate',
+      prompt: 'You step inside an old London red telephone box to escape a sudden downpour, and the rotary phone begins ringing...',
+      starter: 'I hesitated before lifting the heavy black receiver to my ear...',
+      minSentences: 3,
+      hints: [
+        'Hint 1: Who was on the line and what did they urgently say?',
+        'Hint 2: Describe the raindrops drumming on the red glass panels.',
+        'Hint 3: Use descriptive British verbs: peered, crackled, whispered.'
+      ],
+      idealExample: 'I hesitated before lifting the heavy black receiver to my ear as the rain drummed violently against the red glass. A calm voice crackled over the line, whispering, "Leave the umbrella by the fountain and look up at the clock tower." Before I could utter a word of reply, the line went dead, leaving only the sound of rushing London traffic.'
+    },
+    {
+      id: 'sc-4',
+      level: 'advanced',
+      prompt: 'While browsing an eccentric vintage bookshop on Charing Cross Road, you notice that the novel you opened is describing your exact movements in real time...',
+      starter: 'My eyes scanned the parchment page and my pulse quickened...',
+      minSentences: 3,
+      hints: [
+        'Hint 1: What did the sentence on the page say you were about to do?',
+        'Hint 2: How did you test whether the book was truly predictive?',
+        'Hint 3: Describe the dusty scent of vintage paper and dim gaslight.'
+      ],
+      idealExample: 'My eyes scanned the parchment page and my pulse quickened as I read the words: "The visitor glanced up toward the spiraling staircase." Shocked, I deliberately stepped backwards, only to see the fresh ink reshape itself before my very eyes. At the bottom of the page, the book issued an unmistakable warning.'
     }
   ],
 
@@ -286,6 +408,35 @@ export const WRITING_EXERCISES = {
       rules: [
         "Do not combine 'Although' and 'but' in the same sentence; choose one connector.",
         "Correct prepositions: 'arrive at a meeting' and 'on time' (punctual), not 'at time'."
+      ]
+    },
+    {
+      id: 'fm-6',
+      level: 'intermediate',
+      badText: "I am looking forward to meet you next week at the conference.",
+      correction: "I am looking forward to meeting you next week at the conference.",
+      rules: [
+        "In the phrase 'look forward to', 'to' is a preposition, so it must be followed by a gerund (-ing form): 'looking forward to meeting'."
+      ]
+    },
+    {
+      id: 'fm-7',
+      level: 'intermediate',
+      badText: "He gave me many good advices about how to improve my British accent.",
+      correction: "He gave me plenty of good advice on how to improve my British accent.",
+      rules: [
+        "'Advice' is an uncountable noun in English; it never takes a plural '-s' or 'many'. Say 'a piece of advice', 'some advice', or 'good advice'."
+      ]
+    },
+    {
+      id: 'fm-8',
+      level: 'advanced',
+      badText: "If I would have known about the delay, I wouldn't have came to the station so early.",
+      correction: "If I had known about the delay, I wouldn't have come to the station so early.",
+      rules: [
+        "Third Conditional structure: 'If + past perfect (had known), would have + past participle (come)'.",
+        "Never put 'would have' in the 'if' clause.",
+        "The past participle of 'come' is 'come', not 'came'."
       ]
     }
   ],
@@ -383,6 +534,59 @@ export const WRITING_EXERCISES = {
         'Describe people, organizations, or nature overcoming hardships.'
       ],
       idealExample: 'Despite encountering numerous startup setbacks, the founders proved remarkably resilient and eventually built a thriving company.'
+    },
+    {
+      id: 'ww-5',
+      word: 'gobsmacked',
+      phonetic: '/ˈɡɒb.smækt/',
+      partOfSpeech: 'adjective (British slang)',
+      definition: 'Utterly astonished, stunned, or speechless with surprise.',
+      exampleSentence: 'I was completely gobsmacked when they announced our team had won the award.',
+      prompt: 'Write an expressive sentence using the British slang word "gobsmacked".',
+      hints: [
+        'Often paired with "absolutely" or "completely": "absolutely gobsmacked".',
+        'Describe an unexpected victory, sudden plot twist, or astonishing news.'
+      ],
+      idealExample: 'I was absolutely gobsmacked when I opened the envelope and found tickets to the West End show.'
+    },
+    {
+      id: 'ww-6',
+      word: 'bespoke',
+      phonetic: '/bɪˈspəʊk/',
+      partOfSpeech: 'adjective',
+      definition: 'Made to individual order; custom-made (traditionally tailored clothing, furniture, or solutions).',
+      exampleSentence: 'He wore a bespoke navy suit tailored on Savile Row.',
+      prompt: 'Write a sophisticated sentence incorporating the British word "bespoke".',
+      hints: [
+        'Common pairings: "bespoke suit", "bespoke software", "bespoke design", "bespoke service".'
+      ],
+      idealExample: 'The London consultancy developed a bespoke marketing solution tailored specifically for independent bookshops.'
+    },
+    {
+      id: 'ww-7',
+      word: 'fortnight',
+      phonetic: '/ˈfɔːt.naɪt/',
+      partOfSpeech: 'noun',
+      definition: 'A period of two weeks (universally used across Britain).',
+      exampleSentence: 'We spent a lovely fortnight walking through the Scottish Highlands.',
+      prompt: 'Write a sentence incorporating the word "fortnight".',
+      hints: [
+        'Often used with time prepositions: "for a fortnight", "in a fortnight\'s time", "a fortnight ago".'
+      ],
+      idealExample: 'Our family is traveling to Cornwall for a peaceful fortnight by the seaside next month.'
+    },
+    {
+      id: 'ww-8',
+      word: 'knackered',
+      phonetic: '/ˈnæk.əd/',
+      partOfSpeech: 'adjective (British informal)',
+      definition: 'Extremely tired, exhausted, or worn out after hard physical or mental exertion.',
+      exampleSentence: 'After walking ten miles around London, I was completely knackered.',
+      prompt: 'Write an authentic conversational sentence using the British slang word "knackered".',
+      hints: [
+        'Collocates with "proper knackered", "absolutely knackered", or "ready for a good night\'s kip".'
+      ],
+      idealExample: 'After cycling through the hills all afternoon, we were both completely knackered and ready for hot fish and chips.'
     }
   ],
 
@@ -1520,6 +1724,283 @@ export async function auditWritingSubmission(text, exercise = {}) {
 }
 
 // ============================================================================
+// AI EVALUATION (CONTEXTUAL UNDERSTANDING OF EXERCISE PROMPT) & REFRESH ENGINE
+// ============================================================================
+export async function auditWritingSubmissionWithAI(text, exercise = {}, mode = {}) {
+  const cleanText = (text || '').trim();
+  const apiKey = getGeminiApiKey();
+
+  if (!cleanText) {
+    return {
+      isValid: false,
+      score: 0,
+      questionComplianceFeedback: 'No text was provided.',
+      errors: [{
+        category: 'Empty Submission',
+        classification: 'Prompt Requirement',
+        mistake: 'Blank entry',
+        correction: 'Write your sentence in English',
+        explanation: 'Please enter your response before clicking Check with AI.',
+        rule: 'Every challenge requires a written English response.',
+        examples: ['Type your thoughts into the box above.'],
+        yourTurn: 'Write a sentence to answer the prompt.'
+      }],
+      strengths: [],
+      recurringPatterns: [],
+      polishedText: ''
+    };
+  }
+
+  // 1. Contextual AI evaluation with Gemini if API Key is configured
+  if (apiKey) {
+    try {
+      const modeTitle = mode.title || 'Writing Challenge';
+      const promptText = getExercisePromptText(exercise, mode);
+      const targetWords = exercise.words && exercise.words.length > 0 ? exercise.words.join(', ') : (exercise.word || 'None');
+
+      const systemInstruction = `You are a distinguished British English tutor. Evaluate a student's answer to a specific writing exercise in the British English Vault app.
+
+CRITICAL INSTRUCTIONS:
+1. QUESTION UNDERSTANDING & COMPLIANCE:
+   - Carefully review the EXERCISE PROMPT and required TARGET WORDS.
+   - Judge if the student actually answered the question asked, or wrote something irrelevant.
+   - If target words were required (${targetWords}), check if the student used them correctly in context.
+   - In "questionComplianceFeedback", write 1-2 friendly, precise sentences explaining how well the student addressed the question and prompt requirements.
+
+2. PEDAGOGICAL ERROR CORRECTION & RULES:
+   - Check grammar, spelling, verb tenses, subject-verb agreement, prepositions, and natural British collocations.
+   - Do NOT penalize for lack of closing periods or punctuation unless it affects meaning.
+   - For every genuine error, output:
+     * "mistake": the exact flawed phrase/word
+     * "category": Grammar / Spelling & Typo / Vocabulary & Phrasing / Question Requirement
+     * "classification": "Incorrect" (real error) or "More natural" (idiomatic suggestion) or "Question Requirement"
+     * "explanation": Why it is incorrect in simple, encouraging English
+     * "rule": The grammar or vocabulary rule formula
+     * "examples": 2 similar correct examples
+     * "yourTurn": A short challenge for the student to practice this rule
+   - Follow pedagogical self-correction: DO NOT write the entire corrected sentence for the student in the error card. Give them the tools to fix it themselves!
+
+3. SCORE & STRENGTHS:
+   - Provide a quality score (0 to 100) based on answering the question and language accuracy.
+   - If the student answered the question well and made no errors, set "errors": [] and praise their effort in "strengths".
+
+Output must be ONLY a single valid JSON object.`;
+
+      const promptContent = `EXERCISE MODE: ${modeTitle}
+EXERCISE PROMPT: ${promptText}
+MANDATORY TARGET WORDS: ${targetWords}
+
+STUDENT SUBMISSION:
+"${cleanText}"
+
+Evaluate in JSON:
+{
+  "isValid": true,
+  "score": 90,
+  "answersQuestion": true,
+  "questionComplianceFeedback": "You addressed the prompt effectively by...",
+  "strengths": ["Clear sentence structure", "Accurate use of target vocabulary"],
+  "errors": [
+    {
+      "category": "Grammar",
+      "classification": "Incorrect",
+      "mistake": "She don't",
+      "correction": "She doesn't",
+      "explanation": "With third-person singular (he, she, it) in present simple, use 'doesn't' instead of 'don't'.",
+      "rule": "Doesn't + base verb",
+      "examples": ["She doesn't like tea.", "He doesn't work on Sundays."],
+      "yourTurn": "Write a sentence using 'doesn't' and a different verb."
+    }
+  ],
+  "polishedText": "A natural British English version"
+}`;
+
+      const modelsToTry = [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
+        'gemini-3.5-flash',
+        'gemini-3.1-flash-lite',
+        'gemini-3-flash-preview'
+      ];
+
+      const cachedModel = localStorage.getItem('bev_working_gemini_model');
+      if (cachedModel && modelsToTry.includes(cachedModel)) {
+        modelsToTry.splice(modelsToTry.indexOf(cachedModel), 1);
+        modelsToTry.unshift(cachedModel);
+      }
+
+      for (const model of modelsToTry) {
+        try {
+          const resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: promptContent }] }],
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  temperature: 0.15,
+                  maxOutputTokens: 1500
+                }
+              })
+            }
+          );
+
+          if (resp.ok) {
+            const data = await resp.json();
+            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (raw) {
+              localStorage.setItem('bev_working_gemini_model', model);
+              const aiResult = extractJSON(raw);
+              if (aiResult && typeof aiResult.score === 'number') {
+                aiResult.isValid = aiResult.score >= 50;
+                aiResult.errors = aiResult.errors || [];
+                aiResult.strengths = aiResult.strengths || [];
+
+                // Identify recurring patterns with historical errors
+                const errorStats = getErrorStats();
+                const recurringPatterns = [];
+                aiResult.errors.forEach(err => {
+                  const cat = err.category;
+                  const prevCount = errorStats[cat] || 0;
+                  if (prevCount >= 2 && !recurringPatterns.some(r => r.category === cat)) {
+                    recurringPatterns.push({
+                      category: cat,
+                      previousCount: prevCount,
+                      explanation: err.explanation,
+                      rule: err.rule,
+                      targetedExercise: err.yourTurn || `Write 2 practice sentences focusing on ${cat}.`
+                    });
+                  }
+                });
+                aiResult.recurringPatterns = recurringPatterns;
+
+                return aiResult;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn(`Gemini model ${model} check failed:`, e);
+        }
+      }
+    } catch (err) {
+      console.error('Error with Gemini AI check:', err);
+    }
+  }
+
+  // 2. Fallback to local audit if no API key or network is unavailable
+  const localResult = await auditWritingSubmission(cleanText, exercise);
+  localResult.questionComplianceFeedback = apiKey 
+    ? 'Checked using local grammar diagnosis.' 
+    : 'Local grammar check completed. (Tip: Enter your Gemini API key in Settings to enable real-time AI question and task understanding!)';
+  return localResult;
+}
+
+export async function loadFreshPracticeChallenge(modeId) {
+  const mode = WRITING_MODES.find(m => m.id === modeId) || WRITING_MODES[0];
+  const apiKey = getGeminiApiKey();
+
+  if (apiKey) {
+    try {
+      const systemPrompt = `You are an elite British English curriculum author. Generate ONE brand new writing challenge with fresh questions and words for mode: "${mode.title}" (${mode.desc}).
+Requirements for "${modeId}":
+- If "sentence-builder": Pick 3 distinct, high-impact British English words (adverbs, conjunctions, advanced verbs, or idioms) that the student must combine.
+- If "daily-journal": Provide an original, engaging daily reflection question about everyday life, culture, or personal growth.
+- If "story-challenge": Provide an intriguing opening narrative line (starter) set in Britain or a fascinating situation.
+- If "fix-my-writing": Provide an authentic flawed English sentence ("badText") containing 2 realistic grammatical or spelling mistakes for the student to rewrite.
+- If "real-life-writing": Provide an authentic UK communication scenario (e.g. email, letter, polite request).
+- If "word-to-writing": Pick an authentic British English word (e.g. "Chuffed", "Bespoke", "Fortnight", "Gobsmacked", "Knackered", "Skint", "Dodgy", "Posh", "Proper", "Cuppa", "Brolly", "Gutted"), its part of speech and definition.
+- If "expand-sentence": Provide a simple 4-6 word base sentence and instructions to expand it.
+- If "paragraph-master": Provide a rich topic for a 3-sentence structured paragraph (Topic, Support, Conclusion).
+
+Return ONLY raw JSON matching:
+{
+  "id": "ai-${Date.now()}",
+  "prompt": "challenge prompt instructions",
+  "words": ["w1", "w2", "w3"],
+  "word": "word",
+  "partOfSpeech": "Adjective/Noun/Verb",
+  "definition": "definition",
+  "badText": "flawed sentence",
+  "starter": "opening sentence...",
+  "base": "short sentence",
+  "topic": "topic name",
+  "minSentences": 3,
+  "hints": ["Hint 1: ...", "Hint 2: ...", "Hint 3: ..."],
+  "idealExample": "Model answer in British English"
+}`;
+
+      const modelsToTry = [
+        'gemini-2.5-flash',
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro'
+      ];
+
+      const cachedModel = localStorage.getItem('bev_working_gemini_model');
+      if (cachedModel && modelsToTry.includes(cachedModel)) {
+        modelsToTry.splice(modelsToTry.indexOf(cachedModel), 1);
+        modelsToTry.unshift(cachedModel);
+      }
+
+      for (const model of modelsToTry) {
+        try {
+          const resp = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: `Generate a new ${mode.title} challenge with different words and questions now.` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                  responseMimeType: 'application/json',
+                  temperature: 0.85,
+                  maxOutputTokens: 1200
+                }
+              })
+            }
+          );
+
+          if (resp.ok) {
+            const data = await resp.json();
+            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (raw) {
+              const aiEx = extractJSON(raw);
+              if (aiEx && (aiEx.prompt || aiEx.badText || aiEx.words)) {
+                aiEx.id = `ai-${Date.now()}`;
+                if (!WRITING_EXERCISES[modeId]) WRITING_EXERCISES[modeId] = [];
+                WRITING_EXERCISES[modeId].unshift(aiEx);
+                currentExerciseIndex = 0;
+                return aiEx;
+              }
+            }
+          }
+        } catch (e) {
+          console.warn(`Model ${model} failed to generate challenge:`, e);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to generate challenge via AI:', err);
+    }
+  }
+
+  // Diverse bank fallback: cycle through different exercises in the bank
+  const list = getFilteredExerciseList(modeId);
+  if (list.length > 1) {
+    const nextIdx = (currentExerciseIndex + 1 + Math.floor(Math.random() * (list.length - 1))) % list.length;
+    currentExerciseIndex = nextIdx;
+  } else {
+    currentExerciseIndex = 0;
+  }
+  return list[currentExerciseIndex % list.length];
+}
+
+// ============================================================================
 // UI RENDERING & CONTROLLER (100% ENGLISH & REDESIGNED BUTTONS)
 // ============================================================================
 export function initDailyPracticeUI() {
@@ -1588,14 +2069,6 @@ function renderDailyPracticeLayout(container) {
           <span>Personal Error Tracker</span>
         </button>
       </div>
-
-      <!-- Difficulty Level Pill Selector -->
-      <div id="level-pill-container" style="display: flex; gap: 0.35rem; background: var(--input-bg); padding: 0.35rem 0.5rem; border-radius: 20px; border: 1px solid var(--border-color); width: fit-content; margin: 0.6rem auto 0 auto; flex-wrap: wrap; justify-content: center;">
-        <button type="button" class="btn-level-filter active" data-level="all" style="border: none; background: var(--card-bg); color: var(--text-main); font-size: 0.82rem; font-weight: 700; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">All Levels</button>
-        <button type="button" class="btn-level-filter" data-level="beginner" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌱 Beginner</button>
-        <button type="button" class="btn-level-filter" data-level="intermediate" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌿 Intermediate</button>
-        <button type="button" class="btn-level-filter" data-level="advanced" style="border: none; background: transparent; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 16px; cursor: pointer;">🌲 Advanced</button>
-      </div>
     </div>
 
     <!-- SUB-VIEW CONTAINER -->
@@ -1609,13 +2082,9 @@ function renderCurrentSubTab() {
   const container = document.getElementById('practice-subview-content');
   if (!container) return;
 
-  const levelPills = document.getElementById('level-pill-container');
-
   if (activeSubTab === 'challenges') {
-    if (levelPills) levelPills.style.display = 'flex';
     renderChallengesView(container);
   } else if (activeSubTab === 'error-tracker') {
-    if (levelPills) levelPills.style.display = 'none';
     renderErrorTrackerView(container);
   }
 }
@@ -1693,10 +2162,7 @@ function renderChallengesView(container) {
 }
 
 function getFilteredExerciseList(modeId) {
-  const list = WRITING_EXERCISES[modeId] || [];
-  if (activeLevelFilter === 'all') return list;
-  const filtered = list.filter(item => !item.level || item.level === 'all' || item.level === activeLevelFilter);
-  return filtered.length > 0 ? filtered : list;
+  return WRITING_EXERCISES[modeId] || [];
 }
 
 function getExercisePromptText(exercise, mode) {
@@ -1723,35 +2189,36 @@ function getExercisePromptText(exercise, mode) {
 
 function renderExerciseWorkbench(mode, exercise, totalAvailable) {
   if (!exercise) {
-    return `<div style="text-align: center; padding: 2rem; color: var(--text-muted);">No exercises found for this level. Please select "All Levels".</div>`;
+    exercise = WRITING_EXERCISES[mode.id]?.[0] || { prompt: 'Write a sentence in natural British English.' };
   }
 
   return `
     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;">
       <div style="display: flex; align-items: center; gap: 0.8rem;">
-        <span style="width: 36px; height: 36px; border-radius: 10px; background: ${mode.color}20; color: ${mode.color}; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
+        <span style="width: 38px; height: 38px; border-radius: 12px; background: ${mode.color}20; color: ${mode.color}; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
           <i class="fa-solid ${mode.icon}"></i>
         </span>
         <div>
           <h2 style="margin: 0; font-size: 1.35rem; font-weight: 800; color: var(--text-main);">
             ${mode.title}
           </h2>
-          <div style="font-size: 0.82rem; color: var(--text-muted);">
-            Challenge ${(currentExerciseIndex % totalAvailable) + 1} of ${totalAvailable}
-            ${exercise.level ? `• <span style="text-transform: capitalize; font-weight: 700; color: var(--uk-blue);">${exercise.level}</span>` : ''}
+          <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.2rem;">
+            <span><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> AI Contextual Evaluation</span>
+            <span>•</span>
+            <span style="color: var(--uk-blue); font-weight: 700;">Dynamic Practice</span>
           </div>
         </div>
       </div>
 
       <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+        <button type="button" id="btn-refresh-challenge" class="practice-btn-refresh" title="Generate or load a brand new question with different words so it's never the same!">
+          <i class="fa-solid fa-arrows-rotate"></i> <span>Refresh Challenge 🔄</span>
+        </button>
         <button type="button" id="btn-copy-practice-prompt" class="practice-btn-copy" style="font-size: 0.85rem; padding: 0.55rem 1.05rem;" title="Copy exercise prompt">
           <i class="fa-regular fa-copy"></i> <span>Copy Prompt</span>
         </button>
         <button type="button" id="btn-share-practice-prompt" class="practice-btn-share" style="font-size: 0.85rem; padding: 0.55rem 1.05rem;" title="Share exercise challenge">
           <i class="fa-solid fa-share-nodes"></i> <span>Share Challenge</span>
-        </button>
-        <button type="button" id="btn-next-prompt" class="practice-btn-secondary" style="font-size: 0.85rem; padding: 0.55rem 1.1rem;">
-          <i class="fa-solid fa-shuffle"></i> <span>Next Prompt</span>
         </button>
       </div>
     </div>
@@ -1833,11 +2300,15 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
       "></textarea>
     </div>
 
-    <!-- Action Buttons (Modern, Comfortable, Distinct Copy & Share) -->
+    <!-- Action Buttons (Check with AI, Refresh, Copy, Share, Clear) -->
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem;">
       <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-        <button type="button" id="btn-check-writing" class="practice-btn-primary">
-          <i class="fa-solid fa-magnifying-glass-check"></i> <span>Check My Writing & Feedback</span>
+        <button type="button" id="btn-check-writing" class="practice-btn-primary practice-btn-ai-check" title="Analyze your sentence using Gemini AI based on this question">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> <span>Check with AI</span>
+        </button>
+
+        <button type="button" id="btn-refresh-bottom" class="practice-btn-refresh" style="font-size: 0.85rem; padding: 0.7rem 1.15rem;" title="Get another question with different words">
+          <i class="fa-solid fa-arrows-rotate"></i> <span>New Question</span>
         </button>
 
         <button type="button" id="btn-copy-practice-writing" class="practice-btn-copy" title="Copy written sentence">
@@ -1848,13 +2319,13 @@ function renderExerciseWorkbench(mode, exercise, totalAvailable) {
           <i class="fa-solid fa-share-nodes"></i> <span>Share</span>
         </button>
 
-        <button type="button" id="btn-clear-writing" class="practice-btn-secondary">
+        <button type="button" id="btn-clear-writing" class="practice-btn-secondary" title="Clear response text">
           <i class="fa-solid fa-eraser"></i> <span>Clear</span>
         </button>
       </div>
 
       <div style="font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
-        <i class="fa-solid fa-shield-halved" style="color: #10B981;"></i> Automatic Grammar, Spelling & Syntax Diagnosis
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> Evaluated by AI according to your question
       </div>
     </div>
 
@@ -1988,7 +2459,47 @@ function bindWorkbenchEvents(container) {
     });
   });
 
-  // Next prompt button
+  // Refresh Challenge with brand new question & words
+  const handleRefreshChallenge = async () => {
+    const refreshTopBtn = document.getElementById('btn-refresh-challenge');
+    const refreshBotBtn = document.getElementById('btn-refresh-bottom');
+    const origTop = refreshTopBtn ? refreshTopBtn.innerHTML : '';
+    const origBot = refreshBotBtn ? refreshBotBtn.innerHTML : '';
+
+    if (refreshTopBtn) {
+      refreshTopBtn.disabled = true;
+      refreshTopBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Creating New Challenge...</span>';
+    }
+    if (refreshBotBtn) {
+      refreshBotBtn.disabled = true;
+      refreshBotBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Loading New Words...</span>';
+    }
+
+    try {
+      await loadFreshPracticeChallenge(activeMode);
+      hintStage = 0;
+      renderChallengesView(container);
+      showCopyShareToast('✨ Fresh challenge & words loaded!', 'fa-wand-magic-sparkles');
+    } catch (err) {
+      console.error('Error refreshing challenge:', err);
+    } finally {
+      if (refreshTopBtn) {
+        refreshTopBtn.disabled = false;
+        refreshTopBtn.innerHTML = origTop;
+      }
+      if (refreshBotBtn) {
+        refreshBotBtn.disabled = false;
+        refreshBotBtn.innerHTML = origBot;
+      }
+    }
+  };
+
+  const refreshTopBtn = document.getElementById('btn-refresh-challenge');
+  if (refreshTopBtn) refreshTopBtn.addEventListener('click', handleRefreshChallenge);
+
+  const refreshBotBtn = document.getElementById('btn-refresh-bottom');
+  if (refreshBotBtn) refreshBotBtn.addEventListener('click', handleRefreshChallenge);
+
   const nextBtn = document.getElementById('btn-next-prompt');
   if (nextBtn) {
     nextBtn.addEventListener('click', () => {
@@ -2143,7 +2654,7 @@ function bindWorkbenchEvents(container) {
       checkBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Checking with AI...</span>';
 
       try {
-        const feedback = await auditWritingSubmission(text, curEx);
+        const feedback = await auditWritingSubmissionWithAI(text, curEx, curMode);
         lastCheckedFeedback = feedback;
 
         // Render feedback UI
@@ -2245,6 +2756,27 @@ function renderFeedbackCard(feedback, originalText, exercise = {}, mode = {}) {
           <i class="fa-solid fa-share-nodes"></i> <span>Share Sentence & Feedback</span>
         </button>
       </div>
+
+      <!-- AI Question Assessment & Prompt Compliance -->
+      ${feedback.questionComplianceFeedback ? `
+        <div style="background: rgba(0,36,125,0.06); border-left: 4px solid var(--uk-blue); border-radius: 0 12px 12px 0; padding: 1rem 1.3rem; margin-bottom: 1.3rem;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: var(--uk-blue); text-transform: uppercase; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.4rem;">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--gold);"></i> AI Question & Task Evaluation:
+          </div>
+          <div style="font-size: 0.95rem; color: var(--text-main); line-height: 1.55; font-weight: 600;">
+            ${feedback.questionComplianceFeedback}
+          </div>
+          ${feedback.strengths && feedback.strengths.length > 0 ? `
+            <div style="margin-top: 0.6rem; display: flex; gap: 0.45rem; flex-wrap: wrap;">
+              ${feedback.strengths.map(s => `
+                <span style="font-size: 0.8rem; font-weight: 700; color: #10B981; background: rgba(16,185,129,0.1); padding: 0.25rem 0.7rem; border-radius: 12px; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <i class="fa-solid fa-check"></i> ${s}
+                </span>
+              `).join('')}
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
 
       <!-- Your Submitted Writing Card (Active Self-Correction, No Spoon-fed Answer) -->
       <div style="margin-bottom: 1.5rem;">
@@ -2711,29 +3243,6 @@ function bindDailyPracticeEvents(container) {
       btn.classList.add('active');
 
       activeSubTab = btn.getAttribute('data-subtab');
-      renderCurrentSubTab();
-    });
-  });
-
-  // Level selector filter (All Levels / Beginner / Intermediate / Advanced)
-  container.querySelectorAll('#level-pill-container .btn-level-filter').forEach(btn => {
-    btn.addEventListener('click', () => {
-      container.querySelectorAll('#level-pill-container .btn-level-filter').forEach(b => {
-        b.classList.remove('active');
-        b.style.background = 'transparent';
-        b.style.color = 'var(--text-muted)';
-        b.style.boxShadow = 'none';
-        b.style.fontWeight = '600';
-      });
-      btn.classList.add('active');
-      btn.style.background = 'var(--card-bg)';
-      btn.style.color = 'var(--text-main)';
-      btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-      btn.style.fontWeight = '700';
-
-      activeLevelFilter = btn.getAttribute('data-level');
-      currentExerciseIndex = 0;
-      hintStage = 0;
       renderCurrentSubTab();
     });
   });
