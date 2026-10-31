@@ -170,9 +170,9 @@ function initGrammarChecklist() {
     copyBtn.dataset.bound = 'true';
     copyBtn.addEventListener('click', () => {
       const currentCompleted = getCompletedChecklist();
-      const total = (GRAMMAR_CHECKLIST || []).length || 14;
+      const total = (GRAMMAR_CHECKLIST || []).length || 17;
       const lines = [
-        '### English Learning Methods & Study Roadmap',
+        '### 17 Master Pillars of English Fluency - Study Roadmap',
         '',
         '### Your Study Progress',
         `${currentCompleted.length} of ${total} completed (${Math.round((currentCompleted.length / total) * 100)}%)`,
@@ -238,7 +238,7 @@ function updateChecklistProgress(completedCount) {
   const fillEl = document.getElementById('checklist-progress-fill');
   const heroCountEl = document.getElementById('hero-checklist-count');
 
-  const total = (GRAMMAR_CHECKLIST || []).length || 14;
+  const total = (GRAMMAR_CHECKLIST || []).length || 17;
   const pct = Math.round((completedCount / total) * 100);
 
   if (textEl) textEl.innerText = `${completedCount} of ${total} completed (${pct}%)`;
@@ -247,7 +247,7 @@ function updateChecklistProgress(completedCount) {
 }
 
 /**
- * Initialize "Where should you start?" Guide with 14 Learning Methods & Modern Audio
+ * Initialize "Where should you start?" Guide with 17 Master Pillars & Modern Audio
  */
 function initWhereToStartGuide() {
   const container = document.getElementById('guide-examples-container');
@@ -298,12 +298,12 @@ function initWhereToStartGuide() {
     });
   });
 
-  // Bind Start with Flashcards button
+  // Bind Start with Grammar button
   const startBtn = document.getElementById('btn-start-parts-of-speech');
   if (startBtn && !startBtn.dataset.bound) {
     startBtn.dataset.bound = 'true';
     startBtn.addEventListener('click', () => {
-      openTopicDetail('flashcards');
+      openTopicDetail('grammar');
     });
   }
 }
@@ -332,7 +332,7 @@ function renderCategoryChips() {
       const checklistCard = document.getElementById('grammar-checklist-card');
       const startGuideCard = document.getElementById('grammar-start-guide-card');
 
-      if (activeCategory === 'all' || activeCategory === 'vocabulary') {
+      if (activeCategory === 'all' || activeCategory === 'foundations') {
         if (checklistCard) checklistCard.style.display = 'block';
         if (startGuideCard) startGuideCard.style.display = 'block';
       } else {

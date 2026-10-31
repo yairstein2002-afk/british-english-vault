@@ -1,888 +1,1103 @@
 /**
  * British English Vault - Learn & Practice Module Data Structure (100% English)
- * 14 Core Language Learning Pillars, Methods, Rules, UK Examples & Interactive Practice Quizzes.
+ * 17 Master Pillars of English Fluency: Complete Curriculum from Foundations to Mastery.
  */
 
 export const LEARN_CATEGORIES = [
   {
-    "id": "vocabulary",
-    "titleEng": "Vocabulary & Retention",
-    "icon": "fa-layer-group",
-    "emoji": "🗂️",
-    "desc": "Spaced repetition flashcards, lexical notebooks, and active recall techniques."
+    "id": "foundations",
+    "titleEng": "Foundations & Mechanics",
+    "icon": "fa-cubes",
+    "emoji": "🧱",
+    "desc": "Grammar rules, core vocabulary, spelling mechanics, and punctuation precision."
   },
   {
-    "id": "comprehension",
-    "titleEng": "Comprehension & Ear Training",
-    "icon": "fa-headphones",
-    "emoji": "🎧",
-    "desc": "Extensive daily reading, authentic listening, shadowing cadence, and dictation."
-  },
-  {
-    "id": "production",
-    "titleEng": "Active Production",
+    "id": "core-skills",
+    "titleEng": "The 4 Core Skills & Pronunciation",
     "icon": "fa-comments",
-    "emoji": "🗣️",
-    "desc": "Spontaneous conversational speaking drills and structured British English writing."
+    "emoji": "🎙️",
+    "desc": "Speaking fluency, listening comprehension, extensive reading, writing, and pronunciation."
   },
   {
-    "id": "assessment",
-    "titleEng": "Accuracy & Testing",
-    "icon": "fa-list-check",
-    "emoji": "📊",
-    "desc": "Targeted grammar drills, interactive vocabulary quizzes, and systematic error tracking."
+    "id": "idioms-varieties",
+    "titleEng": "Phrasals, Idioms & Varieties",
+    "icon": "fa-crown",
+    "emoji": "🇬🇧",
+    "desc": "Phrasal verbs, idiomatic expressions, British vs American English, and advanced eloquence."
   },
   {
-    "id": "immersion",
-    "titleEng": "Entertainment & Immersion",
-    "icon": "fa-film",
-    "emoji": "🎬",
-    "desc": "Real-world British English through cinema, authentic podcasts, and language games."
+    "id": "practical-accuracy",
+    "titleEng": "Functional English & Error Traps",
+    "icon": "fa-briefcase",
+    "emoji": "💼",
+    "desc": "Real-world situational dialogues and systematically eliminating common grammatical mistakes."
+  },
+  {
+    "id": "mindset-techniques",
+    "titleEng": "Thinking in English & Techniques",
+    "icon": "fa-brain",
+    "emoji": "🧠",
+    "desc": "Forming direct English thoughts without translating, and accelerated learning methodologies."
   }
 ];
 
 export const LEARN_TOPICS = [
-  // 1. Flashcards
+  // 1. Grammar
   {
-    "id": "flashcards",
-    "categoryId": "vocabulary",
-    "subgroup": "Vocabulary & Retention",
-    "title": "Flashcards",
-    "summary": "Harness the power of digital and physical spaced-repetition flashcards to transfer British vocabulary and collocations into permanent long-term memory.",
+    "id": "grammar",
+    "categoryId": "foundations",
+    "subgroup": "Foundations & Mechanics",
+    "title": "Grammar",
+    "summary": "Master the structural architecture of English: Parts of Speech, Sentence Structures, the 12 Verb Tenses, Modal Verbs, Conditionals, and Voice.",
     "rules": [
       {
-        "title": "Spaced Repetition System (SRS)",
-        "details": "Review cards at expanding time intervals (1 day, 3 days, 1 week, 2 weeks) to interrupt the forgetting curve precisely before memory fades."
+        "title": "Parts of Speech & Word Classes",
+        "details": "Nouns, Verbs, Adjectives, Adverbs, Pronouns, Prepositions, Conjunctions, Articles, Determiners, and Interjections form the grammatical foundation."
       },
       {
-        "title": "Sentence-Based Context",
-        "details": "Never store isolated words on a card. Always include a complete, natural British English context sentence showcasing prepositions and word partners."
+        "title": "Sentence Structure & Word Order",
+        "details": "English adheres strictly to Subject-Verb-Object (SVO). Combine clauses into Simple, Compound, and Complex sentences with relative clauses."
       },
       {
-        "title": "Active Recall Over Recognition",
-        "details": "Force your brain to actively retrieve the target word or phrase from meaning before flipping the card over to verify."
+        "title": "The 12 Verb Tenses & Aspects",
+        "details": "Coordinate Simple, Continuous, Perfect, and Perfect Continuous across Present, Past, and Future timeframes with consistent temporal markers."
+      },
+      {
+        "title": "Conditionals, Modals & Voice",
+        "details": "Employ 0-3 and Mixed Conditionals (if-clauses), modal verbs (must, should, would, might), passive voice, and reported speech for sophisticated expression."
+      }
+    ],
+    "keywords": [
+      "parts of speech",
+      "sentence structure",
+      "verb tenses",
+      "modal verbs",
+      "conditionals",
+      "passive voice",
+      "reported speech",
+      "subjunctive mood"
+    ],
+    "examples": [
+      "Although the train was delayed, the conductor promptly apologised to all passengers aboard.",
+      "If you had arrived on time, we would have caught the express coach to Oxford.",
+      "The historic charter was meticulously examined by senior constitutional scholars."
+    ],
+    "practice": [
+      {
+        "question": "Which of the following sentences represents a correct Third Conditional structure?",
+        "options": [
+          "If I study hard, I will pass the exam.",
+          "If I had known about the meeting, I would have attended.",
+          "If it rains, we stay at home.",
+          "If I were you, I would accept the offer."
+        ],
+        "correctIndex": 1,
+        "explanation": "Third Conditional (past hypothetical) requires: If + Past Perfect, would have + Past Participle."
+      },
+      {
+        "question": "What is the standard unmarked word order in an English affirmative clause?",
+        "options": [
+          "Verb - Subject - Object (VSO)",
+          "Subject - Object - Verb (SOV)",
+          "Subject - Verb - Object (SVO)",
+          "Object - Verb - Subject (OVS)"
+        ],
+        "correctIndex": 2,
+        "explanation": "Standard English grammar relies primarily on Subject - Verb - Object order (e.g., 'The conductor blew the whistle')."
+      }
+    ]
+  },
+
+  // 2. Vocabulary
+  {
+    "id": "vocabulary",
+    "categoryId": "foundations",
+    "subgroup": "Foundations & Mechanics",
+    "title": "Vocabulary",
+    "summary": "Build a vast lexical repertoire spanning everyday topics, academic prose, professional business, technology, collocations, and word formation.",
+    "rules": [
+      {
+        "title": "Thematic & Contextual Clusters",
+        "details": "Acquire vocabulary clustered around domains: Career, Technology, Finance, Travel, Health, Nature, Society, and Describing People."
+      },
+      {
+        "title": "Collocations & Natural Word Partnerships",
+        "details": "Learn words with their natural partners (e.g., 'make an effort', 'bear in mind', 'pay attention', 'heavy rain') rather than isolated translations."
+      },
+      {
+        "title": "Word Families & Affixes",
+        "details": "Expand a single root word using prefixes (un-, dis-, re-) and suffixes (-tion, -able, -ment, -ly) to multiply your vocabulary fourfold."
+      }
+    ],
+    "keywords": [
+      "collocations",
+      "word families",
+      "synonyms",
+      "antonyms",
+      "academic vocabulary",
+      "prefixes and suffixes",
+      "register",
+      "homophones"
+    ],
+    "examples": [
+      "Acquiring strong collocations like 'profound impact' and 'vital role' elevates written expression.",
+      "Recognizing prefixes helps deduce the meaning of unfamiliar academic terms effortlessly.",
+      "The business proposal incorporated formal vocabulary suited for international executive review."
+    ],
+    "practice": [
+      {
+        "question": "Which collocation is natural and standard in English?",
+        "options": [
+          "Do a decision",
+          "Make a decision",
+          "Create a decision",
+          "Form a decision"
+        ],
+        "correctIndex": 1,
+        "explanation": "'Make a decision' is the standard fixed collocation in English; 'do a decision' is an incorrect calque."
+      },
+      {
+        "question": "What is the antonym of the formal adjective 'scarce'?",
+        "options": [
+          "Abundant",
+          "Rare",
+          "Minimal",
+          "Limited"
+        ],
+        "correctIndex": 0,
+        "explanation": "'Abundant' means plentiful or available in large quantities, opposite to 'scarce' (rare/in short supply)."
+      }
+    ]
+  },
+
+  // 3. Pronunciation
+  {
+    "id": "pronunciation",
+    "categoryId": "core-skills",
+    "subgroup": "The 4 Core Skills & Pronunciation",
+    "title": "Pronunciation",
+    "summary": "Master English vowel sounds, diphthongs, consonants, word and sentence stress, connected speech, weak forms, and British cadence.",
+    "rules": [
+      {
+        "title": "Connected Speech & Linking Sounds",
+        "details": "Native speech links consonant to vowel ('pick it up' -> /pɪ.kɪ.tʌp/) and inserts linking 'r' in non-rhotic British pronunciation."
+      },
+      {
+        "title": "Word & Sentence Stress",
+        "details": "English is stress-timed. Stressed syllables are louder and longer; unstressed function words reduce to the neutral schwa /ə/."
+      },
+      {
+        "title": "Challenging Sounds & Intonation",
+        "details": "Master minimal pairs: TH (/θ/ vs /ð/), short I vs long E (/ɪ/ vs /iː/), W vs V, and expressive falling/rising intonation curves."
+      }
+    ],
+    "keywords": [
+      "connected speech",
+      "word stress",
+      "schwa sound",
+      "weak forms",
+      "diphthongs",
+      "intonation",
+      "linking sounds",
+      "silent letters"
+    ],
+    "examples": [
+      "In standard British English, the letter 'r' is silent in 'car' unless followed immediately by a vowel.",
+      "The neutral schwa sound /ə/ appears in unstressed syllables like the 'a' in 'about' and 'doctor'.",
+      "Falling intonation signals certainty and completion at the end of affirmative British statements."
+    ],
+    "practice": [
+      {
+        "question": "What is the most common vowel sound in spoken English?",
+        "options": [
+          "The long /iː/ sound as in 'see'",
+          "The neutral schwa /ə/ sound found in unstressed syllables",
+          "The short /æ/ sound as in 'cat'",
+          "The open /ɑː/ sound as in 'car'"
+        ],
+        "correctIndex": 1,
+        "explanation": "The schwa /ə/ is the most prevalent sound in English, occurring in nearly all unstressed syllables and weak forms."
+      },
+      {
+        "question": "Which letter is completely silent in the British word 'subtle'?",
+        "options": [
+          "The letter 's'",
+          "The letter 'u'",
+          "The letter 'b'",
+          "The letter 't'"
+        ],
+        "correctIndex": 2,
+        "explanation": "In 'subtle', the letter 'b' is completely silent (/ˈsʌt.əl/)."
+      }
+    ]
+  },
+
+  // 4. Speaking
+  {
+    "id": "speaking",
+    "categoryId": "core-skills",
+    "subgroup": "The 4 Core Skills & Pronunciation",
+    "title": "Speaking",
+    "summary": "Build effortless spontaneous speech: introductions, small talk, expressing nuanced opinions, agreeing/disagreeing, storytelling, and public speaking.",
+    "rules": [
+      {
+        "title": "Conversational Fluency & Small Talk",
+        "details": "Open dialogue with courteous remarks on common ground (the weather, weekend plans, shared events) to establish instant rapport."
+      },
+      {
+        "title": "Diplomatic Politeness & Hedging",
+        "details": "Soften opinions and disagreements using polite British hedging: 'I see your point, however...', 'I'm not entirely convinced that...'"
+      },
+      {
+        "title": "Storytelling & Experience Sharing",
+        "details": "Structure narratives with sequencing markers: 'To begin with', 'Out of nowhere', 'Before I knew it', and 'In the end'."
+      }
+    ],
+    "keywords": [
+      "small talk",
+      "hedging",
+      "fluency",
+      "spontaneous speech",
+      "public speaking",
+      "negotiation",
+      "agreeing and disagreeing",
+      "discourse markers"
+    ],
+    "examples": [
+      "To be entirely honest, I would recommend reviewing the budget before finalising our proposal.",
+      "That's a fascinating perspective, although I wonder if there might be an alternative route.",
+      "Could you possibly elaborate on how this strategy will benefit our client base?"
+    ],
+    "practice": [
+      {
+        "question": "Which phrase expresses polite, diplomatic disagreement in professional British English?",
+        "options": [
+          "You are completely wrong about this.",
+          "I see what you mean, but I'm inclined to look at it somewhat differently.",
+          "No way, that makes no sense.",
+          "I refuse to listen to that idea."
+        ],
+        "correctIndex": 1,
+        "explanation": "'I see what you mean, but...' acknowledges the other person's view before politely presenting a counter-perspective."
+      },
+      {
+        "question": "What is the role of discourse markers like 'Well', 'Actually', or 'As a matter of fact' in spoken English?",
+        "options": [
+          "They signal tone, structure ideas, and buy natural thinking time",
+          "They indicate grammatical errors",
+          "They are only used in written poetry",
+          "They indicate that the conversation is ending"
+        ],
+        "correctIndex": 0,
+        "explanation": "Discourse markers give spoken conversations natural rhythm, soften transitions, and manage conversational flow."
+      }
+    ]
+  },
+
+  // 5. Listening
+  {
+    "id": "listening",
+    "categoryId": "core-skills",
+    "subgroup": "The 4 Core Skills & Pronunciation",
+    "title": "Listening",
+    "summary": "Calibrate your ear to understand native British speakers, rapid speech, diverse regional accents, podcasts, news broadcasts, and television dialogues.",
+    "rules": [
+      {
+        "title": "Listening for Gist vs. Detail",
+        "details": "Train your brain to catch the primary thesis without panicking over missed words; focus on stressed content words (nouns and verbs)."
+      },
+      {
+        "title": "Deciphering Fast Connected Speech",
+        "details": "Understand how native speakers elide (drop) sounds (e.g. 'next door' sounds like 'nexdoor') and assimilate neighboring consonants."
+      },
+      {
+        "title": "Multi-Accent Calibration",
+        "details": "Expose your hearing regularly to BBC News, Scottish, Welsh, Northern English, and Estuary voices to build versatile real-world comprehension."
+      }
+    ],
+    "keywords": [
+      "fast speech",
+      "comprehension",
+      "accents",
+      "connected speech",
+      "podcasts",
+      "BBC Radio",
+      "dictation",
+      "shadowing"
+    ],
+    "examples": [
+      "Listening to BBC Radio 4 broadcasts trains the ear to follow complex debates delivered at natural speed.",
+      "Noticing how consonants assimilate in rapid speech prevents misinterpreting common phrases.",
+      "Regular podcast immersion makes following fast-paced native conversations comfortable and natural."
+    ],
+    "practice": [
+      {
+        "question": "When listening to fast native English speech, which words carry the most essential meaning?",
+        "options": [
+          "Auxiliary verbs and articles",
+          "Stressed content words: nouns, main verbs, adjectives, and adverbs",
+          "Prepositions and pronouns exclusively",
+          "Conjunctions only"
+        ],
+        "correctIndex": 1,
+        "explanation": "Content words receive primary stress in English, carrying the core meaning of the message."
+      },
+      {
+        "question": "What auditory technique trains both accurate listening and vocal imitation simultaneously?",
+        "options": [
+          "Reading a silent book",
+          "Shadowing (repeating audio in real-time right behind the speaker)",
+          "Memorizing spelling lists",
+          "Translating subtitles into another language"
+        ],
+        "correctIndex": 1,
+        "explanation": "Shadowing directly connects auditory perception with vocal motor reproduction."
+      }
+    ]
+  },
+
+  // 6. Reading
+  {
+    "id": "reading",
+    "categoryId": "core-skills",
+    "subgroup": "The 4 Core Skills & Pronunciation",
+    "title": "Reading",
+    "summary": "Develop rapid reading comprehension, skimming, scanning, contextual word deduction, and analytical critique across British journalism, essays, and literature.",
+    "rules": [
+      {
+        "title": "Skimming & Scanning Techniques",
+        "details": "Skim introductory and concluding paragraphs for global overview; scan rapidly for dates, names, figures, and key terms."
+      },
+      {
+        "title": "Contextual Clue Deduction",
+        "details": "Infer the meaning of unfamiliar vocabulary from sentence syntax, surrounding adjectives, contrast markers, and logical flow."
+      },
+      {
+        "title": "Evaluating Tone & Author's Stance",
+        "details": "Detect subtle British irony, understatement, academic detachment, or rhetorical persuasion through modal adverbs and adjectives."
+      }
+    ],
+    "keywords": [
+      "skimming",
+      "scanning",
+      "comprehension",
+      "context clues",
+      "academic reading",
+      "author purpose",
+      "tone",
+      "editorial analysis"
+    ],
+    "examples": [
+      "Skimming the opening paragraph gave me an immediate understanding of the editorial's central thesis.",
+      "Contextual clues in the surrounding passage made the meaning of the rare adjective unmistakable.",
+      "Analyzing articles from The Economist deepens reading speed and critical comprehension."
+    ],
+    "practice": [
+      {
+        "question": "What is the difference between 'skimming' and 'scanning' a text?",
+        "options": [
+          "Skimming reads every word slowly; scanning reads backwards",
+          "Skimming grasps the overall main idea; scanning searches for specific pieces of information",
+          "Skimming is only for novels; scanning is for newspapers",
+          "There is no difference between the two"
+        ],
+        "correctIndex": 1,
+        "explanation": "Skimming provides a rapid global overview; scanning targets specific names, dates, or keywords."
+      },
+      {
+        "question": "How can you deduce the meaning of an unfamiliar word without checking a dictionary?",
+        "options": [
+          "Skip the entire page immediately",
+          "Examine surrounding contrast words, examples, synonyms, and grammatical role in the sentence",
+          "Assume it means the opposite of everything in the paragraph",
+          "Replace it with a random noun"
+        ],
+        "correctIndex": 1,
+        "explanation": "Contextual clues (syntax, punctuation, contrast conjunctions like 'unlike' or 'whereas') reveal word meaning naturally."
+      }
+    ]
+  },
+
+  // 7. Writing
+  {
+    "id": "writing",
+    "categoryId": "core-skills",
+    "subgroup": "The 4 Core Skills & Pronunciation",
+    "title": "Writing",
+    "summary": "Craft elegant sentences, cohesive paragraphs, professional emails, essays, reports, and CVs with British spelling, punctuation, and style.",
+    "rules": [
+      {
+        "title": "Paragraph Architecture",
+        "details": "Structure every paragraph around a single core Topic Sentence, expand with evidence/analysis, and synthesize with a closing transition."
+      },
+      {
+        "title": "Cohesive Transition Devices",
+        "details": "Bind sentences together using sophisticated transitional linkers ('furthermore', 'nevertheless', 'consequently', 'on the other hand')."
+      },
+      {
+        "title": "Tone & Register Adaptation",
+        "details": "Master the distinction between formal professional correspondence (impersonal passive, polite sign-offs) and informal creative writing."
+      }
+    ],
+    "keywords": [
+      "paragraph structure",
+      "cohesion",
+      "formal emails",
+      "essay writing",
+      "linking words",
+      "proofreading",
+      "punctuation",
+      "register"
+    ],
+    "examples": [
+      "I am writing to inquire about the prospective fellowship announced in your latest academic journal.",
+      "Furthermore, the collected empirical data reinforces our primary hypothesis regarding economic stability.",
+      "Meticulous proofreading ensures that spelling, punctuation, and syntax remain impeccably accurate."
+    ],
+    "practice": [
+      {
+        "question": "Which transitional linker expresses contrast between two ideas?",
+        "options": [
+          "Consequently",
+          "Furthermore",
+          "Nevertheless",
+          "Similarly"
+        ],
+        "correctIndex": 2,
+        "explanation": "'Nevertheless' introduces a contrasting or counter-balancing statement (similar to 'yet' or 'in spite of that')."
+      },
+      {
+        "question": "What is the recommended opening for a formal business letter when the recipient's name is unknown?",
+        "options": [
+          "Hey mate,",
+          "Dear Sir or Madam, / Dear Hiring Team,",
+          "To anyone reading this,",
+          "Greetings friend,"
+        ],
+        "correctIndex": 1,
+        "explanation": "'Dear Sir or Madam' or 'Dear Hiring Team' maintains the highest standard of formal British etiquette."
+      }
+    ]
+  },
+
+  // 8. Phrasal Verbs
+  {
+    "id": "phrasal-verbs",
+    "categoryId": "idioms-varieties",
+    "subgroup": "Phrasals, Idioms & Varieties",
+    "title": "Phrasal Verbs",
+    "summary": "Conquer one of the most vital features of natural English: separable/inseparable, transitive/intransitive phrasals with Get, Take, Put, Come, Go, Make, Turn, Look, Break, Bring.",
+    "rules": [
+      {
+        "title": "Separable vs. Inseparable Phrasals",
+        "details": "In separable phrasals ('turn off'), pronouns MUST go in the middle ('turn it off'). Inseparable phrasals ('look after') keep verb and particle together."
+      },
+      {
+        "title": "Literal vs. Idiomatic Meaning",
+        "details": "Distinguish literal direction ('look up at the sky') from idiomatic meaning ('look up a word in the dictionary' or 'things are looking up')."
+      },
+      {
+        "title": "Core Particle Families",
+        "details": "Learn particles systematically: 'out' often means discovery or completion ('find out', 'figure out', 'carry out'); 'off' indicates departure ('set off', 'take off')."
+      }
+    ],
+    "keywords": [
+      "phrasal verbs",
+      "separable",
+      "inseparable",
+      "transitive",
+      "intransitive",
+      "particles",
+      "get",
+      "take",
+      "put",
+      "look"
+    ],
+    "examples": [
+      "Could you please look after the documents while I attend the morning conference?",
+      "We had to put off the meeting until next Friday due to unexpected train strikes.",
+      "She came across a vintage edition of classic British poetry in a small bookshop."
+    ],
+    "practice": [
+      {
+        "question": "If a pronoun (it/them) is used with a separable phrasal verb like 'turn down' (to reject), where must it go?",
+        "options": [
+          "Always after the particle: 'turn down it'",
+          "Always between the verb and particle: 'turn it down'",
+          "At the very beginning of the sentence only",
+          "It does not matter"
+        ],
+        "correctIndex": 1,
+        "explanation": "With separable phrasal verbs, pronoun objects must be placed between the verb and the particle ('turn it down')."
+      },
+      {
+        "question": "What does the phrasal verb 'call off' mean?",
+        "options": [
+          "To phone someone loudly",
+          "To cancel a scheduled event or arrangement",
+          "To postpone until next week",
+          "To invite someone inside"
+        ],
+        "correctIndex": 1,
+        "explanation": "'Call off' means to cancel completely (e.g., 'They decided to call off the football match')."
+      }
+    ]
+  },
+
+  // 9. Idioms and Expressions
+  {
+    "id": "idioms-expressions",
+    "categoryId": "idioms-varieties",
+    "subgroup": "Phrasals, Idioms & Varieties",
+    "title": "Idioms and Expressions",
+    "summary": "Master figurative language, metaphors, proverbs, and idiomatic expressions across daily life, business, money, time, and human relationships.",
+    "rules": [
+      {
+        "title": "Figurative Meaning Over Literal Words",
+        "details": "Idioms cannot be understood from the literal definition of individual words ('cost an arm and a leg' means extremely expensive)."
+      },
+      {
+        "title": "Register & Appropriateness",
+        "details": "Some idioms suit casual conversations ('spill the beans'), while others are valued in professional settings ('touch base', 'ahead of the curve')."
+      },
+      {
+        "title": "Fixed Phrasing",
+        "details": "Do not alter the words or grammar inside fixed idioms ('bite the bullet', never 'chew the bullet')."
+      }
+    ],
+    "keywords": [
+      "idioms",
+      "figurative language",
+      "proverbs",
+      "metaphors",
+      "similes",
+      "business idioms",
+      "everyday expressions",
+      "cultural sayings"
+    ],
+    "examples": [
+      "After months of hesitation, the founders decided to bite the bullet and launch the venture.",
+      "The new vintage sports car cost an arm and a leg, but it performs magnificently.",
+      "Let's touch base next Monday afternoon once the initial analytics have arrived."
+    ],
+    "practice": [
+      {
+        "question": "What does the idiom 'bite the bullet' mean?",
+        "options": [
+          "To eat something very hard",
+          "To endure a painful or difficult situation with courage and fortitude",
+          "To start a violent argument",
+          "To shoot a target accurately"
+        ],
+        "correctIndex": 1,
+        "explanation": "'Bite the bullet' means to face a challenging or unpleasant situation bravely because it cannot be avoided."
+      },
+      {
+        "question": "What does someone mean if they say an opportunity happens 'once in a blue moon'?",
+        "options": [
+          "It happens during every lunar eclipse",
+          "It occurs very rarely or hardly ever",
+          "It happens every single weekend",
+          "It only happens at night"
+        ],
+        "correctIndex": 1,
+        "explanation": "'Once in a blue moon' is a classic idiom meaning something takes place very infrequently."
+      }
+    ]
+  },
+
+  // 10. British English
+  {
+    "id": "british-english",
+    "categoryId": "idioms-varieties",
+    "subgroup": "Phrasals, Idioms & Varieties",
+    "title": "British English",
+    "summary": "Explore authentic British vocabulary, slang, polite understatement, Received Pronunciation, spelling differences, and cultural social customs.",
+    "rules": [
+      {
+        "title": "Distinctive British Vocabulary & Slang",
+        "details": "Master everyday UK terms: 'flat' (apartment), 'boot' (car trunk), 'lift' (elevator), 'chuffed' (very pleased), 'knackered' (exhausted)."
+      },
+      {
+        "title": "British Orthography & Spelling",
+        "details": "Preserve standard UK spelling: -our ('colour', 'honour'), -ise ('organise', 'realise'), -re ('theatre', 'centre'), and double-l ('travelling')."
+      },
+      {
+        "title": "British Understatement & Courtesy",
+        "details": "British culture favors understatement ('not bad at all' = excellent; 'a bit of a nuisance' = major disaster) and courteous apologies ('Sorry!')."
+      }
+    ],
+    "keywords": [
+      "British vocabulary",
+      "British slang",
+      "UK spelling",
+      "understatement",
+      "politeness",
+      "Received Pronunciation",
+      "tea culture",
+      "regional accents"
+    ],
+    "examples": [
+      "I was absolutely chuffed when my essay on British constitutional history received top honors.",
+      "Mind the gap between the train and the platform edge when alighting at Piccadilly Circus.",
+      "Shall we pop over to the corner cafe for a proper cup of Earl Grey tea?"
+    ],
+    "practice": [
+      {
+        "question": "In British English, what is the word for an apartment?",
+        "options": [
+          "Condo",
+          "Flat",
+          "Cabin",
+          "Chamber"
+        ],
+        "correctIndex": 1,
+        "explanation": "In standard British English, an apartment is universally called a 'flat'."
+      },
+      {
+        "question": "Which of the following follows standard British English spelling?",
+        "options": [
+          "Color and Theater",
+          "Colour and Theatre",
+          "Color and Theatre",
+          "Colour and Theater"
+        ],
+        "correctIndex": 1,
+        "explanation": "British English preserves the '-our' ('colour') and '-re' ('theatre') spellings."
+      }
+    ]
+  },
+
+  // 11. American English
+  {
+    "id": "american-english",
+    "categoryId": "idioms-varieties",
+    "subgroup": "Phrasals, Idioms & Varieties",
+    "title": "American English",
+    "summary": "Understand General American pronunciation, rhoticity, simplified spellings, slang, vocabulary contrasts, and conversational directness.",
+    "rules": [
+      {
+        "title": "Rhotic Pronunciation & T-Flapping",
+        "details": "American English is rhotic (the 'r' is always pronounced). Intervocalic 't' frequently flaps into a soft 'd' sound ('water' sounds like 'wader')."
+      },
+      {
+        "title": "Lexical Counterparts",
+        "details": "Recognize key American terms: 'elevator' (lift), 'trunk' (boot), 'sidewalk' (pavement), 'gas' (petrol), 'fall' (autumn), 'apartment' (flat)."
+      },
+      {
+        "title": "American Spelling Conventions",
+        "details": "American orthography prefers -or ('color'), -ize ('organize'), -er ('center'), and single consonants in inflections ('traveling')."
+      }
+    ],
+    "keywords": [
+      "American vocabulary",
+      "rhoticity",
+      "t-flapping",
+      "US spelling",
+      "American slang",
+      "directness",
+      "differences vs British",
+      "General American"
+    ],
+    "examples": [
+      "Take the elevator to the tenth floor and walk down the hallway to room 104.",
+      "In the fall, the colorful leaves in Central Park create a stunning landscape.",
+      "He put his luggage into the trunk of the car and headed out onto the highway."
+    ],
+    "practice": [
+      {
+        "question": "What is the American English equivalent for the British term 'pavement'?",
+        "options": [
+          "Sidewalk",
+          "Crosswalk",
+          "Highway",
+          "Driveway"
+        ],
+        "correctIndex": 0,
+        "explanation": "In the United States, the pedestrian walkway alongside a road is called the 'sidewalk'."
+      },
+      {
+        "question": "What happens to the letter 'r' in American English (rhotic pronunciation)?",
+        "options": [
+          "It is always silent after vowels",
+          "It is pronounced clearly in all positions, including word-finally (e.g. 'car', 'hard')",
+          "It is pronounced as an 'h'",
+          "It is only pronounced before vowels"
+        ],
+        "correctIndex": 1,
+        "explanation": "American English is predominantly rhotic, meaning the 'r' sound is voiced wherever it appears in spelling."
+      }
+    ]
+  },
+
+  // 12. Advanced English
+  {
+    "id": "advanced-english",
+    "categoryId": "idioms-varieties",
+    "subgroup": "Phrasals, Idioms & Varieties",
+    "title": "Advanced English",
+    "summary": "Attain C1/C2 mastery: negative inversion, cleft sentences, nuanced vocabulary, rhetoric, subjunctive constructions, precision, and formal academic registers.",
+    "rules": [
+      {
+        "title": "Negative Inversion for Emphasis",
+        "details": "Invert subject and auxiliary after negative limiters: 'Seldom have I witnessed...', 'Not only did she succeed, but...'"
+      },
+      {
+        "title": "Cleft Sentences for Focus",
+        "details": "Highlight specific details using It-clefts ('It was the executive who made the decision') or What-clefts ('What surprised us was his composure')."
+      },
+      {
+        "title": "Lexical Precision & Nuance",
+        "details": "Distinguish exact shades of meaning (e.g., 'meticulous' vs 'fastidious'; 'inevitable' vs 'imminent'; 'pervasive' vs 'ubiquitous')."
+      }
+    ],
+    "keywords": [
+      "inversion",
+      "cleft sentences",
+      "subjunctive",
+      "rhetoric",
+      "nuance",
+      "register",
+      "academic prose",
+      "C1 C2 fluency"
+    ],
+    "examples": [
+      "Rarely has a breakthrough in biomedical research sparked such profound global optimism.",
+      "It was through sheer resilience and intellectual rigor that the scholars overcame the crisis.",
+      "The treaty contained meticulous stipulations designed to preempt future diplomatic discord."
+    ],
+    "practice": [
+      {
+        "question": "Which sentence correctly demonstrates formal negative inversion?",
+        "options": [
+          "Seldom I have seen such magnificent architecture.",
+          "Seldom have I seen such magnificent architecture.",
+          "I have seen seldom such magnificent architecture.",
+          "Have I seen seldom such magnificent architecture."
+        ],
+        "correctIndex": 1,
+        "explanation": "Negative inversion inverts the auxiliary verb and subject when a limiting adverb begins the clause ('Seldom have I seen...')."
+      },
+      {
+        "question": "What is the primary function of a cleft sentence (e.g., 'It was her determination that saved the project')?",
+        "options": [
+          "To make the sentence shorter",
+          "To place special focus and emphasis on a specific element of the sentence",
+          "To turn a statement into a question",
+          "To indicate future tense"
+        ],
+        "correctIndex": 1,
+        "explanation": "Cleft structures ('It was X that...') split a clause into two parts to highlight and emphasize a specific component."
+      }
+    ]
+  },
+
+  // 13. Spelling and Punctuation
+  {
+    "id": "spelling-punctuation",
+    "categoryId": "foundations",
+    "subgroup": "Foundations & Mechanics",
+    "title": "Spelling and Punctuation",
+    "summary": "Master English orthography, silent letters, double consonants, apostrophe possession vs contraction, semicolons, commas, and hyphenation rules.",
+    "rules": [
+      {
+        "title": "Apostrophe Precision (Its vs. It's)",
+        "details": "'It's' is ONLY a contraction for 'it is' or 'it has'. The possessive pronoun is 'its' (no apostrophe), exactly like 'his' or 'hers'."
+      },
+      {
+        "title": "Semicolon & Comma Rules",
+        "details": "Use semicolons (;) to link two closely related independent clauses without a conjunction. Avoid comma splices between complete sentences."
+      },
+      {
+        "title": "Silent Letters & Tricky Double Consonants",
+        "details": "Memorize common silent letters (doubt, receipt, knight, column) and tricky spellings (definitely, accommodation, necessary, separate)."
+      }
+    ],
+    "keywords": [
+      "spelling rules",
+      "silent letters",
+      "double consonants",
+      "semicolons",
+      "apostrophes",
+      "comma splice",
+      "hyphens",
+      "capitalization"
+    ],
+    "examples": [
+      "The museum completed its expansion; the newly restored Victorian wing opens on Tuesday.",
+      "It's definitely necessary to accommodate all guests with utmost courtesy.",
+      "She packed her scissors, receipt, and diary before departing for Edinburgh."
+    ],
+    "practice": [
+      {
+        "question": "Which sentence uses the apostrophe correctly?",
+        "options": [
+          "The company celebrated it's tenth anniversary in London.",
+          "The company celebrated its tenth anniversary in London.",
+          "The company celebrated its' tenth anniversary in London.",
+          "The company celebrated its's tenth anniversary in London."
+        ],
+        "correctIndex": 1,
+        "explanation": "Possessive 'its' takes no apostrophe ('its tenth anniversary'); 'it's' is exclusively a contraction for 'it is' or 'it has'."
+      },
+      {
+        "question": "Which of the following words is spelled correctly?",
+        "options": [
+          "Definately",
+          "Definitly",
+          "Definitely",
+          "Definitelyy"
+        ],
+        "correctIndex": 2,
+        "explanation": "'Definitely' is spelled with 'i-t-e' in the middle (derived from 'finite')."
+      }
+    ]
+  },
+
+  // 14. Functional English
+  {
+    "id": "functional-english",
+    "categoryId": "practical-accuracy",
+    "subgroup": "Functional English & Error Traps",
+    "title": "Functional English",
+    "summary": "Practical English for authentic real-world situations: restaurants, hotels, airports, doctor appointments, banking, job interviews, and complaints.",
+    "rules": [
+      {
+        "title": "Polite Service Inquiries & Requests",
+        "details": "Use indirect structures: 'Could you possibly advise...', 'I would like to make a reservation for two', 'Would you mind checking...'"
+      },
+      {
+        "title": "Handling Discontent & Making Complaints",
+        "details": "British complaints are framed constructively: 'I'm afraid there appears to be a slight discrepancy with my invoice', rather than shouting."
+      },
+      {
+        "title": "Navigating Travel & Transit",
+        "details": "Master vocabulary for boarding gates, delays, connections, baggage claims, ticketing machines, and booking changes."
+      }
+    ],
+    "keywords": [
+      "restaurant dialogues",
+      "hotel check-in",
+      "airport transit",
+      "doctor appointments",
+      "making complaints",
+      "job interviews",
+      "phone etiquette",
+      "asking for directions"
+    ],
+    "examples": [
+      "Could we please have the bill whenever it is convenient for you?",
+      "I am afraid there appears to be a slight misunderstanding regarding my hotel booking.",
+      "Which platform does the express service to London King's Cross depart from?"
+    ],
+    "practice": [
+      {
+        "question": "What is the polite British way to request the bill in a restaurant?",
+        "options": [
+          "Give me the check right now!",
+          "Could we please have the bill, whenever you have a moment?",
+          "Money, please!",
+          "I want to pay immediately."
+        ],
+        "correctIndex": 1,
+        "explanation": "'Could we please have the bill, whenever you have a moment?' demonstrates ideal British courtesy and phrasing."
+      },
+      {
+        "question": "How do you politely announce a problem with a service or product in English?",
+        "options": [
+          "You ruined everything!",
+          "I'm afraid there seems to be a slight issue with my order.",
+          "Fix this immediately or else!",
+          "Your service is unacceptable and terrible."
+        ],
+        "correctIndex": 1,
+        "explanation": "Opening with 'I'm afraid there seems to be...' is the professional, polite way to introduce a complaint."
+      }
+    ]
+  },
+
+  // 15. Common Mistakes
+  {
+    "id": "common-mistakes",
+    "categoryId": "practical-accuracy",
+    "subgroup": "Functional English & Error Traps",
+    "title": "Common Mistakes",
+    "summary": "Systematically eliminate the most frequent grammar, preposition, translation, and word-choice traps (Make vs. Do, Say vs. Tell, In/On/At, False Friends).",
+    "rules": [
+      {
+        "title": "Make vs. Do Collocations",
+        "details": "'Make' involves creating, producing, or deciding ('make a mistake', 'make coffee'). 'Do' involves actions, tasks, and duties ('do homework', 'do business')."
+      },
+      {
+        "title": "Prepositions of Time & Place (In, On, At)",
+        "details": "'At' for specific points/times (at 5:00, at the station); 'On' for days/surfaces (on Monday, on the wall); 'In' for enclosed areas/months/years (in London, in July)."
+      },
+      {
+        "title": "Subject-Verb Agreement & Tense Clashes",
+        "details": "He/she/it takes -s in Present Simple ('he goes', not 'he go'). Don't mix 'yesterday' with present tense ('yesterday I went', not 'yesterday I go')."
+      }
+    ],
+    "keywords": [
+      "make vs do",
+      "say vs tell",
+      "in on at",
+      "false friends",
+      "subject-verb agreement",
+      "confused words",
+      "since vs for",
+      "common grammar traps"
+    ],
+    "examples": [
+      "Everyone makes mistakes when learning something new, but consistent practice brings mastery.",
+      "The train arrives at Heathrow Airport at quarter past nine in the morning.",
+      "She explained the proposal to me thoroughly before we commenced the project."
+    ],
+    "practice": [
+      {
+        "question": "Which sentence correctly pairs the verb with 'mistake'?",
+        "options": [
+          "I did a mistake on the examination.",
+          "I made a mistake on the examination.",
+          "I created a mistake on the examination.",
+          "I performed a mistake on the examination."
+        ],
+        "correctIndex": 1,
+        "explanation": "In English, the fixed collocation is always 'make a mistake', never 'do a mistake'."
+      },
+      {
+        "question": "Which preposition should be used before a specific calendar day (e.g., Friday)?",
+        "options": [
+          "In Friday",
+          "At Friday",
+          "On Friday",
+          "For Friday"
+        ],
+        "correctIndex": 2,
+        "explanation": "Specific days and dates always take 'on' (e.g. 'on Friday', 'on the 15th of October')."
+      }
+    ]
+  },
+
+  // 16. Thinking in English
+  {
+    "id": "thinking-in-english",
+    "categoryId": "mindset-techniques",
+    "subgroup": "Thinking in English & Techniques",
+    "title": "Thinking in English",
+    "summary": "Break the translation habit, build direct English thought pathways, narrate your daily environment, describe unknown words, and boost response speed.",
+    "rules": [
+      {
+        "title": "Eliminate Subconscious Mental Translation",
+        "details": "Connecting ideas directly to English words and phrases avoids cognitive delay and unnatural literal translations."
+      },
+      {
+        "title": "Internal Monologue & Narration",
+        "details": "Narrate your surroundings silently in English during routine tasks: 'I am boiling the kettle, checking my emails, and planning my afternoon schedule.'"
+      },
+      {
+        "title": "Circumlocution & Paraphrasing",
+        "details": "When you forget a specific word, describe its purpose or appearance ('the device used to cork wine bottles') rather than pausing or switching languages."
+      }
+    ],
+    "keywords": [
+      "thinking in English",
+      "stop translating",
+      "internal monologue",
+      "circumlocution",
+      "paraphrasing",
+      "response speed",
+      "spontaneous thoughts",
+      "fluency mindset"
+    ],
+    "examples": [
+      "Mentally narrating my morning commute in English accelerated my speaking response speed dramatically.",
+      "When I forgot the word for 'whisk', I paraphrased: 'the kitchen tool used to beat eggs.'",
+      "Thinking directly in sentence frames eliminates hesitation pauses during live conversations."
+    ],
+    "practice": [
+      {
+        "question": "What is 'circumlocution' and why is it essential for fluency?",
+        "options": [
+          "Stopping speech completely until you look up a word",
+          "Describing or paraphrasing an unknown word using familiar terms to keep conversation flowing",
+          "Speaking in circular rhymes",
+          "Translating every word through a dictionary"
+        ],
+        "correctIndex": 1,
+        "explanation": "Circumlocution allows speakers to explain concepts even when a specific noun escapes memory, maintaining unbroken fluency."
+      },
+      {
+        "question": "What is an effective daily exercise to train thinking directly in English?",
+        "options": [
+          "Silently narrating your actions and surroundings in English as you go about your day",
+          "Translating a dictionary page backwards",
+          "Only reading single words without sentences",
+          "Avoiding all English communication"
+        ],
+        "correctIndex": 0,
+        "explanation": "Silent self-narration builds immediate neural pathways connecting thoughts directly to English sentences."
+      }
+    ]
+  },
+
+  // 17. English Learning Techniques
+  {
+    "id": "learning-techniques",
+    "categoryId": "mindset-techniques",
+    "subgroup": "Thinking in English & Techniques",
+    "title": "English Learning Techniques",
+    "summary": "Accelerate your mastery using proven pedagogical science: Spaced Repetition (SRS), Active Recall, Flashcards, Vocabulary Notebooks, Shadowing, and Error Tracking.",
+    "rules": [
+      {
+        "title": "Active Recall & Spaced Repetition",
+        "details": "Testing yourself repeatedly at expanding intervals transfers vocabulary and grammar rules permanently into your long-term memory."
+      },
+      {
+        "title": "The Input-Output Balance",
+        "details": "Pair comprehensive input (Daily Reading, Podcasts, Audio) with immediate active output (Shadowing, Dictation, Writing Practice, Speaking)."
+      },
+      {
+        "title": "Consistent Micro-Habits",
+        "details": "Twenty focused minutes of deliberate practice daily outperforms sporadic three-hour cramming sessions every time."
       }
     ],
     "keywords": [
       "spaced repetition",
       "active recall",
-      "Anki",
-      "retrieval practice",
-      "context clues",
-      "collocations",
-      "long-term memory"
+      "flashcards",
+      "shadowing",
+      "dictation",
+      "deliberate practice",
+      "error tracking",
+      "habit building"
     ],
     "examples": [
-      "Reviewing my digital flashcards on the morning tube journey keeps new British idioms fresh in my memory.",
-      "By adding authentic audio pronunciations to my flashcards, I mastered subtle British vowel distinctions.",
-      "Each flashcard contains a complete sentence, the UK definition, and common dependent prepositions."
+      "Combining spaced repetition flashcards with daily shadowing produced dramatic fluency gains in just three months.",
+      "Maintaining an error log and reviewing it weekly systematically eliminated my chronic preposition mistakes.",
+      "Twenty minutes of deliberate daily practice builds lifelong linguistic intuition and effortless fluency."
     ],
     "practice": [
       {
-        "question": "What is the most effective approach when creating English flashcards?",
+        "question": "Why is 'active recall' superior to passively re-reading notes?",
         "options": [
-          "Write single words with dictionary definitions only",
-          "Include a full context sentence featuring the target term and collocations",
-          "Memorize 150 new cards in a single sitting",
-          "Review cards only once a month"
+          "It takes less time to read notes",
+          "Forcing the brain to retrieve information strengthens neural pathways and dramatically boosts retention",
+          "Passive reading has been proven useless",
+          "Active recall requires no mental effort"
         ],
         "correctIndex": 1,
-        "explanation": "Context sentences provide essential grammatical meaning, tone register, and associated dependent prepositions."
+        "explanation": "The cognitive effort required to retrieve information signals to the brain that the memory is valuable and must be retained."
       },
       {
-        "question": "How does Spaced Repetition (SRS) improve long-term vocabulary retention?",
+        "question": "What is the key advantage of daily 20-minute micro-habits over occasional cramming?",
         "options": [
-          "It prompts reviews right before memory traces fade, strengthening neural connections",
-          "It eliminates the need to review words altogether",
-          "It tests spelling without requiring definitions",
-          "It only functions with grammar rules rather than vocabulary"
+          "It avoids cognitive overload, sustains motivation, and capitalizes on overnight memory consolidation",
+          "It is required by British law",
+          "It eliminates the need for grammar exercises",
+          "It allows you to skip listening practice"
         ],
         "correctIndex": 0,
-        "explanation": "Reviewing at expanding intervals right at the verge of forgetting cements knowledge permanently in memory."
-      }
-    ]
-  },
-
-  // 2. Vocabulary Notebooks
-  {
-    "id": "vocabulary-notebooks",
-    "categoryId": "vocabulary",
-    "subgroup": "Vocabulary & Retention",
-    "title": "Vocabulary Notebooks",
-    "summary": "Build a personalized lexical repository categorizing authentic British terms, synonyms, collocations, dependent prepositions, and self-written sentences.",
-    "rules": [
-      {
-        "title": "Thematic Categorization",
-        "details": "Organize vocabulary by thematic clusters (workplace negotiations, travel, polite debates, culinary arts) rather than alphabetical order."
-      },
-      {
-        "title": "Collocation Columns",
-        "details": "Record words with their fixed natural partners (e.g., 'make a decision', 'bear in mind', 'take into consideration') to sound genuinely native."
-      },
-      {
-        "title": "Personal Connection Sentences",
-        "details": "Draft personal sentences describing your own routines, reflections, or goals using the newly acquired British phrasing."
-      }
-    ],
-    "keywords": [
-      "lexical chunks",
-      "word partnerships",
-      "dependent prepositions",
-      "thematic logging",
-      "synonyms",
-      "register",
-      "antonyms"
-    ],
-    "examples": [
-      "I maintain a dedicated notebook section for British workplace idioms like 'touch base' and 'across the board'.",
-      "Writing down dependent prepositions alongside verbs prevents common grammatical slips.",
-      "My vocabulary journal includes antonyms, formal registers, and colloquial equivalents for every entry."
-    ],
-    "practice": [
-      {
-        "question": "Why is thematic grouping superior to alphabetical ordering in a vocabulary notebook?",
-        "options": [
-          "It mirrors how the brain connects related concepts, accelerating spontaneous conversational retrieval",
-          "It saves physical pages in a notebook",
-          "It makes spelling easier to check in a dictionary",
-          "It is mandatory for British university examinations"
-        ],
-        "correctIndex": 0,
-        "explanation": "Thematic networks mimic the brain's semantic webs, facilitating immediate access during spontaneous speech."
-      },
-      {
-        "question": "What should always accompany a new verb in your vocabulary notebook?",
-        "options": [
-          "Its dependent prepositions and natural collocations",
-          "Its translation into five languages",
-          "Only its infinitive form",
-          "The date you learned it"
-        ],
-        "correctIndex": 0,
-        "explanation": "Noting dependent prepositions (e.g. 'arrive at' vs 'arrive in') prevents the most common usage mistakes."
-      }
-    ]
-  },
-
-  // 3. Daily Reading
-  {
-    "id": "daily-reading",
-    "categoryId": "comprehension",
-    "subgroup": "Comprehension & Ear Training",
-    "title": "Daily Reading",
-    "summary": "Immerse your mind in authentic British journalism, essays, literature, and analytical commentary for 15-20 minutes daily to absorb natural syntax and phrasing.",
-    "rules": [
-      {
-        "title": "The 95% Rule (Comprehensible Input)",
-        "details": "Select reading material where you comfortably understand 90-95% of the words, allowing you to deduce unfamiliar terms effortlessly from context."
-      },
-      {
-        "title": "Extensive vs. Intensive Reading",
-        "details": "Read extensive articles for general flow without stopping; choose one short paragraph daily for intensive sentence-by-sentence analysis."
-      },
-      {
-        "title": "Reputable British Sources",
-        "details": "Rotate between quality publications like BBC News, The Guardian, The Economist, and contemporary British fiction."
-      }
-    ],
-    "keywords": [
-      "extensive reading",
-      "comprehensible input",
-      "contextual deduction",
-      "reading flow",
-      "BBC News",
-      "editorial prose",
-      "literary cadence"
-    ],
-    "examples": [
-      "Reading an editorial from The Times each morning expands my academic vocabulary and analytical reasoning.",
-      "I highlight unfamiliar idioms in novel chapters and deduce their nuance before checking a dictionary.",
-      "Ten minutes of concentrated reading per day delivers thousands of natural grammar encounters each month."
-    ],
-    "practice": [
-      {
-        "question": "What does the '95% rule' in language reading recommend?",
-        "options": [
-          "Reading 95 pages every week",
-          "Selecting material where you understand ~95% of words to enable contextual deduction",
-          "Memorizing 95% of every vocabulary list",
-          "Reading at 95 words per minute"
-        ],
-        "correctIndex": 1,
-        "explanation": "When 90-95% of words are known, the text remains enjoyable and you deduce new words naturally without frustration."
-      },
-      {
-        "question": "What is the primary benefit of 'extensive reading'?",
-        "options": [
-          "Analyzing every single grammatical rule",
-          "Building reading speed, intuition for natural word patterns, and effortless language immersion",
-          "Looking up every unknown word in a dictionary",
-          "Memorizing entire paragraphs by heart"
-        ],
-        "correctIndex": 1,
-        "explanation": "Extensive reading develops automatic processing, subconscious grammar acquisition, and reading stamina."
-      }
-    ]
-  },
-
-  // 4. Daily Listening
-  {
-    "id": "daily-listening",
-    "categoryId": "comprehension",
-    "subgroup": "Comprehension & Ear Training",
-    "title": "Daily Listening",
-    "summary": "Train your ear to natural British cadence, connected speech, elision, and intonation curves through consistent daily immersion in spoken audio.",
-    "rules": [
-      {
-        "title": "Connected Speech Awareness",
-        "details": "Observe how native British speakers link consonant to vowel ('pick it up' sounds like 'pi-ki-tup') and drop unstressed sounds."
-      },
-      {
-        "title": "Weak Forms & The Schwa",
-        "details": "Notice how function words like 'to', 'for', 'of', and 'at' reduce to the unstressed neutral schwa sound /ə/ in rapid conversation."
-      },
-      {
-        "title": "Accent Diversity",
-        "details": "Expose your ears to Received Pronunciation (RP), Estuary English, Scottish, northern dialects, and diverse regional varieties."
-      }
-    ],
-    "keywords": [
-      "connected speech",
-      "elision",
-      "weak forms",
-      "RP accent",
-      "BBC Radio 4",
-      "intonation patterns",
-      "ear calibration"
-    ],
-    "examples": [
-      "Listening to BBC Radio 4 during my morning tea attuned my ears to natural British intonation curves.",
-      "I focus on how small words like 'to' and 'for' reduce into weak forms /tə/ and /fə/ in rapid speech.",
-      "Active listening with the transcript open helps clarify dropped consonants and rapid colloquial speech."
-    ],
-    "practice": [
-      {
-        "question": "What happens to weak forms (e.g. 'to', 'at', 'of') in connected British speech?",
-        "options": [
-          "They are stressed loudly",
-          "Their vowels reduce to the neutral schwa sound /ə/",
-          "They are omitted completely in formal English",
-          "They double in length"
-        ],
-        "correctIndex": 1,
-        "explanation": "In standard British English, unstressed grammatical function words naturally reduce to weak forms featuring the schwa /ə/."
-      },
-      {
-        "question": "Why is listening to regional British accents beneficial?",
-        "options": [
-          "It prepares you for real-world communication with native speakers across the UK",
-          "Regional accents are grammatically incorrect",
-          "It is only useful for actors",
-          "It replaces the need to learn vocabulary"
-        ],
-        "correctIndex": 0,
-        "explanation": "Real-world British English encompasses rich regional variations; exposure prevents auditory shock during travel or work."
-      }
-    ]
-  },
-
-  // 5. Shadowing
-  {
-    "id": "shadowing",
-    "categoryId": "comprehension",
-    "subgroup": "Comprehension & Ear Training",
-    "title": "Shadowing",
-    "summary": "Speak simultaneously alongside a native British speaker, mimicking pitch, rhythm, stress, and pronunciation in real time.",
-    "rules": [
-      {
-        "title": "Micro-Delay Execution",
-        "details": "Repeat the words a split-second (about 0.2 seconds) behind the speaker, matching their exact vocal inflection and breathing pauses."
-      },
-      {
-        "title": "Focus on Prosody & Music",
-        "details": "Prioritize sentence musicality, rises and falls in pitch, and vowel length rather than isolated individual consonants."
-      },
-      {
-        "title": "Short, Intense Repetitions",
-        "details": "Select 60-90 second audio segments from documentaries, speeches, or audiobooks and repeat them until delivery feels completely automatic."
-      }
-    ],
-    "keywords": [
-      "speech shadowing",
-      "prosody",
-      "rhythm mimicry",
-      "intonation mirroring",
-      "neuromuscular training",
-      "accent tuning"
-    ],
-    "examples": [
-      "Shadowing Sir David Attenborough's nature documentaries dramatically refined my pauses and pacing.",
-      "By mirroring native audio at normal speed, my tongue muscles adapted to complex British consonant clusters.",
-      "Just five minutes of intense shadowing before a meeting warms up your vocal cadence and confidence."
-    ],
-    "practice": [
-      {
-        "question": "What is the primary objective of the language shadowing technique?",
-        "options": [
-          "Translating audio in your head into another language",
-          "Imitating native pronunciation, cadence, and rhythm in real time",
-          "Writing down every word heard as quickly as possible",
-          "Reading subtitles silently without vocalizing"
-        ],
-        "correctIndex": 1,
-        "explanation": "Shadowing trains the vocal articulators and auditory cortex to reproduce natural speech melody and tempo."
-      },
-      {
-        "question": "What type of audio material is ideal for effective shadowing practice?",
-        "options": [
-          "Short 1-2 minute clips of clear, natural speech from documentaries or quality podcasts",
-          "Long 3-hour lectures with heavy background noise",
-          "Songs with heavily distorted vocals",
-          "Silent movies with subtitles"
-        ],
-        "correctIndex": 0,
-        "explanation": "Short, crystal-clear clips allow repeated focused practice until vocal synchronization is achieved."
-      }
-    ]
-  },
-
-  // 6. Dictation
-  {
-    "id": "dictation",
-    "categoryId": "comprehension",
-    "subgroup": "Comprehension & Ear Training",
-    "title": "Dictation",
-    "summary": "Listen to short audio passages and transcribe every single word accurately, sharpening orthography, acoustic discrimination, and punctuation.",
-    "rules": [
-      {
-        "title": "The Three-Pass Method",
-        "details": "1st pass: Listen without writing for overall meaning. 2nd pass: Pause sentence by sentence to transcribe. 3rd pass: Listen continuously to proofread."
-      },
-      {
-        "title": "Identify Acoustic Blindspots",
-        "details": "Compare your transcript letter-by-letter against the original to discover which words, contractions, or prepositions your ears missed."
-      },
-      {
-        "title": "British Spelling Precision",
-        "details": "Use dictation to enforce standard British orthography (e.g., 'colour', 'organise', 'theatre', 'travelled', 'practise')."
-      }
-    ],
-    "keywords": [
-      "transcription",
-      "spelling precision",
-      "acoustic discrimination",
-      "orthography",
-      "punctuation accuracy",
-      "three-pass listening"
-    ],
-    "examples": [
-      "Transcribing short BBC clips revealed words I thought I recognized but misheard due to connected speech.",
-      "Dictation exercises bridge the gap between spoken sounds and standard British orthography.",
-      "Comparing my handwritten transcription against the official transcript immediately pinpoints listening blindspots."
-    ],
-    "practice": [
-      {
-        "question": "What is the recommended multi-pass approach for effective dictation?",
-        "options": [
-          "Write blindly on the first pass without listening",
-          "Listen once for meaning, second with pauses to transcribe, third to proofread",
-          "Only write down words you already know and omit others",
-          "Listen at 2x speed with subtitles"
-        ],
-        "correctIndex": 1,
-        "explanation": "The three-pass method ensures comprehension precedes transcription and is followed by rigorous proofreading."
-      },
-      {
-        "question": "Why is dictation particularly valuable for British English learners?",
-        "options": [
-          "It exposes the discrepancy between complex British pronunciation and non-phonetic spelling",
-          "It eliminates the need to speak",
-          "It only teaches handwriting",
-          "It is the only way to learn vocabulary"
-        ],
-        "correctIndex": 0,
-        "explanation": "English has many silent letters and homophones; dictation forces you to link sounds directly to correct spelling."
-      }
-    ]
-  },
-
-  // 7. Speaking Practice
-  {
-    "id": "speaking-practice",
-    "categoryId": "production",
-    "subgroup": "Active Production",
-    "title": "Speaking Practice",
-    "summary": "Transform passive vocabulary into effortless active speech through structured monologue prompts, dialogue simulation, and vocal self-recording.",
-    "rules": [
-      {
-        "title": "Formulate Directly in English",
-        "details": "Discipline your mind to bypass translation. Construct ideas directly using simple, well-practiced English sentence frames."
-      },
-      {
-        "title": "Voice Memo Journaling",
-        "details": "Record 60 to 90 seconds answering an engaging prompt daily. Listen back objectively to identify hesitation patterns and pacing."
-      },
-      {
-        "title": "Authentic British Discourse Markers",
-        "details": "Enrich spoken fluency using natural connectors such as 'Well, to be fair', 'As a matter of fact', 'Actually', and 'Mind you'."
-      }
-    ],
-    "keywords": [
-      "active fluency",
-      "conversational fillers",
-      "vocal recording",
-      "spontaneous speech",
-      "monologue drills",
-      "discourse markers"
-    ],
-    "examples": [
-      "Practicing 2-minute spontaneous speeches on random topics builds conversational agility under pressure.",
-      "Recording daily voice notes allows me to track improvements in fluidity and grammatical precision over time.",
-      "Using authentic British conversational markers like 'to be honest' and 'frankly' gives speech natural warmth."
-    ],
-    "practice": [
-      {
-        "question": "Why is recording yourself speaking one of the fastest ways to build fluency?",
-        "options": [
-          "It lets you objectively hear your pacing, hesitations, and pronunciation flaws",
-          "It eliminates all grammar requirements",
-          "It replaces the need for listening practice",
-          "It guarantees immediate native fluency overnight"
-        ],
-        "correctIndex": 0,
-        "explanation": "Self-recording provides objective feedback on cadence, pronunciation, and recurring hesitation traps."
-      },
-      {
-        "question": "What is the role of British discourse markers like 'Well, to be fair' or 'Mind you'?",
-        "options": [
-          "They buy thinking time, soften statements, and signal natural conversational tone",
-          "They indicate that you are ending the conversation",
-          "They are considered grammatically incorrect in the UK",
-          "They are only used in academic textbooks"
-        ],
-        "correctIndex": 0,
-        "explanation": "Discourse markers give spoken English natural rhythm, politeness, and conversational flow."
-      }
-    ]
-  },
-
-  // 8. Writing Practice
-  {
-    "id": "writing-practice",
-    "categoryId": "production",
-    "subgroup": "Active Production",
-    "title": "Writing Practice",
-    "summary": "Develop structured expression, nuanced British vocabulary, and grammatical coherence through daily journaling, reflections, and essay drafting.",
-    "rules": [
-      {
-        "title": "Three-Part Paragraph Architecture",
-        "details": "Anchor every paragraph with a clear Topic Sentence, substantiate with Evidence or Examples, and conclude with a Cohesive Wrap-up."
-      },
-      {
-        "title": "Cohesive Transitional Linkers",
-        "details": "Connect thoughts with varied linkers like 'nevertheless', 'furthermore', 'in contrast', and 'consequently' to avoid choppy sentences."
-      },
-      {
-        "title": "Self-Proofreading Routine",
-        "details": "Always read your text aloud before checking. Your ear will frequently catch awkward phrasing that your eye overlooks."
-      }
-    ],
-    "keywords": [
-      "journaling",
-      "cohesion",
-      "transitional linkers",
-      "paragraph mastery",
-      "active drafting",
-      "British spelling",
-      "self-editing"
-    ],
-    "examples": [
-      "Writing a 5-sentence personal reflection each evening solidifies the words learned throughout the day.",
-      "Employing cohesive linkers like 'nevertheless' and 'in addition' elevated my written clarity and structure.",
-      "Daily writing forces deliberate grammatical choices that passive reading alone cannot instill."
-    ],
-    "practice": [
-      {
-        "question": "What is the hallmark of a well-crafted English paragraph?",
-        "options": [
-          "A single sentence spanning 100 words",
-          "A clear topic sentence followed by supporting details and a cohesive wrap-up",
-          "Avoiding all punctuation marks",
-          "Using only past tense verbs exclusively"
-        ],
-        "correctIndex": 1,
-        "explanation": "Standard academic and professional paragraphs are built on a topic statement, elaboration, and cohesive conclusion."
-      },
-      {
-        "question": "Why is reading your written draft aloud recommended?",
-        "options": [
-          "It activates auditory feedback, helping you spot awkward rhythm and missing words",
-          "It replaces the need to spell correctly",
-          "It makes your writing longer automatically",
-          "It is required by British grammar publishers"
-        ],
-        "correctIndex": 0,
-        "explanation": "Reading aloud engages auditory processing, catching clumsy phrasing and grammatical missteps easily."
-      }
-    ]
-  },
-
-  // 9. Grammar Exercises
-  {
-    "id": "grammar-exercises",
-    "categoryId": "assessment",
-    "subgroup": "Accuracy & Testing",
-    "title": "Grammar Exercises",
-    "summary": "Sharpen sentence accuracy, tense consistency, and structural mechanics through targeted, contextual grammar exercises and diagnostic drills.",
-    "rules": [
-      {
-        "title": "Articulate the Underlying Rule",
-        "details": "Never guess based on vague feeling alone. Formulate the exact grammatical rule (e.g. 'doesn't + base verb', 'enjoy + gerund') for every choice."
-      },
-      {
-        "title": "Targeted Weakness Focus",
-        "details": "Dedicate the majority of drill time to areas that trigger recurring errors (articles, dependent prepositions, mixed conditionals)."
-      },
-      {
-        "title": "Transformation & Inversion Drills",
-        "details": "Practice rewriting sentences into passive voice, reported speech, or negative inversion to gain complete syntactic mastery."
-      }
-    ],
-    "keywords": [
-      "syntax drills",
-      "tense consistency",
-      "subject-verb agreement",
-      "prepositional rules",
-      "error elimination",
-      "deliberate practice"
-    ],
-    "examples": [
-      "Targeted preposition exercises helped me master difficult combinations like 'listen to' and 'arrive at'.",
-      "Practicing conditional transformations solidified my understanding of hypothetical British speech.",
-      "Understanding the grammatical logic behind each answer turns mistakes into lasting learning breakthroughs."
-    ],
-    "practice": [
-      {
-        "question": "What is the most effective way to approach grammar exercises?",
-        "options": [
-          "Guessing quickly to finish as fast as possible",
-          "Articulating the specific grammatical rule behind your choice",
-          "Only practicing topics you already find easy",
-          "Memorizing question numbers rather than content"
-        ],
-        "correctIndex": 1,
-        "explanation": "Explaining the rationale for an answer ensures deep structural understanding rather than surface-level intuition."
-      },
-      {
-        "question": "How do sentence transformation exercises build advanced fluency?",
-        "options": [
-          "They teach you to express the same core idea using multiple syntactic structures",
-          "They prove that grammar rules do not matter",
-          "They eliminate the need for vocabulary study",
-          "They only test punctuation marks"
-        ],
-        "correctIndex": 0,
-        "explanation": "Transformations (e.g. active to passive, direct to reported) give you versatile stylistic flexibility."
-      }
-    ]
-  },
-
-  // 10. Vocabulary Quizzes
-  {
-    "id": "vocabulary-quizzes",
-    "categoryId": "assessment",
-    "subgroup": "Accuracy & Testing",
-    "title": "Vocabulary Quizzes",
-    "summary": "Test active retrieval, synonym recognition, collocations, and contextual nuance through timed interactive vocabulary quizzes.",
-    "rules": [
-      {
-        "title": "Contextual Nuance Discrimination",
-        "details": "Distinguish between subtle synonyms (e.g. 'adequate' vs 'splendid' vs 'superb') based on formality, emotion, and context."
-      },
-      {
-        "title": "Timed Recall Pressure",
-        "details": "Incorporate timed quizzes to train quick lexical retrieval, eliminating long pauses during live conversations."
-      },
-      {
-        "title": "Immediate Feedback Loop",
-        "details": "Analyze missed quiz items immediately and feed them directly into your flashcards or vocabulary notebook for review."
-      }
-    ],
-    "keywords": [
-      "synonym discrimination",
-      "lexical testing",
-      "timed challenges",
-      "active recall",
-      "multiple-choice mastery",
-      "connotation"
-    ],
-    "examples": [
-      "Daily 5-minute vocabulary quizzes expose gaps in my active recall and test subtle synonym nuances.",
-      "Testing collocations like 'heavy rain' versus 'strong wind' trains natural British phrase pairing.",
-      "Reviewing incorrect quiz items creates high-priority candidates for my spaced repetition flashcards."
-    ],
-    "practice": [
-      {
-        "question": "How should you treat words you miss during a vocabulary quiz?",
-        "options": [
-          "Ignore them and move on to new lists",
-          "Immediately review the explanation and add them to your flashcard or notebook routine",
-          "Only re-test them next year",
-          "Delete the question from the quiz"
-        ],
-        "correctIndex": 1,
-        "explanation": "Mistakes in quizzes highlight prime learning opportunities that must be integrated into active retention tools."
-      },
-      {
-        "question": "Why is testing words in full context sentences more valuable than testing word-definition pairs?",
-        "options": [
-          "It tests whether you know the word's prepositions, tone, and grammatical partner words",
-          "It takes less time to answer",
-          "It prevents you from reading definitions",
-          "It only tests grammar"
-        ],
-        "correctIndex": 0,
-        "explanation": "Context reveals the correct grammatical behavior, collocations, and formality register of the term."
-      }
-    ]
-  },
-
-  // 11. Error Tracking
-  {
-    "id": "error-tracking",
-    "categoryId": "assessment",
-    "subgroup": "Accuracy & Testing",
-    "title": "Error Tracking",
-    "summary": "Maintain an analytical log of your recurring grammar, spelling, and pronunciation mistakes to systematically eradicate them.",
-    "rules": [
-      {
-        "title": "Categorize by Error Pattern",
-        "details": "Tag logged mistakes under specific headings (e.g., Subject-Verb Agreement, Article Omission, Tricky Spelling, Preposition Error)."
-      },
-      {
-        "title": "The Rule & Examples Formula",
-        "details": "Never just write the wrong word. Write the flawed sentence, the corrected version, the governing rule, and two original examples."
-      },
-      {
-        "title": "Targeted Re-testing Cycles",
-        "details": "Regularly challenge yourself specifically on previously logged mistakes until you achieve a 100% accuracy streak."
-      }
-    ],
-    "keywords": [
-      "error log",
-      "habitual traps",
-      "diagnostic review",
-      "recurring patterns",
-      "self-auditing",
-      "accuracy streaks"
-    ],
-    "examples": [
-      "Logging every missed third-person '-s' ended a habit of saying 'he go' instead of 'he goes'.",
-      "My personal error tracker alerted me that 40% of my writing mistakes were related to dependent prepositions.",
-      "Systematically reviewing my error journal transformed chronic weaknesses into confident strengths."
-    ],
-    "practice": [
-      {
-        "question": "What is the primary benefit of maintaining an Error Tracker?",
-        "options": [
-          "Punishing yourself for every mistake",
-          "Identifying recurring personal blindspots so you can apply targeted practice",
-          "Proving that English has no consistent rules",
-          "Counting how many words you know"
-        ],
-        "correctIndex": 1,
-        "explanation": "Tracking reveals persistent subconscious error patterns, enabling focused, efficient self-correction."
-      },
-      {
-        "question": "What should you record alongside a flagged mistake in your error tracker?",
-        "options": [
-          "The corrected sentence, the grammatical rule, and two new model examples",
-          "Only the wrong word in red ink",
-          "A translation into your native language",
-          "The time of day the mistake happened"
-        ],
-        "correctIndex": 0,
-        "explanation": "Understanding the core rule and generating model examples rewrites flawed neural habits."
-      }
-    ]
-  },
-
-  // 12. Learning Through Movies
-  {
-    "id": "learning-through-movies",
-    "categoryId": "immersion",
-    "subgroup": "Entertainment & Immersion",
-    "title": "Learning Through Movies",
-    "summary": "Absorb British cultural nuances, regional accents, idiomatic expressions, and body language through UK cinema and television drama.",
-    "rules": [
-      {
-        "title": "Smart Subtitle Progression",
-        "details": "Begin with English subtitles to link sound with orthography, then re-watch favorite scenes with subtitles turned completely off."
-      },
-      {
-        "title": "The 2-Minute Pause & Shadow Technique",
-        "details": "Pause an engaging 2-minute dialogue, note down colloquial idioms, and vocalize the lines mimicking the actor's exact emotion and cadence."
-      },
-      {
-        "title": "Diverse British Genres",
-        "details": "Explore period dramas (The Crown, Downton Abbey) for formal elegance alongside sharp modern comedy and gritty British crime series."
-      }
-    ],
-    "keywords": [
-      "British cinema",
-      "English subtitles",
-      "cultural idioms",
-      "intonation mimicry",
-      "slang detection",
-      "visual context"
-    ],
-    "examples": [
-      "Watching British period dramas familiarised me with formal polite phrasing and sophisticated vocabulary.",
-      "Pausing and repeating witty TV banter helped me absorb British conversational sarcasm and timing.",
-      "English subtitles connect the spoken pronunciation of fast dialogue directly to written words."
-    ],
-    "practice": [
-      {
-        "question": "What is the recommended subtitle strategy for maximizing language gains from movies?",
-        "options": [
-          "Using native language subtitles permanently",
-          "Watching with English subtitles first, then re-watching key scenes without subtitles",
-          "Watching on mute with subtitles",
-          "Never watching with subtitles even as a beginner"
-        ],
-        "correctIndex": 1,
-        "explanation": "English subtitles connect sounds to spellings; removing them on a second pass forces genuine auditory comprehension."
-      },
-      {
-        "question": "Why is watching British cinema particularly helpful for real-world fluency?",
-        "options": [
-          "It reveals body language, humor, cultural idioms, and realistic speech rhythms",
-          "It replaces the need to study grammar",
-          "It only teaches Shakespearean English",
-          "It makes reading textbooks unnecessary"
-        ],
-        "correctIndex": 0,
-        "explanation": "Film embeds language within rich cultural, visual, and social contexts that textbooks cannot replicate."
-      }
-    ]
-  },
-
-  // 13. Learning Through Podcasts
-  {
-    "id": "learning-through-podcasts",
-    "categoryId": "immersion",
-    "subgroup": "Entertainment & Immersion",
-    "title": "Learning Through Podcasts",
-    "summary": "Transform daily commutes and routine chores into productive listening immersion with authentic British podcasts across topics you genuinely love.",
-    "rules": [
-      {
-        "title": "Interest-Driven Selection",
-        "details": "Listen to content you would enjoy in your native language (history, science, comedy, football, literature) to sustain intrinsic motivation."
-      },
-      {
-        "title": "Speed Calibration",
-        "details": "Modulate playback speed: drop to 0.85x if a speaker is excessively fast, or accelerate to 1.1x to train agile processing."
-      },
-      {
-        "title": "The 2-Minute Post-Listen Summary",
-        "details": "Immediately after listening to an episode, speak or write a 2-minute summary of the core arguments in your own English words."
-      }
-    ],
-    "keywords": [
-      "podcast immersion",
-      "BBC Sounds",
-      "passive exposure",
-      "speed adjustment",
-      "topic passions",
-      "comprehension summaries"
-    ],
-    "examples": [
-      "Listening to British history podcasts on my daily commute added an hour of natural immersion every day.",
-      "BBC podcasts provide a rich variety of natural discussions, interviews, and intellectual debates.",
-      "Summarizing podcast episodes aloud right after listening trains spontaneous synthesis in English."
-    ],
-    "practice": [
-      {
-        "question": "Why are interest-driven podcasts exceptionally effective for language acquisition?",
-        "options": [
-          "Because genuine curiosity keeps your brain actively engaged and eager to decipher meaning",
-          "Because they only use simple, basic vocabulary",
-          "Because podcasts do not require audio equipment",
-          "Because they always come with grammar tests"
-        ],
-        "correctIndex": 0,
-        "explanation": "High intrinsic interest maintains focused attention, significantly boosting contextual vocabulary absorption."
-      },
-      {
-        "question": "What is the benefit of summarizing a podcast episode in your own words immediately after listening?",
-        "options": [
-          "It converts passive auditory intake into active productive language skills",
-          "It lets you delete the podcast episode",
-          "It proves the podcast host was wrong",
-          "It is required by podcast applications"
-        ],
-        "correctIndex": 0,
-        "explanation": "Summarizing forces you to synthesize concepts and retrieve vocabulary, cementing active comprehension."
-      }
-    ]
-  },
-
-  // 14. Learning Through Games
-  {
-    "id": "learning-through-games",
-    "categoryId": "immersion",
-    "subgroup": "Entertainment & Immersion",
-    "title": "Learning Through Games",
-    "summary": "Activate vocabulary recall, quick thinking, and spelling precision in a fun, pressure-free gamified environment.",
-    "rules": [
-      {
-        "title": "Word Puzzles & Crosswords",
-        "details": "Solve British cryptic or quick crosswords, wordle variants, and anagram puzzles to reinforce letter patterns and subtle definitions."
-      },
-      {
-        "title": "Story-Driven Video Games",
-        "details": "Play narrative-rich video games featuring British voice acting and dialogue trees where choices depend on understanding nuances."
-      },
-      {
-        "title": "Rapid Category Challenges",
-        "details": "Challenge yourself to name 10 items belonging to a category (e.g., kitchen utensils, autumn words) within 30 seconds to bypass hesitation."
-      }
-    ],
-    "keywords": [
-      "gamification",
-      "word puzzles",
-      "interactive quests",
-      "quick retrieval",
-      "narrative games",
-      "stress-free learning"
-    ],
-    "examples": [
-      "Word association and anagram games accelerate my rapid retrieval of vocabulary under time pressure.",
-      "Story-driven games provide interactive environments where choices require comprehending complex English text.",
-      "Gamifying daily practice turns tedious memorization into an engaging, habit-forming challenge."
-    ],
-    "practice": [
-      {
-        "question": "How does gamified language practice enhance vocabulary recall?",
-        "options": [
-          "It increases engagement and dopamine, lowering anxiety and speeding up retrieval",
-          "It removes the need to understand grammar rules",
-          "It replaces reading books completely",
-          "It only benefits young children"
-        ],
-        "correctIndex": 0,
-        "explanation": "Play-based learning lowers the affective filter, boosting motivation and strengthening neural recall pathways."
-      },
-      {
-        "question": "What skill do rapid category recall games (e.g. 10 words in 30 seconds) develop?",
-        "options": [
-          "Overcoming hesitation and retrieving vocabulary rapidly under mild pressure",
-          "Improving handwriting speed",
-          "Memorizing alphabetical lists",
-          "Avoiding all difficult words"
-        ],
-        "correctIndex": 0,
-        "explanation": "Timed category challenges train the brain to access lexical stores quickly, mirroring live conversational tempo."
+        "explanation": "Daily consistent practice harnesses sleep cycles for memory consolidation, creating permanent language habits."
       }
     ]
   }
@@ -891,122 +1106,146 @@ export const LEARN_TOPICS = [
 export const GRAMMAR_CHECKLIST = [
   {
     num: 1,
-    title: "Flashcards",
-    desc: "Spaced repetition digital & physical cards for permanent lexical retention",
-    topicId: "flashcards",
-    example: "Reviewing my digital flashcards on the morning tube journey keeps new British idioms fresh in my memory."
+    title: "Grammar",
+    desc: "The structural rules: parts of speech, sentence structure, 12 tenses, conditionals, passive voice, and modals",
+    topicId: "grammar",
+    example: "Although the train was delayed, the conductor promptly apologised to all passengers aboard."
   },
   {
     num: 2,
-    title: "Vocabulary Notebooks",
-    desc: "Personalized thematic notebooks recording collocations, prepositions & personal sentences",
-    topicId: "vocabulary-notebooks",
-    example: "I maintain a dedicated notebook section for British workplace idioms and dependent prepositions."
+    title: "Vocabulary",
+    desc: "Everyday, academic, professional, and business vocabulary, natural collocations, synonyms, and word families",
+    topicId: "vocabulary",
+    example: "Acquiring strong collocations like 'profound impact' and 'vital role' elevates written expression."
   },
   {
     num: 3,
-    title: "Daily Reading",
-    desc: "15-20 minutes of daily extensive British journalism, literature, and analytical essays",
-    topicId: "daily-reading",
-    example: "Reading an editorial from The Times each morning expands my academic vocabulary and analytical reasoning."
+    title: "Pronunciation",
+    desc: "Vowels, consonants, word and sentence stress, connected speech, weak forms, intonation, and British cadence",
+    topicId: "pronunciation",
+    example: "In standard British English, the letter 'r' is silent in 'car' unless followed immediately by a vowel."
   },
   {
     num: 4,
-    title: "Daily Listening",
-    desc: "Consistent ear calibration with authentic BBC radio, connected speech, and diverse accents",
-    topicId: "daily-listening",
-    example: "Listening to BBC Radio 4 during my morning tea attuned my ears to natural British intonation curves."
+    title: "Speaking",
+    desc: "Introductions, small talk, expressing opinions, diplomatic agreement/disagreement, fluency, and spontaneous dialogue",
+    topicId: "speaking",
+    example: "To be entirely honest, I would recommend reviewing the budget before finalising our proposal."
   },
   {
     num: 5,
-    title: "Shadowing",
-    desc: "Real-time speech mimicry matching native British pacing, pitch, pauses, and cadence",
-    topicId: "shadowing",
-    example: "Shadowing Sir David Attenborough's nature documentaries dramatically refined my pauses and pacing."
+    title: "Listening",
+    desc: "Understanding native speakers, diverse regional accents, fast connected speech, podcasts, news, and films",
+    topicId: "listening",
+    example: "Listening to BBC Radio 4 broadcasts trains the ear to follow complex debates delivered at natural speed."
   },
   {
     num: 6,
-    title: "Dictation",
-    desc: "Three-pass transcription of native British audio to eliminate spelling and acoustic blindspots",
-    topicId: "dictation",
-    example: "Transcribing short BBC clips revealed words I thought I recognized but misheard due to connected speech."
+    title: "Reading",
+    desc: "Comprehension, skimming, scanning, contextual deduction, articles, short stories, and academic literature",
+    topicId: "reading",
+    example: "Skimming the opening paragraph gave me an immediate understanding of the editorial's central thesis."
   },
   {
     num: 7,
-    title: "Speaking Practice",
-    desc: "Active fluency monologues, 60-second voice memos, and spontaneous conversational prompts",
-    topicId: "speaking-practice",
-    example: "Recording daily voice notes allows me to track improvements in fluidity and grammatical precision over time."
+    title: "Writing",
+    desc: "Sentence mechanics, cohesive paragraph architecture, formal letters, emails, essays, and proofreading",
+    topicId: "writing",
+    example: "I am writing to inquire about the prospective fellowship announced in your latest academic journal."
   },
   {
     num: 8,
-    title: "Writing Practice",
-    desc: "Structured paragraph crafting, cohesive discourse linkers, and active daily journaling",
-    topicId: "writing-practice",
-    example: "Writing a 5-sentence personal reflection each evening solidifies the words learned throughout the day."
+    title: "Phrasal Verbs",
+    desc: "Separable, inseparable, transitive phrasals with Get, Take, Put, Come, Go, Make, Turn, Look, Break, Bring",
+    topicId: "phrasal-verbs",
+    example: "Could you please look after the documents while I attend the morning conference?"
   },
   {
     num: 9,
-    title: "Grammar Exercises",
-    desc: "Targeted syntax drills, conditional transformations, and rule-based diagnostic exercises",
-    topicId: "grammar-exercises",
-    example: "Targeted preposition exercises helped me master difficult combinations like 'listen to' and 'arrive at'."
+    title: "Idioms and Expressions",
+    desc: "Everyday idioms, British expressions, business idioms, metaphors, similes, and cultural proverbs",
+    topicId: "idioms-expressions",
+    example: "After months of hesitation, the founders decided to bite the bullet and launch the venture."
   },
   {
     num: 10,
-    title: "Vocabulary Quizzes",
-    desc: "Contextual multiple-choice challenges, synonym discrimination, and rapid recall tests",
-    topicId: "vocabulary-quizzes",
-    example: "Daily 5-minute vocabulary quizzes expose gaps in my active recall and test subtle synonym nuances."
+    title: "British English",
+    desc: "British vocabulary, slang, polite understatement, Received Pronunciation, spelling differences, and culture",
+    topicId: "british-english",
+    example: "I was absolutely chuffed when my essay on British constitutional history received top honors."
   },
   {
     num: 11,
-    title: "Error Tracking",
-    desc: "Systematic logging and recurring pattern analysis to eradicate habitual grammatical traps",
-    topicId: "error-tracking",
-    example: "My personal error tracker alerted me that 40% of my writing mistakes were related to dependent prepositions."
+    title: "American English",
+    desc: "General American vocabulary, rhotic pronunciation, t-flapping, spelling conventions, and slang differences",
+    topicId: "american-english",
+    example: "Take the elevator to the tenth floor and walk down the hallway to room 104."
   },
   {
     num: 12,
-    title: "Learning Through Movies",
-    desc: "British TV dramas and cinema with smart subtitle progression to master colloquial cadence",
-    topicId: "learning-through-movies",
-    example: "Watching British period dramas familiarised me with formal polite phrasing and sophisticated vocabulary."
+    title: "Advanced English",
+    desc: "C1/C2 advanced grammar, negative inversion, cleft sentences, nuanced vocabulary, rhetoric, and precision",
+    topicId: "advanced-english",
+    example: "Rarely has a breakthrough in biomedical research sparked such profound global optimism."
   },
   {
     num: 13,
-    title: "Learning Through Podcasts",
-    desc: "Interest-driven audio immersion with BBC Sounds, speed modulation, and oral summaries",
-    topicId: "learning-through-podcasts",
-    example: "Listening to British history podcasts on my daily commute added an hour of natural immersion every day."
+    title: "Spelling and Punctuation",
+    desc: "Spelling rules, silent letters, double consonants, apostrophe possession vs contraction, and semicolons",
+    topicId: "spelling-punctuation",
+    example: "The museum completed its expansion; the newly restored Victorian wing opens on Tuesday."
   },
   {
     num: 14,
-    title: "Learning Through Games",
-    desc: "Crosswords, interactive word quests, and gamified speed challenges for stress-free mastery",
-    topicId: "learning-through-games",
-    example: "Word association and anagram games accelerate my rapid retrieval of vocabulary under time pressure."
+    title: "Functional English",
+    desc: "Real-world English: restaurant, hotel, airport, bank, doctor, workplace, interviews, directions, complaints",
+    topicId: "functional-english",
+    example: "Could we please have the bill whenever it is convenient for you?"
+  },
+  {
+    num: 15,
+    title: "Common Mistakes",
+    desc: "Eradicating frequent errors: Make vs Do, Say vs Tell, In/On/At, False Friends, Subject-Verb agreement",
+    topicId: "common-mistakes",
+    example: "Everyone makes mistakes when learning something new, but consistent practice brings mastery."
+  },
+  {
+    num: 16,
+    title: "Thinking in English",
+    desc: "Stopping translation in your head, building direct English thoughts, self-narration, and response speed",
+    topicId: "thinking-in-english",
+    example: "Mentally narrating my morning commute in English accelerated my speaking response speed dramatically."
+  },
+  {
+    num: 17,
+    title: "English Learning Techniques",
+    desc: "Accelerated learning science: Spaced Repetition, Active Recall, Flashcards, Notebooks, Shadowing, Dictation",
+    topicId: "learning-techniques",
+    example: "Combining spaced repetition flashcards with daily shadowing produced dramatic fluency gains."
   }
 ];
 
 export const WHERE_TO_START_GUIDE = {
   title: "Where should you start?",
-  intro: "We recommend starting with Vocabulary Notebooks & Flashcards to establish your core lexical base, followed by Daily Listening & Reading for steady immersion.",
+  intro: "To reach advanced English fluency, follow this structured roadmap: begin with Grammar & Vocabulary foundations, develop your 4 Core Skills, master Phrasals & Idioms, and train your mind to think directly in English.",
   examples: [
-    { part: "Flashcards", sentence: "Reviewing my digital flashcards on the morning tube journey keeps new British idioms fresh in my memory.", highlight: "flashcards", role: "Spaced repetition active recall to cement words into long-term memory." },
-    { part: "Vocabulary Notebooks", sentence: "I maintain a dedicated notebook section for British workplace idioms and dependent prepositions.", highlight: "notebook", role: "Organized thematic logging of collocations, definitions, and personal sentences." },
-    { part: "Daily Reading", sentence: "Reading an editorial from The Times each morning expands my academic vocabulary and analytical reasoning.", highlight: "Reading", role: "Extensive exposure to natural sentence structures, vocabulary, and flow." },
-    { part: "Daily Listening", sentence: "Listening to BBC Radio 4 during my morning tea attuned my ears to natural British intonation curves.", highlight: "Listening", role: "Training auditory discrimination, connected speech, and accent recognition." },
-    { part: "Shadowing", sentence: "Shadowing Sir David Attenborough's nature documentaries dramatically refined my pauses and pacing.", highlight: "Shadowing", role: "Neuromuscular vocal training to match native British rhythm and intonation." },
-    { part: "Dictation", sentence: "Transcribing short BBC clips revealed words I thought I recognized but misheard due to connected speech.", highlight: "Transcribing", role: "Connecting fast spoken sounds to precise spelling and punctuation." },
-    { part: "Speaking Practice", sentence: "Recording daily voice notes allows me to track improvements in fluidity and grammatical precision over time.", highlight: "voice notes", role: "Converting passive knowledge into active, spontaneous speech." },
-    { part: "Writing Practice", sentence: "Writing a 5-sentence personal reflection each evening solidifies the words learned throughout the day.", highlight: "reflection", role: "Deliberate sentence construction and cohesive paragraph architecture." },
-    { part: "Grammar Exercises", sentence: "Targeted preposition exercises helped me master difficult combinations like 'listen to' and 'arrive at'.", highlight: "exercises", role: "Diagnostic drills to understand the core logic behind English rules." },
-    { part: "Vocabulary Quizzes", sentence: "Daily 5-minute vocabulary quizzes expose gaps in my active recall and test subtle synonym nuances.", highlight: "quizzes", role: "Fast-paced contextual testing to measure active lexical strength." },
-    { part: "Error Tracking", sentence: "My personal error tracker alerted me that 40% of my writing mistakes were related to dependent prepositions.", highlight: "error tracker", role: "Systematic logging to eliminate repeated mistakes and build accuracy." },
-    { part: "Learning Through Movies", sentence: "Watching British period dramas familiarised me with formal polite phrasing and sophisticated vocabulary.", highlight: "period dramas", role: "Immersive cultural context, body language, and colloquial idioms." },
-    { part: "Learning Through Podcasts", sentence: "Listening to British history podcasts on my daily commute added an hour of natural immersion every day.", highlight: "podcasts", role: "Passion-driven listening during daily routines to train sustained focus." },
-    { part: "Learning Through Games", sentence: "Word association and anagram games accelerate my rapid retrieval of vocabulary under time pressure.", highlight: "anagram games", role: "Low-stress, gamified challenges that sharpen rapid lexical retrieval." }
+    { part: "1. Grammar", sentence: "If you had arrived on time, we would have caught the express coach to Oxford.", highlight: "had arrived", role: "Master sentence structures, parts of speech, and the 12 verb tenses." },
+    { part: "2. Vocabulary", sentence: "Acquiring strong collocations like 'profound impact' elevates written expression.", highlight: "collocations", role: "Build rich everyday, academic, and professional word partnerships." },
+    { part: "3. Pronunciation", sentence: "In standard British English, the letter 'r' is silent in 'car' unless followed by a vowel.", highlight: "silent", role: "Train vowels, word stress, connected speech, and weak forms." },
+    { part: "4. Speaking", sentence: "To be entirely honest, I would recommend reviewing the budget before finalising our proposal.", highlight: "honest", role: "Practice spontaneous speech, polite hedging, and conversational fluency." },
+    { part: "5. Listening", sentence: "Listening to BBC Radio 4 broadcasts trains the ear to follow complex debates delivered at natural speed.", highlight: "Listening", role: "Accustom your ears to native cadence, diverse accents, and rapid speech." },
+    { part: "6. Reading", sentence: "Skimming the opening paragraph gave me an immediate understanding of the editorial's central thesis.", highlight: "Skimming", role: "Expand comprehension through extensive reading of news and literature." },
+    { part: "7. Writing", sentence: "I am writing to inquire about the prospective fellowship announced in your latest journal.", highlight: "inquire", role: "Craft clear paragraph architecture, formal correspondence, and essays." },
+    { part: "8. Phrasal Verbs", sentence: "Could you please look after the documents while I attend the morning conference?", highlight: "look after", role: "Master separable and inseparable verbs that native speakers use daily." },
+    { part: "9. Idioms & Expressions", sentence: "After months of hesitation, the founders decided to bite the bullet and launch the venture.", highlight: "bite the bullet", role: "Enrich your language with figurative expressions, metaphors, and sayings." },
+    { part: "10. British English", sentence: "I was absolutely chuffed when my essay on British constitutional history received top honors.", highlight: "chuffed", role: "Learn authentic UK vocabulary, slang, polite understatement, and spelling." },
+    { part: "11. American English", sentence: "Take the elevator to the tenth floor and walk down the hallway to room 104.", highlight: "elevator", role: "Understand American vocabulary, rhoticity, and spelling differences." },
+    { part: "12. Advanced English", sentence: "Rarely has a breakthrough in biomedical research sparked such profound global optimism.", highlight: "Rarely has", role: "Acquire C1/C2 mastery: negative inversion, cleft sentences, and rhetoric." },
+    { part: "13. Spelling & Punctuation", sentence: "The museum completed its expansion; the newly restored Victorian wing opens on Tuesday.", highlight: "its", role: "Ensure flawless orthography, apostrophe accuracy, and semicolon usage." },
+    { part: "14. Functional English", sentence: "Could we please have the bill whenever it is convenient for you?", highlight: "bill", role: "Confidently handle real-life situations: restaurants, hotels, flights, and interviews." },
+    { part: "15. Common Mistakes", sentence: "Everyone makes mistakes when learning something new, but consistent practice brings mastery.", highlight: "makes mistakes", role: "Systematically eliminate frequent traps like Make vs Do and In/On/At." },
+    { part: "16. Thinking in English", sentence: "Mentally narrating my morning commute in English accelerated my speaking response speed dramatically.", highlight: "narrating", role: "Stop translating in your head and form thoughts directly in English." },
+    { part: "17. Learning Techniques", sentence: "Combining spaced repetition flashcards with daily shadowing produced dramatic fluency gains.", highlight: "spaced repetition", role: "Harness pedagogical science: Spaced Repetition, Active Recall, and Dictation." }
   ],
-  conclusion: "Combine these 14 learning methods throughout your week for balanced, natural, and lasting English mastery."
+  conclusion: "Work through these 17 pillars systematically to build unshakeable confidence and total British English fluency."
 };
