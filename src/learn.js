@@ -14,6 +14,7 @@ import { copyTextToClipboard, shareTextContent } from './shareUtils.js';
 
 let activePillarId = 'grammar';
 let subtopicSearchQuery = '';
+let activeSelectedSubtopicId = null;
 let activeLesson = null;
 let activeLessonTab = 'rules'; // 'rules' | 'practice'
 let lessonQuizAnswers = {}; // { qIndex: optIndex }
@@ -150,18 +151,36 @@ function renderActivePillarView() {
             <span class="subheader-count-pill">${sh.matchingSubtopics.length} Subtopics</span>
           </div>
 
-          <div class="subtopics-buttons-grid">
+          <!-- DROPDOWN SELECTION BUTTON (כפתור בחירה מהרשימה) -->
+          <div class="subtopic-picker-row">
+            <div class="subtopic-select-control">
+              <i class="fa-solid fa-hand-pointer select-icon"></i>
+              <select class="subtopic-picker-dropdown" data-pillar="${pillar.id}" data-subheader="${sh.id}">
+                <option value="" disabled selected>✨ Select a Subtopic / בחר תת-נושא מרשימת בחירה...</option>
+                ${sh.matchingSubtopics.map(st => `
+                  <option value="${st.id}" ${activeSelectedSubtopicId === st.id ? 'selected' : ''}>${st.title} – ${st.titleHe}</option>
+                `).join('')}
+              </select>
+              <i class="fa-solid fa-chevron-down chevron-icon"></i>
+            </div>
+          </div>
+
+          <!-- SELECTION BUTTONS (כפתורי בחירה עם סמן בחירה רדיו/צ'ק) -->
+          <div class="subtopics-selection-grid">
             ${sh.matchingSubtopics.map(st => `
-              <button type="button" class="subtopic-action-btn" data-pillar="${pillar.id}" data-subheader="${sh.id}" data-subtopic="${st.id}">
-                <div class="subtopic-btn-top">
-                  <span class="subtopic-name">${st.title}</span>
-                  <i class="fa-solid fa-arrow-right subtopic-arrow"></i>
+              <button type="button" class="subtopic-choice-btn ${activeSelectedSubtopicId === st.id ? 'active' : ''}" data-pillar="${pillar.id}" data-subheader="${sh.id}" data-subtopic="${st.id}">
+                <span class="choice-radio-indicator">
+                  <i class="fa-regular fa-circle indicator-unselected"></i>
+                  <i class="fa-solid fa-circle-dot indicator-selected"></i>
+                </span>
+                <div class="choice-text-col">
+                  <span class="choice-title-eng">${st.title}</span>
+                  <span class="choice-title-he">${st.titleHe}</span>
                 </div>
-                <span class="subtopic-name-he">${st.titleHe}</span>
-                ${st.desc ? `<p class="subtopic-desc-snippet">${st.desc}</p>` : ''}
-                <div class="subtopic-btn-footer">
-                  <span class="subtopic-action-tag"><i class="fa-solid fa-graduation-cap"></i> Learn & Practice</span>
-                </div>
+                <span class="choice-action-pill" title="Start Lesson & Practice">
+                  <span>Practice</span>
+                  <i class="fa-solid fa-play" style="font-size: 0.65rem;"></i>
+                </span>
               </button>
             `).join('')}
           </div>
@@ -185,13 +204,29 @@ function renderActivePillarView() {
     });
   }
 
-  // Bind click on all subtopic action buttons
-  container.querySelectorAll('.subtopic-action-btn').forEach(btn => {
+  // Bind change event on subtopic dropdown selection controls (כפתורי בחירה נפתחים)
+  container.querySelectorAll('.subtopic-picker-dropdown').forEach(dropdown => {
+    dropdown.addEventListener('change', (e) => {
+      const pid = e.target.getAttribute('data-pillar');
+      const shid = e.target.getAttribute('data-subheader');
+      const stid = e.target.value;
+      if (pid && shid && stid) {
+        activeSelectedSubtopicId = stid;
+        openSubtopicDetail(pid, shid, stid);
+      }
+    });
+  });
+
+  // Bind click on subtopic choice buttons (כפתורי בחירה עם סמן)
+  container.querySelectorAll('.subtopic-choice-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const pid = e.currentTarget.getAttribute('data-pillar');
       const shid = e.currentTarget.getAttribute('data-subheader');
       const stid = e.currentTarget.getAttribute('data-subtopic');
       if (pid && shid && stid) {
+        activeSelectedSubtopicId = stid;
+        container.querySelectorAll('.subtopic-choice-btn').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
         openSubtopicDetail(pid, shid, stid);
       }
     });

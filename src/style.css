@@ -6849,6 +6849,219 @@ button, input, select, textarea {
   }
 }
 
+/* Subtopic Selection Controls (כפתורי בחירה ותפריט בחירה) */
+.subtopic-picker-row {
+  margin-bottom: 1rem;
+}
+
+.subtopic-select-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-width: 480px;
+}
+
+.subtopic-select-control .select-icon {
+  position: absolute;
+  left: 1rem;
+  color: var(--uk-blue);
+  font-size: 0.95rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+[data-theme="dark"] .subtopic-select-control .select-icon {
+  color: var(--gold);
+}
+
+.subtopic-picker-dropdown {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0.75rem 2.5rem 0.75rem 2.6rem;
+  border-radius: 12px;
+  border: 1.5px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.subtopic-picker-dropdown:hover,
+.subtopic-picker-dropdown:focus {
+  border-color: var(--uk-blue);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 3px rgba(0, 36, 125, 0.12);
+}
+
+[data-theme="dark"] .subtopic-picker-dropdown:hover,
+[data-theme="dark"] .subtopic-picker-dropdown:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+.subtopic-select-control .chevron-icon {
+  position: absolute;
+  right: 1rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Subtopics Selection Buttons Grid (כפתורי בחירה) */
+.subtopics-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .subtopics-selection-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.subtopic-choice-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--bg-main);
+  border: 1.5px solid var(--border-color);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 0.75rem;
+}
+
+.subtopic-choice-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--uk-blue);
+  background: var(--card-bg);
+  box-shadow: 0 4px 16px rgba(0, 36, 125, 0.08);
+}
+
+[data-theme="dark"] .subtopic-choice-btn:hover {
+  border-color: var(--gold);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.12);
+}
+
+.subtopic-choice-btn.active {
+  background: linear-gradient(135deg, rgba(0, 36, 125, 0.08) 0%, rgba(212, 175, 55, 0.12) 100%);
+  border-color: var(--uk-blue);
+  box-shadow: 0 0 0 2px var(--uk-blue);
+}
+
+[data-theme="dark"] .subtopic-choice-btn.active {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(0, 36, 125, 0.25) 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+
+.choice-radio-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+}
+
+.indicator-selected {
+  display: none;
+}
+
+.subtopic-choice-btn:hover .choice-radio-indicator {
+  color: var(--uk-blue);
+}
+
+[data-theme="dark"] .subtopic-choice-btn:hover .choice-radio-indicator {
+  color: var(--gold);
+}
+
+.subtopic-choice-btn.active .choice-radio-indicator {
+  color: var(--uk-blue);
+}
+
+[data-theme="dark"] .subtopic-choice-btn.active .choice-radio-indicator {
+  color: var(--gold);
+}
+
+.subtopic-choice-btn.active .indicator-unselected {
+  display: none;
+}
+
+.subtopic-choice-btn.active .indicator-selected {
+  display: inline-block;
+}
+
+.choice-text-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.choice-title-eng {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.choice-title-he {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-top: 0.15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.choice-action-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0, 36, 125, 0.08);
+  color: var(--uk-blue);
+  border: 1px solid rgba(0, 36, 125, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.subtopic-choice-btn:hover .choice-action-pill {
+  background: var(--uk-blue);
+  color: #fff;
+}
+
+[data-theme="dark"] .choice-action-pill {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+[data-theme="dark"] .subtopic-choice-btn:hover .choice-action-pill {
+  background: var(--gold);
+  color: #0b111e;
+}
+
 .subtopic-action-btn {
   display: flex;
   flex-direction: column;
