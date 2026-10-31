@@ -1,29 +1,26 @@
 /**
- * British English Vault - Interactive 3-Tier Curriculum Module
+ * British English Vault - Interactive 3-Tier Curriculum Module (100% English)
  * Architecture:
- * 1. Title / 17 Master Pillar Buttons (הכותרת של הנושא ככפתור)
- * 2. Thematic Sub-headers (תת-כותרות לפי הסדר המדויק)
- * 3. Subtopics as Action Buttons (הנושאים לפי הסדר)
- * 4. Dedicated Subtopic Lesson Modal: Detailed Explanation & Rules + Interactive Practice Exercises with Instant Feedback
+ * 1. Topic Buttons (17 Master Topics: Grammar, Vocabulary, Pronunciation, etc.)
+ * 2. Sub-header Buttons (Accordion toggle buttons for each category)
+ * 3. Subtopics with Selection Options (Dropdown picker & selection choice buttons)
+ * 4. Dedicated Subtopic Lesson Modal: Detailed Rules & Examples + Interactive Practice Exercises with Instant Feedback
  */
 
 import { CURRICULUM_PILLARS, getSubtopicLesson } from './curriculumData.js';
-import { GRAMMAR_CHECKLIST, WHERE_TO_START_GUIDE } from './learnData.js';
 import { speakText } from './speech.js';
 import { copyTextToClipboard, shareTextContent } from './shareUtils.js';
 
 let activePillarId = 'grammar';
+let expandedSubHeaderId = 'parts-of-speech'; // Open the first sub-header by default
 let subtopicSearchQuery = '';
 let activeSelectedSubtopicId = null;
 let activeLesson = null;
 let activeLessonTab = 'rules'; // 'rules' | 'practice'
 let lessonQuizAnswers = {}; // { qIndex: optIndex }
-let checklistFilter = 'all'; // 'all' | 'remaining' | 'completed'
 
 export function initLearnUI() {
   initCurriculumInteractiveSystem();
-  initGrammarChecklist();
-  initWhereToStartGuide();
   setupModalDismissHandlers();
 }
 
@@ -39,7 +36,7 @@ function initCurriculumInteractiveSystem() {
 }
 
 /**
- * Render the 17 numbered master topic buttons
+ * Render the 17 numbered master topic buttons (100% English)
  */
 function renderPillarsNav() {
   const container = document.getElementById('curriculum-pillars-nav');
@@ -51,20 +48,22 @@ function renderPillarsNav() {
 
     return `
       <button type="button" class="pillar-nav-btn ${isActive ? 'active' : ''}" data-pillar-id="${pillar.id}">
-        <span class="pillar-badge-num">Pillar ${padNum}</span>
+        <span class="pillar-badge-num">Topic ${padNum}</span>
         <span class="pillar-btn-title">${pillar.title}</span>
-        <span class="pillar-btn-he">${pillar.titleHe}</span>
       </button>
     `;
   }).join('');
 
-  // Bind click on pillar buttons
+  // Bind click on topic buttons
   container.querySelectorAll('.pillar-nav-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const pid = e.currentTarget.getAttribute('data-pillar-id');
       if (pid && pid !== activePillarId) {
         activePillarId = pid;
         subtopicSearchQuery = '';
+        const currentPillar = CURRICULUM_PILLARS.find(p => p.id === pid);
+        // Default to opening the first sub-header so subtopics are immediately visible
+        expandedSubHeaderId = currentPillar?.subHeaders?.[0]?.id || null;
         renderPillarsNav();
         renderActivePillarView();
       }
@@ -73,7 +72,7 @@ function renderPillarsNav() {
 }
 
 /**
- * Render the active pillar: hero header, search input, sub-headers, and subtopic buttons
+ * Render the active topic view with expandable sub-header buttons and subtopics
  */
 function renderActivePillarView() {
   const container = document.getElementById('curriculum-pillar-content');
@@ -95,9 +94,8 @@ function renderActivePillarView() {
     const matchingSubtopics = (sh.subtopics || []).filter(st => {
       if (!query) return true;
       const matchTitle = (st.title || '').toLowerCase().includes(query);
-      const matchTitleHe = (st.titleHe || '').toLowerCase().includes(query);
       const matchDesc = (st.desc || '').toLowerCase().includes(query);
-      return matchTitle || matchTitleHe || matchDesc;
+      return matchTitle || matchDesc;
     });
 
     return {
@@ -107,19 +105,18 @@ function renderActivePillarView() {
   }).filter(sh => sh.matchingSubtopics.length > 0);
 
   container.innerHTML = `
-    <!-- ACTIVE PILLAR HERO -->
+    <!-- ACTIVE TOPIC HERO CARD -->
     <div class="card active-pillar-hero">
       <div class="pillar-hero-left">
         <div class="pillar-avatar-badge">
           <i class="fa-solid ${pillar.icon || 'fa-book-bookmark'}"></i>
         </div>
         <div>
-          <div class="section-badge-small"><i class="fa-solid fa-crown"></i> Pillar ${pillar.number} of 17</div>
+          <div class="section-badge-small"><i class="fa-solid fa-crown"></i> Topic ${pillar.number} of 17</div>
           <h2 class="pillar-hero-title">${pillar.number}. ${pillar.title}</h2>
-          <h3 class="pillar-hero-he">${pillar.titleHe}</h3>
           <p class="pillar-hero-meta">
             <i class="fa-solid fa-layer-group" style="color: var(--uk-blue); margin-right: 0.35rem;"></i>
-            <strong>${totalSubtopicsCount} Subtopics</strong> with dedicated explanations and practice quizzes
+            <strong>${totalSubtopicsCount} Subtopics</strong> across ${pillar.subHeaders.length} categories
           </p>
         </div>
       </div>
@@ -130,62 +127,78 @@ function renderActivePillarView() {
       </div>
     </div>
 
-    <!-- SUB-HEADERS STACK (תת-כותרות) -->
-    <div class="subheaders-stack">
+    <!-- SUB-HEADERS ACCORDION BUTTONS STACK -->
+    <div class="subheaders-accordion-stack">
       ${filteredSubHeaders.length === 0 ? `
         <div class="card text-center" style="padding: 3rem 1.5rem; color: var(--text-muted);">
           <i class="fa-solid fa-magnifying-glass" style="font-size: 2.2rem; margin-bottom: 0.85rem; color: var(--uk-blue);"></i>
           <h4>No subtopics found matching "${subtopicSearchQuery}".</h4>
           <p style="font-size: 0.9rem; margin-top: 0.25rem;">Try clearing your search query.</p>
         </div>
-      ` : filteredSubHeaders.map(sh => `
-        <div class="curriculum-subheader-card card">
-          <div class="subheader-header-row">
-            <div class="subheader-header-left">
-              <div class="subheader-badge"><i class="fa-solid fa-bookmark"></i></div>
-              <div>
-                <h3 class="subheader-title-eng">${sh.title}</h3>
-                <h4 class="subheader-title-he">${sh.titleHe}</h4>
-              </div>
-            </div>
-            <span class="subheader-count-pill">${sh.matchingSubtopics.length} Subtopics</span>
-          </div>
-
-          <!-- DROPDOWN SELECTION BUTTON (כפתור בחירה מהרשימה) -->
-          <div class="subtopic-picker-row">
-            <div class="subtopic-select-control">
-              <i class="fa-solid fa-hand-pointer select-icon"></i>
-              <select class="subtopic-picker-dropdown" data-pillar="${pillar.id}" data-subheader="${sh.id}">
-                <option value="" disabled selected>✨ Select a Subtopic / בחר תת-נושא מרשימת בחירה...</option>
-                ${sh.matchingSubtopics.map(st => `
-                  <option value="${st.id}" ${activeSelectedSubtopicId === st.id ? 'selected' : ''}>${st.title} – ${st.titleHe}</option>
-                `).join('')}
-              </select>
-              <i class="fa-solid fa-chevron-down chevron-icon"></i>
-            </div>
-          </div>
-
-          <!-- SELECTION BUTTONS (כפתורי בחירה עם סמן בחירה רדיו/צ'ק) -->
-          <div class="subtopics-selection-grid">
-            ${sh.matchingSubtopics.map(st => `
-              <button type="button" class="subtopic-choice-btn ${activeSelectedSubtopicId === st.id ? 'active' : ''}" data-pillar="${pillar.id}" data-subheader="${sh.id}" data-subtopic="${st.id}">
-                <span class="choice-radio-indicator">
-                  <i class="fa-regular fa-circle indicator-unselected"></i>
-                  <i class="fa-solid fa-circle-dot indicator-selected"></i>
+      ` : filteredSubHeaders.map(sh => {
+        const isExpanded = query ? true : (sh.id === expandedSubHeaderId);
+        return `
+          <div class="subheader-accordion-item" data-subheader-id="${sh.id}">
+            <!-- SUB-HEADER TOGGLE BUTTON -->
+            <button type="button" class="subheader-toggle-btn ${isExpanded ? 'expanded' : ''}" data-subheader-id="${sh.id}" aria-expanded="${isExpanded}">
+              <div class="subheader-btn-left">
+                <span class="subheader-btn-icon">
+                  <i class="fa-solid ${isExpanded ? 'fa-folder-open' : 'fa-folder'}"></i>
                 </span>
-                <div class="choice-text-col">
-                  <span class="choice-title-eng">${st.title}</span>
-                  <span class="choice-title-he">${st.titleHe}</span>
+                <div class="subheader-btn-text">
+                  <span class="subheader-btn-title">${sh.title}</span>
                 </div>
-                <span class="choice-action-pill" title="Start Lesson & Practice">
-                  <span>Practice</span>
-                  <i class="fa-solid fa-play" style="font-size: 0.65rem;"></i>
-                </span>
-              </button>
-            `).join('')}
+              </div>
+              <div class="subheader-btn-right">
+                <span class="subheader-count-pill">${sh.matchingSubtopics.length} Subtopics</span>
+                <i class="fa-solid fa-chevron-down subheader-chevron"></i>
+              </div>
+            </button>
+
+            <!-- SUBTOPICS REVEALED WHEN OPENED -->
+            ${isExpanded ? `
+              <div class="subheader-expanded-panel">
+                <!-- DROPDOWN SELECTION PICKER -->
+                <div class="subtopic-picker-row" style="margin-bottom: 1rem;">
+                  <div class="subtopic-select-control">
+                    <i class="fa-solid fa-hand-pointer select-icon"></i>
+                    <select class="subtopic-picker-dropdown" data-pillar="${pillar.id}" data-subheader="${sh.id}">
+                      <option value="" disabled ${!activeSelectedSubtopicId ? 'selected' : ''}>✨ Choose a subtopic to study...</option>
+                      ${sh.matchingSubtopics.map(st => `
+                        <option value="${st.id}" ${activeSelectedSubtopicId === st.id ? 'selected' : ''}>${st.title} – ${st.desc}</option>
+                      `).join('')}
+                    </select>
+                    <i class="fa-solid fa-chevron-down chevron-icon"></i>
+                  </div>
+                </div>
+
+                <!-- SUBTOPIC CHOICE BUTTONS -->
+                <div class="subtopics-selection-grid">
+                  ${sh.matchingSubtopics.map(st => {
+                    const isSelected = activeSelectedSubtopicId === st.id;
+                    return `
+                      <button type="button" class="subtopic-choice-btn ${isSelected ? 'active' : ''}" data-pillar="${pillar.id}" data-subheader="${sh.id}" data-subtopic="${st.id}">
+                        <span class="choice-radio-indicator">
+                          <i class="fa-regular fa-circle indicator-unselected"></i>
+                          <i class="fa-solid fa-circle-dot indicator-selected"></i>
+                        </span>
+                        <div class="choice-text-col">
+                          <span class="choice-title-eng">${st.title}</span>
+                          <span class="choice-desc-eng">${st.desc || ''}</span>
+                        </div>
+                        <span class="choice-action-pill" title="Study lesson and practice quiz">
+                          <span>Practice</span>
+                          <i class="fa-solid fa-play" style="font-size: 0.65rem;"></i>
+                        </span>
+                      </button>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            ` : ''}
           </div>
-        </div>
-      `).join('')}
+        `;
+      }).join('')}
     </div>
   `;
 
@@ -195,7 +208,6 @@ function renderActivePillarView() {
     searchInput.addEventListener('input', (e) => {
       subtopicSearchQuery = e.target.value;
       renderActivePillarView();
-      // Keep focus on input after re-render
       const newSearchInput = document.getElementById('curriculum-subtopic-search');
       if (newSearchInput) {
         newSearchInput.focus();
@@ -204,7 +216,16 @@ function renderActivePillarView() {
     });
   }
 
-  // Bind change event on subtopic dropdown selection controls (כפתורי בחירה נפתחים)
+  // Bind Sub-header toggle buttons (clicking expands/collapses subtopics)
+  container.querySelectorAll('.subheader-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const shid = e.currentTarget.getAttribute('data-subheader-id');
+      expandedSubHeaderId = (expandedSubHeaderId === shid) ? null : shid;
+      renderActivePillarView();
+    });
+  });
+
+  // Bind change event on subtopic dropdown selector
   container.querySelectorAll('.subtopic-picker-dropdown').forEach(dropdown => {
     dropdown.addEventListener('change', (e) => {
       const pid = e.target.getAttribute('data-pillar');
@@ -217,7 +238,7 @@ function renderActivePillarView() {
     });
   });
 
-  // Bind click on subtopic choice buttons (כפתורי בחירה עם סמן)
+  // Bind click on subtopic choice buttons
   container.querySelectorAll('.subtopic-choice-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const pid = e.currentTarget.getAttribute('data-pillar');
@@ -235,7 +256,7 @@ function renderActivePillarView() {
 
 /**
  * ============================================================================
- * 2. SUBTOPIC LESSON & PRACTICE MODAL
+ * 2. SUBTOPIC LESSON & PRACTICE MODAL (100% ENGLISH)
  * ============================================================================
  */
 
@@ -271,15 +292,14 @@ function renderSubtopicModalContent() {
       <div class="subtopic-modal-breadcrumb">
         <span>${lesson.pillarNumber}. ${lesson.pillarTitle}</span>
         <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i>
-        <span>${lesson.subHeaderTitle} (${lesson.subHeaderTitleHe})</span>
+        <span>${lesson.subHeaderTitle}</span>
         <i class="fa-solid fa-chevron-right" style="font-size: 0.65rem;"></i>
         <strong>${lesson.title}</strong>
       </div>
 
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap;">
         <div>
-          <h2 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.2rem; color: var(--text-main);">${lesson.title}</h2>
-          <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-muted); margin: 0 0 0.5rem;">${lesson.titleHe}</h4>
+          <h2 style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-main);">${lesson.title}</h2>
           <p style="font-size: 0.95rem; color: var(--text-color); margin: 0; line-height: 1.5;">${lesson.description}</p>
         </div>
         
@@ -457,7 +477,7 @@ function renderSubtopicModalContent() {
     });
   }
 
-  // Bind Copy & Share Score
+  // Bind Copy Score
   const copyBtn = document.getElementById('btn-copy-subtopic-score');
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
@@ -469,6 +489,7 @@ function renderSubtopicModalContent() {
     });
   }
 
+  // Bind Share Score
   const shareBtn = document.getElementById('btn-share-subtopic-score');
   if (shareBtn) {
     shareBtn.addEventListener('click', () => {
@@ -597,265 +618,4 @@ function setupModalDismissHandlers() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeTopicDetail();
   });
-}
-
-/**
- * ============================================================================
- * 3. STUDY CHECKLIST & FOUNDATION GUIDE (PERSISTED UTILITIES)
- * ============================================================================
- */
-
-function getCompletedChecklist() {
-  try {
-    const raw = localStorage.getItem('grammar_checklist_completed');
-    return raw ? JSON.parse(raw) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveCompletedChecklist(completed) {
-  try {
-    localStorage.setItem('grammar_checklist_completed', JSON.stringify(completed));
-  } catch (e) {
-    console.error('Failed to save checklist to localStorage:', e);
-  }
-}
-
-function initGrammarChecklist() {
-  const container = document.getElementById('checklist-items-container');
-  if (!container) return;
-
-  const completed = getCompletedChecklist();
-  updateChecklistProgress(completed.length);
-  setupChecklistFilterPills();
-
-  const filteredList = (GRAMMAR_CHECKLIST || []).filter(item => {
-    const isCompleted = completed.includes(item.num);
-    if (checklistFilter === 'completed') return isCompleted;
-    if (checklistFilter === 'remaining') return !isCompleted;
-    return true;
-  });
-
-  if (filteredList.length === 0) {
-    const totalCount = (GRAMMAR_CHECKLIST || []).length || 17;
-    container.innerHTML = `
-      <div style="grid-column: 1/-1; text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
-        <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--success, #28a745); margin-bottom: 0.75rem; display: block;"></i>
-        <h4 style="font-size: 1.15rem; margin-bottom: 0.25rem;">${checklistFilter === 'remaining' ? `Splendid! You have completed all ${totalCount} topics!` : 'No topics found for this filter.'}</h4>
-        <p style="font-size: 0.88rem;">Select "All" to view the complete curriculum.</p>
-      </div>
-    `;
-    return;
-  }
-
-  container.innerHTML = filteredList.map(item => {
-    const isChecked = completed.includes(item.num);
-    const escapedEx = (item.example || '').replace(/"/g, '&quot;');
-
-    return `
-      <div class="checklist-item-row ${isChecked ? 'completed' : ''}" data-item-num="${item.num}">
-        <label class="checklist-item-check-label" title="${isChecked ? 'Mark as incomplete' : 'Mark as completed'}">
-          <input type="checkbox" class="checklist-checkbox" data-num="${item.num}" ${isChecked ? 'checked' : ''}>
-          <span class="checklist-num-badge">${item.num}</span>
-        </label>
-        <div class="checklist-item-text">
-          <div class="checklist-item-title-row">
-            <h4 class="checklist-item-title">${item.title}</h4>
-            ${item.topicId ? `
-              <button type="button" class="btn-open-topic-link" data-topic-id="${item.topicId}" title="Jump to ${item.title}">
-                <i class="fa-solid fa-arrow-up-right-from-square"></i> <span>Explore</span>
-              </button>
-            ` : ''}
-          </div>
-          <p class="checklist-item-desc">${item.desc}</p>
-          
-          ${item.example ? `
-            <div class="checklist-example-box">
-              <div class="checklist-example-text">
-                <i class="fa-solid fa-quote-left quote-icon"></i>
-                <span>${item.example}</span>
-              </div>
-              <button type="button" class="audio-btn-modern checklist-speak-btn" data-text="${escapedEx}" title="Listen in British English">
-                <span class="audio-wave-anim"><span></span><span></span><span></span></span>
-                <i class="fa-solid fa-volume-high audio-icon"></i>
-              </button>
-            </div>
-          ` : ''}
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  // Bind checkbox changes
-  container.querySelectorAll('.checklist-checkbox').forEach(cb => {
-    cb.addEventListener('change', (e) => {
-      const num = parseInt(e.target.getAttribute('data-num'));
-      let currentCompleted = getCompletedChecklist();
-
-      if (e.target.checked) {
-        if (!currentCompleted.includes(num)) currentCompleted.push(num);
-      } else {
-        currentCompleted = currentCompleted.filter(id => id !== num);
-      }
-
-      saveCompletedChecklist(currentCompleted);
-      initGrammarChecklist();
-    });
-  });
-
-  // Bind jump to pillar buttons in checklist
-  container.querySelectorAll('.btn-open-topic-link').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const topicId = e.currentTarget.getAttribute('data-topic-id');
-      if (topicId) {
-        activePillarId = topicId;
-        subtopicSearchQuery = '';
-        renderPillarsNav();
-        renderActivePillarView();
-        const contentEl = document.getElementById('curriculum-pillar-content');
-        if (contentEl) contentEl.scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-
-  // Bind audio speak buttons
-  container.querySelectorAll('.checklist-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const text = btn.getAttribute('data-text');
-      btn.classList.add('speaking');
-      try {
-        await speakText(text, { rate: 0.9 });
-      } catch (err) {
-        console.error('Audio play error:', err);
-      } finally {
-        btn.classList.remove('speaking');
-      }
-    });
-  });
-
-  // Setup Copy Checklist Button
-  const copyBtn = document.getElementById('btn-copy-checklist');
-  if (copyBtn && !copyBtn.dataset.bound) {
-    copyBtn.dataset.bound = 'true';
-    copyBtn.addEventListener('click', () => {
-      const currentCompleted = getCompletedChecklist();
-      const total = (GRAMMAR_CHECKLIST || []).length || 17;
-      const lines = [
-        '### 17 Master Pillars of English Fluency - Study Roadmap',
-        '',
-        '### Your Study Progress',
-        `${currentCompleted.length} of ${total} completed (${Math.round((currentCompleted.length / total) * 100)}%)`,
-        ''
-      ];
-
-      (GRAMMAR_CHECKLIST || []).forEach(item => {
-        const check = currentCompleted.includes(item.num) ? '[x]' : '[ ]';
-        lines.push(`${item.num}. ${item.title} ${check}`);
-        lines.push(`   Description: ${item.desc}`);
-        if (item.example) lines.push(`   UK Example: "${item.example}"`);
-        lines.push('');
-      });
-
-      const fullText = lines.join('\n');
-      navigator.clipboard.writeText(fullText).then(() => {
-        const originalHTML = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<i class="fa-solid fa-check" style="color: var(--success, #28a745);"></i> <span>Copied!</span>';
-        setTimeout(() => {
-          copyBtn.innerHTML = originalHTML;
-        }, 2200);
-      }).catch(err => {
-        console.error('Clipboard copy error:', err);
-      });
-    });
-  }
-}
-
-function setupChecklistFilterPills() {
-  const filterBtns = document.querySelectorAll('.checklist-filter-btn');
-  filterBtns.forEach(btn => {
-    if (!btn.dataset.bound) {
-      btn.dataset.bound = 'true';
-      btn.addEventListener('click', (e) => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        checklistFilter = e.currentTarget.getAttribute('data-filter') || 'all';
-        initGrammarChecklist();
-      });
-    }
-  });
-}
-
-function updateChecklistProgress(completedCount) {
-  const textEl = document.getElementById('checklist-progress-text');
-  const fillEl = document.getElementById('checklist-progress-fill');
-  const heroCountEl = document.getElementById('hero-checklist-count');
-
-  const total = (GRAMMAR_CHECKLIST || []).length || 17;
-  const pct = Math.round((completedCount / total) * 100);
-
-  if (textEl) textEl.innerText = `${completedCount} of ${total} completed (${pct}%)`;
-  if (fillEl) fillEl.style.width = `${pct}%`;
-  if (heroCountEl) heroCountEl.innerText = `${completedCount} / ${total}`;
-}
-
-function initWhereToStartGuide() {
-  const container = document.getElementById('guide-examples-container');
-  if (!container) return;
-
-  const examples = WHERE_TO_START_GUIDE?.examples || [];
-
-  container.innerHTML = examples.map(ex => {
-    const escapedSentence = (ex.sentence || '').replace(/"/g, '&quot;');
-    const parts = ex.sentence.split(new RegExp(`(${ex.highlight})`, 'i'));
-    const formattedSentence = parts.map(part => {
-      if (part.toLowerCase() === ex.highlight.toLowerCase()) {
-        return `<mark class="part-highlight">${part}</mark>`;
-      }
-      return part;
-    }).join('');
-
-    return `
-      <div class="guide-example-card">
-        <div class="guide-card-top">
-          <span class="guide-part-badge">${ex.part}</span>
-          <button type="button" class="audio-btn-modern guide-speak-btn" data-text="${escapedSentence}" title="Listen with authentic UK accent">
-            <span class="audio-wave-anim"><span></span><span></span><span></span></span>
-            <i class="fa-solid fa-volume-high audio-icon"></i>
-          </button>
-        </div>
-        <div class="guide-sentence-text">${formattedSentence}</div>
-        <p class="guide-role-note">${ex.role || ''}</p>
-      </div>
-    `;
-  }).join('');
-
-  container.querySelectorAll('.guide-speak-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const text = btn.getAttribute('data-text');
-      btn.classList.add('speaking');
-      try {
-        await speakText(text, { rate: 0.9 });
-      } catch (err) {
-        console.error('Audio play error:', err);
-      } finally {
-        btn.classList.remove('speaking');
-      }
-    });
-  });
-
-  const startBtn = document.getElementById('btn-start-parts-of-speech');
-  if (startBtn && !startBtn.dataset.bound) {
-    startBtn.dataset.bound = 'true';
-    startBtn.addEventListener('click', () => {
-      activePillarId = 'grammar';
-      subtopicSearchQuery = '';
-      renderPillarsNav();
-      renderActivePillarView();
-      const contentEl = document.getElementById('curriculum-pillar-content');
-      if (contentEl) contentEl.scrollIntoView({ behavior: 'smooth' });
-    });
-  }
 }
