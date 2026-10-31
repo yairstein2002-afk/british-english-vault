@@ -63,10 +63,11 @@ function initGrammarChecklist() {
   });
 
   if (filteredList.length === 0) {
+    const totalCount = (GRAMMAR_CHECKLIST || []).length || 14;
     container.innerHTML = `
       <div style="grid-column: 1/-1; text-align: center; padding: 2.5rem 1rem; color: var(--text-muted);">
         <i class="fa-solid fa-circle-check" style="font-size: 2.5rem; color: var(--success, #28a745); margin-bottom: 0.75rem; display: block;"></i>
-        <h4 style="font-size: 1.15rem; margin-bottom: 0.25rem;">${checklistFilter === 'remaining' ? 'Splendid! You have completed all 25 topics!' : 'No topics found for this filter.'}</h4>
+        <h4 style="font-size: 1.15rem; margin-bottom: 0.25rem;">${checklistFilter === 'remaining' ? `Splendid! You have completed all ${totalCount} topics!` : 'No topics found for this filter.'}</h4>
         <p style="font-size: 0.88rem;">Select "All" to view the complete curriculum.</p>
       </div>
     `;
@@ -169,11 +170,12 @@ function initGrammarChecklist() {
     copyBtn.dataset.bound = 'true';
     copyBtn.addEventListener('click', () => {
       const currentCompleted = getCompletedChecklist();
+      const total = (GRAMMAR_CHECKLIST || []).length || 14;
       const lines = [
-        '### English Grammar Learning Checklist & Study Roadmap',
+        '### English Learning Methods & Study Roadmap',
         '',
         '### Your Study Progress',
-        `${currentCompleted.length} of 25 completed (${Math.round((currentCompleted.length / 25) * 100)}%)`,
+        `${currentCompleted.length} of ${total} completed (${Math.round((currentCompleted.length / total) * 100)}%)`,
         ''
       ];
 
@@ -236,7 +238,7 @@ function updateChecklistProgress(completedCount) {
   const fillEl = document.getElementById('checklist-progress-fill');
   const heroCountEl = document.getElementById('hero-checklist-count');
 
-  const total = (GRAMMAR_CHECKLIST || []).length || 25;
+  const total = (GRAMMAR_CHECKLIST || []).length || 14;
   const pct = Math.round((completedCount / total) * 100);
 
   if (textEl) textEl.innerText = `${completedCount} of ${total} completed (${pct}%)`;
@@ -245,7 +247,7 @@ function updateChecklistProgress(completedCount) {
 }
 
 /**
- * Initialize "Where should you start?" Guide with 10 Parts of Speech & Modern Audio
+ * Initialize "Where should you start?" Guide with 14 Learning Methods & Modern Audio
  */
 function initWhereToStartGuide() {
   const container = document.getElementById('guide-examples-container');
@@ -296,12 +298,12 @@ function initWhereToStartGuide() {
     });
   });
 
-  // Bind Start with Parts of Speech button
+  // Bind Start with Flashcards button
   const startBtn = document.getElementById('btn-start-parts-of-speech');
   if (startBtn && !startBtn.dataset.bound) {
     startBtn.dataset.bound = 'true';
     startBtn.addEventListener('click', () => {
-      openTopicDetail('parts-of-speech-overview');
+      openTopicDetail('flashcards');
     });
   }
 }
@@ -312,7 +314,7 @@ function renderCategoryChips() {
 
   container.innerHTML = `
     <button class="chip ${activeCategory === 'all' ? 'active' : ''}" data-cat="all">
-      🌐 All Topics (52)
+      🌐 All Topics (${LEARN_TOPICS.length})
     </button>
     ${LEARN_CATEGORIES.map(cat => `
       <button class="chip ${activeCategory === cat.id ? 'active' : ''}" data-cat="${cat.id}">
@@ -330,7 +332,7 @@ function renderCategoryChips() {
       const checklistCard = document.getElementById('grammar-checklist-card');
       const startGuideCard = document.getElementById('grammar-start-guide-card');
 
-      if (activeCategory === 'all' || activeCategory === 'parts-of-speech') {
+      if (activeCategory === 'all' || activeCategory === 'vocabulary') {
         if (checklistCard) checklistCard.style.display = 'block';
         if (startGuideCard) startGuideCard.style.display = 'block';
       } else {
