@@ -369,8 +369,9 @@ export function renderTopicsList() {
       const matchSummary = topic.summary.toLowerCase().includes(searchQuery);
       const matchSubgroup = (topic.subgroup || '').toLowerCase().includes(searchQuery);
       const matchKeywords = (topic.keywords || []).some(kw => kw.toLowerCase().includes(searchQuery));
+      const matchSubtopics = (topic.subtopics || []).some(sub => sub.toLowerCase().includes(searchQuery));
 
-      if (!matchTitle && !matchSummary && !matchSubgroup && !matchKeywords) return false;
+      if (!matchTitle && !matchSummary && !matchSubgroup && !matchKeywords && !matchSubtopics) return false;
     }
     return true;
   });
@@ -425,6 +426,7 @@ export function renderTopicsList() {
                 <div class="topic-title-group" style="flex: 1; min-width: 0;">
                   <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.35rem;">
                     <span class="topic-tag"><i class="fa-solid fa-tag" style="font-size: 0.7rem;"></i> ${topic.subgroup || catData.titleEng}</span>
+                    <span class="topic-subtopics-badge"><i class="fa-solid fa-list-check" style="font-size: 0.7rem;"></i> ${(topic.subtopics || []).length} Subtopics</span>
                   </div>
                   <h4 class="topic-name">${topic.title}</h4>
                   <p class="topic-summary">${topic.summary}</p>
@@ -541,6 +543,23 @@ function renderTopicDetailContent(topic) {
           </div>
         `).join('')}
       </div>
+
+      ${topic.subtopics && topic.subtopics.length > 0 ? `
+        <div class="subtopics-syllabus-panel card" style="margin-top: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+            <h4 style="margin: 0; font-size: 1.05rem;"><i class="fa-solid fa-list-check" style="color: var(--uk-blue);"></i> Complete Syllabus & Core Subtopics (${topic.subtopics.length})</h4>
+            <span style="font-size: 0.8rem; color: var(--text-muted);"><i class="fa-solid fa-circle-check" style="color: var(--success, #28a745);"></i> All Concepts Included</span>
+          </div>
+          <div class="subtopics-grid-pills" style="display: flex; flex-wrap: wrap; gap: 0.45rem;">
+            ${topic.subtopics.map(sub => `
+              <span class="subtopic-badge">
+                <i class="fa-solid fa-check" style="font-size: 0.7rem; color: var(--success, #28a745); margin-right: 0.35rem;"></i>
+                <span>${sub}</span>
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
 
       ${topic.keywords && topic.keywords.length > 0 ? `
         <div class="keywords-panel card" style="margin-top: 1.25rem;">

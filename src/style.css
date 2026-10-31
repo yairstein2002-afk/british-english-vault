@@ -6519,6 +6519,58 @@ button, input, select, textarea {
   border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
+/* Subtopics Badges & Syllabus Panel */
+.topic-subtopics-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 36, 125, 0.08);
+  color: var(--uk-blue);
+  border: 1px solid rgba(0, 36, 125, 0.15);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+[data-theme="dark"] .topic-subtopics-badge {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-light);
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.subtopics-syllabus-panel {
+  padding: 1.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+}
+
+.subtopic-badge {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.subtopic-badge:hover {
+  border-color: var(--uk-blue);
+  background: rgba(0, 36, 125, 0.05);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .subtopic-badge:hover {
+  border-color: var(--gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+
 
 
 
