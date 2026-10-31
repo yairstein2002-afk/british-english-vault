@@ -20,8 +20,8 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="./assets/index-B8Tl96Yp.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BHUBSPOL.css">
+  <script type="module" crossorigin src="./assets/index-D5NbK5hg.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index--u-K2bt7.css">
 </head>
 <body>
   <!-- App Container -->
@@ -1626,17 +1626,22 @@
             </div>
           </div>
 
-          <!-- Search & Tag Filter Chips Panel -->
-          <div class="card learn-filter-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
-            <div class="search-box" style="width: 100%; margin-bottom: 1rem;">
-              <i class="fa-solid fa-magnifying-glass"></i>
-              <input type="text" id="learn-search-input" placeholder="Search any pillar, topic, grammar rule, idiom, keyword...">
+          <!-- SECTION 1: 17 TOPIC BUTTONS SELECTOR -->
+          <div class="card curriculum-nav-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
+            <div class="curriculum-nav-header" style="margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="section-badge-small"><i class="fa-solid fa-list-ol"></i> Master Topics (1 - 17)</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Click any topic button to view its sub-headers and subtopics:</span>
+              </div>
             </div>
+            <div id="curriculum-pillars-nav" class="pillars-nav-grid">
+              <!-- Rendered dynamically in src/learn.js (17 Topic Buttons) -->
+            </div>
+          </div>
 
-            <!-- Category / Tag Filter Chips -->
-            <div class="domain-filter-chips" id="learn-chips-container">
-              <!-- Dynamically rendered in src/learn.js -->
-            </div>
+          <!-- SECTION 2: ACTIVE TOPIC WITH SUB-HEADERS & SUBTOPIC BUTTONS -->
+          <div id="curriculum-pillar-content" class="curriculum-pillar-container" style="margin-bottom: 2rem;">
+            <!-- Rendered dynamically in src/learn.js -->
           </div>
 
           <!-- Section 1: 17-Topic Learning Checklist & Study Tracker -->
@@ -1704,12 +1709,7 @@
             </div>
           </div>
 
-          <!-- Section 3: All 17 Master Learning Pillars (Grouped by Domains) -->
-          <div id="learn-topics-section" class="learn-topics-section" style="margin-bottom: 2rem;">
-            <div id="learn-topics-container" class="learn-topics-grid">
-              <!-- Loaded dynamically from src/learn.js, organized by tags -->
-            </div>
-          </div>
+          <!-- (Curriculum topics rendered via #curriculum-pillar-content above) -->
         </section>
 
         <!-- DAILY PRACTICE VIEW (WRITING LAB ✍️) -->
