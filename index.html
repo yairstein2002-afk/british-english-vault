@@ -20,8 +20,8 @@
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom Styling -->
-  <script type="module" crossorigin src="./assets/index-DAz3eWjR.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-BS-57tqr.css">
+  <script type="module" crossorigin src="./assets/index-D_O7MMiD.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-CMLYlxye.css">
 </head>
 <body>
   <!-- App Container -->
@@ -1573,7 +1573,7 @@
         
                 <!-- LEARN & PRACTICE VIEW (ALL LEARNING TOPICS) -->
         <section id="view-learn" class="view-section">
-          <!-- Main Hero Card: 17 Master Pillars -->
+          <!-- Main Hero Banner: 17 Master Pillars -->
           <div class="card learn-hero-banner">
             <div class="learn-hero-content">
               <div class="learn-hero-badge">
@@ -1582,7 +1582,7 @@
               <div class="learn-hero-text">
                 <div class="learn-hero-tag"><i class="fa-solid fa-crown"></i> British English Curriculum</div>
                 <h2>17 Master Pillars of English Fluency</h2>
-                <p>Master the 17 essential pillars of English fluency: Grammar, Vocabulary, 4 Core Skills, Phrasals, Idioms, Varieties, and Accelerated Learning.</p>
+                <p>Select any topic to reveal its sub-headers and subtopics, then click to study lessons with authentic UK audio and interactive quizzes.</p>
               </div>
             </div>
 
@@ -1591,14 +1591,14 @@
                 <i class="fa-solid fa-book-open"></i>
                 <div>
                   <span class="metric-val">17</span>
-                  <span class="metric-lbl">Master Lessons</span>
+                  <span class="metric-lbl">Master Topics</span>
                 </div>
               </div>
               <div class="metric-pill">
-                <i class="fa-solid fa-list-check"></i>
+                <i class="fa-solid fa-layer-group"></i>
                 <div>
-                  <span class="metric-val" id="hero-checklist-count">0 / 17</span>
-                  <span class="metric-lbl">Checklist</span>
+                  <span class="metric-val">337+</span>
+                  <span class="metric-lbl">Subtopics</span>
                 </div>
               </div>
               <div class="metric-pill">
@@ -1611,27 +1611,12 @@
             </div>
           </div>
 
-          <!-- Highlight Callout Banner with curriculum overview -->
-          <div class="card grammar-curriculum-callout" style="margin-bottom: 1.25rem;">
-            <div class="curriculum-callout-header">
-              <div class="checklist-icon-badge" style="width: 44px; height: 44px; font-size: 1.25rem; flex-shrink: 0;">
-                <i class="fa-solid fa-list-check"></i>
-              </div>
-              <div style="flex: 1; min-width: 0;">
-                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-main);">17 Master Learning Pillars Checklist</h3>
-                <p style="margin: 0.35rem 0 0; font-size: 0.94rem; color: var(--text-color); line-height: 1.5; font-weight: 500;">
-                  To achieve advanced English fluency, study the language systematically from foundations to advanced mastery across all 17 master pillars.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- SECTION 1: 17 TOPIC BUTTONS SELECTOR -->
+          <!-- TOPIC BUTTONS SELECTOR (Topics 1 - 17) -->
           <div class="card curriculum-nav-card" style="margin-bottom: 1.5rem; padding: 1.25rem;">
             <div class="curriculum-nav-header" style="margin-bottom: 0.85rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <span class="section-badge-small"><i class="fa-solid fa-list-ol"></i> Master Topics (1 - 17)</span>
-                <span style="font-size: 0.85rem; color: var(--text-muted);">Click any topic button to view its sub-headers and subtopics:</span>
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Click a topic to view its subtopics:</span>
               </div>
             </div>
             <div id="curriculum-pillars-nav" class="pillars-nav-grid">
@@ -1639,77 +1624,10 @@
             </div>
           </div>
 
-          <!-- SECTION 2: ACTIVE TOPIC WITH SUB-HEADERS & SUBTOPIC BUTTONS -->
+          <!-- ACTIVE TOPIC WITH EXPANDABLE SUB-HEADERS & SUBTOPIC BUTTONS -->
           <div id="curriculum-pillar-content" class="curriculum-pillar-container" style="margin-bottom: 2rem;">
             <!-- Rendered dynamically in src/learn.js -->
           </div>
-
-          <!-- Section 1: 17-Topic Learning Checklist & Study Tracker -->
-          <div id="grammar-checklist-card" class="card grammar-checklist-card" style="margin-bottom: 1.5rem;">
-            <div class="checklist-header-row">
-              <div class="checklist-header-title">
-                <div class="section-badge-small"><i class="fa-solid fa-route"></i> Recommended Study Order (1 - 17)</div>
-              </div>
-            </div>
-
-            <div class="checklist-tracker-bar">
-              <div class="checklist-tracker-info">
-                <span class="checklist-study-label">Your Study List:</span>
-                <span id="checklist-progress-text" class="checklist-progress-badge">0 of 17 completed</span>
-                <div class="checklist-progress-bar-bg">
-                  <div id="checklist-progress-fill" style="width: 0%;"></div>
-                </div>
-              </div>
-              
-              <div class="checklist-actions-group">
-                <div class="checklist-filter-pills" style="display: flex; gap: 0.35rem;">
-                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn active" data-filter="all">All (17)</button>
-                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="remaining">Remaining</button>
-                  <button type="button" class="btn btn-sm btn-ghost checklist-filter-btn" data-filter="completed">Completed</button>
-                </div>
-
-                <button type="button" id="btn-copy-checklist" class="btn btn-secondary btn-sm" title="Copy study checklist to clipboard">
-                  <i class="fa-solid fa-copy"></i> <span>Copy Checklist</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- The 17 Items List Container -->
-            <div id="checklist-items-container" class="checklist-items-grid">
-              <!-- Dynamically rendered in src/learn.js with rich British examples & audio -->
-            </div>
-          </div>
-
-          <!-- Section 2: Where Should You Start? (Foundations) -->
-          <div id="grammar-start-guide-card" class="card grammar-start-guide-card" style="margin-bottom: 1.5rem;">
-            <div class="guide-header">
-              <div class="guide-icon-badge">
-                <i class="fa-solid fa-compass"></i>
-              </div>
-              <div style="flex: 1; min-width: 0;">
-                <div class="section-badge-small"><i class="fa-solid fa-star"></i> Foundation Guide</div>
-                <h3 style="margin: 0.15rem 0 0; font-size: 1.2rem;">Where should you start?</h3>
-                <p style="margin: 0.35rem 0 0; font-size: 0.95rem; color: var(--text-color); line-height: 1.5;">
-                  We recommend starting with <strong>Grammar (Parts of Speech & Tenses) & Vocabulary</strong> to establish your structural core, followed by <strong>Pronunciation & the Core Skills</strong> for full immersion.
-                </p>
-              </div>
-            </div>
-
-            <div class="guide-examples-grid" id="guide-examples-container">
-              <!-- Rendered from WHERE_TO_START_GUIDE with audio buttons in src/learn.js -->
-            </div>
-
-            <div class="guide-footer-callout">
-              <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
-                <i class="fa-solid fa-lightbulb" style="color: var(--gold);"></i> Once you understand these categories, explore the full master lessons below.
-              </p>
-              <button type="button" id="btn-start-parts-of-speech" class="btn btn-primary btn-sm">
-                <i class="fa-solid fa-book"></i> Start with Grammar
-              </button>
-            </div>
-          </div>
-
-          <!-- (Curriculum topics rendered via #curriculum-pillar-content above) -->
         </section>
 
         <!-- DAILY PRACTICE VIEW (WRITING LAB ✍️) -->
