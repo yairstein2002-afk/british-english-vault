@@ -57,6 +57,7 @@ import {
   calculateGoalsStats 
 } from './goals.js';
 import { initLearnUI, closeTopicDetail } from './learn.js';
+import { initIrregularVerbsUI } from './irregularVerbs.js';
 import { initDailyPracticeUI } from './dailyPractice.js';
 import { initDailyWritingUI } from './dailyWriting.js';
 import {
@@ -114,6 +115,7 @@ const views = {
   dailyPractice: document.getElementById('view-daily-practice'),
   dailyWriting: document.getElementById('view-daily-writing'),
   learn: document.getElementById('view-learn'),
+  irregularVerbs: document.getElementById('view-irregular-verbs'),
   games: document.getElementById('view-games'),
   quiz: document.getElementById('view-quiz'),
   stats: document.getElementById('view-stats'),
@@ -178,7 +180,7 @@ function initRouter() {
   // Handle URL hash changes for direct linking
   window.addEventListener('hashchange', () => {
     const hash = window.location.hash.substring(1);
-    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'daily-practice', 'daily-writing', 'learn', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
+    const validViews = ['words', 'slangs', 'phrases', 'idioms', 'daily-practice', 'daily-writing', 'learn', 'irregular-verbs', 'games', 'quiz', 'stats', 'settings', 'ai', 'goals'];
     if (validViews.includes(hash)) {
       currentView = hash;
       updateView();
@@ -222,6 +224,7 @@ function updateView() {
     'daily-practice': 'Daily Practice — Writing Lab ✍️',
     'daily-writing': 'Daily Writing & Audio Lab ✍️🎙️',
     learn: 'Learn & Practice',
+    'irregular-verbs': 'Irregular Verbs',
     games: 'Interactive Games',
     quiz: 'Practice & Quiz',
     stats: 'Statistics',
@@ -249,6 +252,9 @@ function updateView() {
     } else if (currentView === 'learn') {
       if (views.learn) views.learn.classList.add('active');
       initLearnUI();
+    } else if (currentView === 'irregular-verbs') {
+      if (views.irregularVerbs) views.irregularVerbs.classList.add('active');
+      initIrregularVerbsUI();
     } else if (currentView === 'games') {
       if (views.games) views.games.classList.add('active');
       renderGamesUI();
