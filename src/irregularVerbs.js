@@ -1,14 +1,16 @@
 /**
  * British English Vault - Irregular Verbs Module
  * Searchable, audio-enabled interactive dictionary of irregular verbs (V1, V2, V3).
+ * Includes: Core, Archaic & Rare, and Compound (Prefixed) verbs.
  */
 
-import { IRREGULAR_VERBS } from './irregularVerbsData.js';
+import { IRREGULAR_VERBS, VERB_CATEGORIES } from './irregularVerbsData.js';
 import { speakText } from './speech.js';
 import { copyTextToClipboard } from './shareUtils.js';
 
 let searchQuery = '';
 let selectedLetter = 'ALL';
+let selectedCategory = 'ALL';
 let isInitialized = false;
 
 export function initIrregularVerbsUI() {
@@ -31,8 +33,9 @@ function bindGlobalEvents() {
     }
   });
 
-  // Clear search button delegation
+  // Click delegation
   container.addEventListener('click', (e) => {
+    // Clear search button delegation
     const clearBtn = e.target.closest('#btn-clear-irregular-search');
     if (clearBtn) {
       searchQuery = '';
@@ -41,6 +44,16 @@ function bindGlobalEvents() {
         input.value = '';
         input.focus();
       }
+      renderVerbsTable();
+      return;
+    }
+
+    // Category filter tabs
+    const catBtn = e.target.closest('.cat-filter-btn');
+    if (catBtn) {
+      selectedCategory = catBtn.getAttribute('data-cat') || 'ALL';
+      container.querySelectorAll('.cat-filter-btn').forEach(b => b.classList.remove('active'));
+      catBtn.classList.add('active');
       renderVerbsTable();
       return;
     }
@@ -61,7 +74,6 @@ function bindGlobalEvents() {
       const v1 = speakBtn.getAttribute('data-v1') || '';
       const v2 = speakBtn.getAttribute('data-v2') || '';
       const v3 = speakBtn.getAttribute('data-v3') || '';
-      // Speak with slight pause between forms: "Break, ... Broke, ... Broken"
       const speechText = `${v1}, ${v2}, ${v3}`;
       
       speakBtn.classList.add('speaking');
@@ -88,6 +100,11 @@ function renderIrregularVerbsView() {
   // Extract distinct first letters
   const letters = ['ALL', ...new Set(IRREGULAR_VERBS.map(item => item.v1.charAt(0).toUpperCase()))].sort();
 
+  // Category counts
+  const coreCount = IRREGULAR_VERBS.filter(v => v.category === 'core').length;
+  const archaicCount = IRREGULAR_VERBS.filter(v => v.category === 'archaic').length;
+  const compoundCount = IRREGULAR_VERBS.filter(v => v.category === 'compound').length;
+
   container.innerHTML = `
     <!-- HERO BANNER -->
     <div class="card irregular-hero-banner">
@@ -96,9 +113,9 @@ function renderIrregularVerbsView() {
           <i class="fa-solid fa-bolt"></i>
         </div>
         <div class="irregular-hero-text">
-          <div class="section-badge-small"><i class="fa-solid fa-crown"></i> English Grammar Reference</div>
+          <div class="section-badge-small"><i class="fa-solid fa-crown"></i> Complete English Grammar Reference</div>
           <h2>Irregular Verbs (יוצאים מן הכלל)</h2>
-          <p>Comprehensive guide to English irregular verbs: Base Form (V1), Past Simple (V2), and Past Participle (V3) with authentic British pronunciation.</p>
+          <p>The definitive dictionary of English irregular verbs: Core Verbs, Archaic & Literary Forms, and Compound Prefixes with Base Form (V1), Past Simple (V2), and Past Participle (V3).</p>
         </div>
       </div>
 
@@ -108,6 +125,13 @@ function renderIrregularVerbsView() {
           <div>
             <span class="metric-val">${IRREGULAR_VERBS.length}</span>
             <span class="metric-lbl">Total Verbs</span>
+          </div>
+        </div>
+        <div class="metric-pill">
+          <i class="fa-solid fa-layer-group"></i>
+          <div>
+            <span class="metric-val">3</span>
+            <span class="metric-lbl">Categories</span>
           </div>
         </div>
         <div class="metric-pill">
@@ -127,6 +151,30 @@ function renderIrregularVerbsView() {
       </div>
     </div>
 
+    <!-- CATEGORY TABS -->
+    <div class="irregular-category-tabs-bar">
+      <button type="button" class="cat-filter-btn ${selectedCategory === 'ALL' ? 'active' : ''}" data-cat="ALL">
+        <i class="fa-solid fa-globe"></i>
+        <span>All Verbs</span>
+        <span class="cat-count-badge">${IRREGULAR_VERBS.length}</span>
+      </button>
+      <button type="button" class="cat-filter-btn ${selectedCategory === 'core' ? 'active' : ''}" data-cat="core">
+        <i class="fa-solid fa-bolt"></i>
+        <span>Core Verbs</span>
+        <span class="cat-count-badge">${coreCount}</span>
+      </button>
+      <button type="button" class="cat-filter-btn ${selectedCategory === 'compound' ? 'active' : ''}" data-cat="compound">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>Compound & Prefixes</span>
+        <span class="cat-count-badge">${compoundCount}</span>
+      </button>
+      <button type="button" class="cat-filter-btn ${selectedCategory === 'archaic' ? 'active' : ''}" data-cat="archaic">
+        <i class="fa-solid fa-feather-pointed"></i>
+        <span>Archaic & Rare</span>
+        <span class="cat-count-badge">${archaicCount}</span>
+      </button>
+    </div>
+
     <!-- SEARCH & FILTER TOOLBAR -->
     <div class="card irregular-toolbar-card">
       <div class="irregular-search-wrapper">
@@ -135,7 +183,7 @@ function renderIrregularVerbsView() {
           <input 
             type="text" 
             id="irregular-search-input" 
-            placeholder="Search verb in V1, V2, or V3 (e.g. go, went, gone)..." 
+            placeholder="Search in V1, V2, V3, or base root (e.g. understand, arose, eaten, redo)..." 
             value="${searchQuery}" 
             autocomplete="off"
             spellcheck="false"
@@ -194,7 +242,7 @@ function renderIrregularVerbsView() {
           <i class="fa-solid fa-magnifying-glass"></i>
         </div>
         <h3>No verbs found</h3>
-        <p>No irregular verbs match your search query. Try typing a different form or clear the search.</p>
+        <p>No irregular verbs match your current filters. Try typing a different search query or selecting another category.</p>
         <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('btn-clear-irregular-search').click();">
           <i class="fa-solid fa-rotate-right"></i> Reset Search
         </button>
@@ -225,6 +273,11 @@ function renderVerbsTable() {
   // Filter verbs
   const q = searchQuery.toLowerCase();
   const filtered = IRREGULAR_VERBS.filter(item => {
+    // Category check
+    if (selectedCategory !== 'ALL' && item.category !== selectedCategory) {
+      return false;
+    }
+
     // Letter filter check
     if (selectedLetter !== 'ALL') {
       if (item.v1.charAt(0).toUpperCase() !== selectedLetter) return false;
@@ -235,12 +288,15 @@ function renderVerbsTable() {
     const matchV1 = item.v1.toLowerCase().includes(q);
     const matchV2 = item.v2.toLowerCase().includes(q);
     const matchV3 = item.v3.toLowerCase().includes(q);
-    return matchV1 || matchV2 || matchV3;
+    const matchRoot = (item.root || '').toLowerCase().includes(q);
+    const matchNote = (item.note || '').toLowerCase().includes(q);
+    return matchV1 || matchV2 || matchV3 || matchRoot || matchNote;
   });
 
   if (matchedCountEl) matchedCountEl.innerText = filtered.length;
   if (subtitleEl) {
-    subtitleEl.innerText = `Showing ${filtered.length} of ${IRREGULAR_VERBS.length} verbs${searchQuery ? ` matching "${searchQuery}"` : ''}${selectedLetter !== 'ALL' ? ` (Letter: ${selectedLetter})` : ''}`;
+    let catText = selectedCategory === 'ALL' ? 'all categories' : (selectedCategory === 'core' ? 'Core' : (selectedCategory === 'compound' ? 'Compound Prefixes' : 'Archaic & Rare'));
+    subtitleEl.innerText = `Showing ${filtered.length} of ${IRREGULAR_VERBS.length} verbs [${catText}]${searchQuery ? ` matching "${searchQuery}"` : ''}${selectedLetter !== 'ALL' ? ` (Letter: ${selectedLetter})` : ''}`;
   }
 
   if (filtered.length === 0) {
@@ -255,15 +311,39 @@ function renderVerbsTable() {
     const v1Highlighted = highlightText(item.v1, q);
     const v2Highlighted = highlightText(item.v2, q);
     const v3Highlighted = highlightText(item.v3, q);
-    const rowCopyText = `${item.v1} | ${item.v2} | ${item.v3}`;
+    const rowCopyText = `${item.v1} | ${item.v2} | ${item.v3}${item.root ? ` (Root: ${item.root})` : ''}`;
+
+    // Meta badge for Compound or Archaic
+    let metaBadge = '';
+    if (item.category === 'compound') {
+      metaBadge = `
+        <div class="compound-meta-row">
+          <span class="compound-root-tag" title="Compound verb derived from base root '${item.root}'">
+            <i class="fa-solid fa-code-branch"></i> Root: <strong>${item.root}</strong>
+          </span>
+          ${item.prefix ? `<span class="compound-prefix-tag">${item.prefix}</span>` : ''}
+        </div>
+      `;
+    } else if (item.category === 'archaic') {
+      metaBadge = `
+        <div class="compound-meta-row">
+          <span class="archaic-tag" title="${item.note || 'Archaic / Historical form'}">
+            <i class="fa-solid fa-scroll"></i> ${item.note || 'Archaic'}
+          </span>
+        </div>
+      `;
+    }
 
     return `
-      <tr class="irregular-row">
+      <tr class="irregular-row cat-${item.category}">
         <td class="col-num"><span class="row-index">${index + 1}</span></td>
         <td class="col-v1">
           <div class="v1-wrapper">
             <span class="v1-tag">V1</span>
-            <strong class="v1-text">${v1Highlighted}</strong>
+            <div class="v1-info-col">
+              <strong class="v1-text">${v1Highlighted}</strong>
+              ${metaBadge}
+            </div>
           </div>
         </td>
         <td class="col-v2">
@@ -306,7 +386,6 @@ function renderVerbsTable() {
 
 function highlightText(text, query) {
   if (!query) return text;
-  // Escape regex special characters
   const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const regex = new RegExp(`(${escapedQuery})`, 'gi');
   return text.replace(regex, '<mark class="search-highlight">$1</mark>');
