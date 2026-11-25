@@ -114,7 +114,7 @@ function renderIrregularVerbsView() {
         </div>
         <div class="irregular-hero-text">
           <div class="section-badge-small"><i class="fa-solid fa-crown"></i> Complete English Grammar Reference</div>
-          <h2>Irregular Verbs (יוצאים מן הכלל)</h2>
+          <h2>Irregular Verbs</h2>
           <p>The definitive dictionary of English irregular verbs: Core Verbs, Archaic & Literary Forms, and Compound Prefixes with Base Form (V1), Past Simple (V2), and Past Participle (V3).</p>
         </div>
       </div>

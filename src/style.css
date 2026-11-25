@@ -7617,8 +7617,11 @@ button, input, select, textarea {
 .irregular-table-responsive {
   width: 100%;
   overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  border: 1.5px solid var(--border-color);
+  background: var(--card-bg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  -webkit-overflow-scrolling: touch;
 }
 
 .irregular-table {
@@ -7634,7 +7637,11 @@ button, input, select, textarea {
 }
 
 .irregular-table th {
-  padding: 0.95rem 1.1rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg-main);
+  padding: 1rem 1.15rem;
   font-weight: 800;
   color: var(--text-main);
   text-transform: uppercase;
@@ -7643,9 +7650,14 @@ button, input, select, textarea {
   white-space: nowrap;
 }
 
+[data-theme="dark"] .irregular-table th {
+  background: #0f172a;
+}
+
 .irregular-table tbody tr {
   border-bottom: 1px solid var(--border-color);
-  transition: background 0.15s ease;
+  transition: all 0.18s ease;
+  border-left: 3px solid transparent;
 }
 
 .irregular-table tbody tr:last-child {
@@ -7653,15 +7665,17 @@ button, input, select, textarea {
 }
 
 .irregular-table tbody tr:hover {
-  background: rgba(0, 36, 125, 0.03);
+  background: rgba(0, 36, 125, 0.04);
+  border-left-color: var(--uk-blue);
 }
 
 [data-theme="dark"] .irregular-table tbody tr:hover {
-  background: rgba(212, 175, 55, 0.05);
+  background: rgba(212, 175, 55, 0.06);
+  border-left-color: var(--gold);
 }
 
 .irregular-table td {
-  padding: 0.9rem 1.1rem;
+  padding: 0.95rem 1.15rem;
   vertical-align: middle;
   color: var(--text-main);
 }
@@ -7968,6 +7982,31 @@ button, input, select, textarea {
   color: #fcd34d;
   background: rgba(252, 211, 77, 0.1);
   border-color: rgba(252, 211, 77, 0.2);
+}
+
+@media (max-width: 768px) {
+  .irregular-hero-banner {
+    padding: 1.25rem 1.15rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.1rem;
+  }
+  .irregular-hero-badge {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+  }
+  .irregular-stats-row {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .col-v1 { min-width: 140px; }
+  .col-v2 { min-width: 140px; }
+  .col-v3 { min-width: 140px; }
+  .col-actions { min-width: 95px; }
+  .irregular-table th, .irregular-table td {
+    padding: 0.8rem 0.9rem;
+  }
 }
 
 

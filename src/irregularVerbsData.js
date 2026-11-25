@@ -207,7 +207,7 @@ export const IRREGULAR_VERBS = [
   { v1: "Write", v2: "Wrote", v3: "Written", category: "core" },
 
   // =========================================================================
-  // 2. ARCHAIC, LITERARY & RARE VERBS (פעלים ארכאיים, ספרותיים ונדירים)
+  // 2. ARCHAIC, LITERARY & RARE VERBS
   // =========================================================================
   { v1: "Beget", v2: "Begot / Begat", v3: "Begotten", category: "archaic", note: "Biblical / Archaic" },
   { v1: "Gild", v2: "Gilt / Gilded", v3: "Gilt / Gilded", category: "archaic", note: "Archaic / Literary" },
@@ -228,7 +228,7 @@ export const IRREGULAR_VERBS = [
   { v1: "Wreak", v2: "Wrought / Wreaked", v3: "Wrought / Wreaked", category: "archaic", note: "Historical / Literary" },
 
   // =========================================================================
-  // 3. COMPOUND VERBS WITH PREFIXES (פעלים מורכבים)
+  // 3. COMPOUND VERBS WITH PREFIXES
   // Prefixes: Mis-, Over-, Out-, Re-, Under-, Un-, Up-, With-
   // =========================================================================
   { v1: "Misunderstand", v2: "Misunderstood", v3: "Misunderstood", category: "compound", root: "Understand", prefix: "Mis-" },
