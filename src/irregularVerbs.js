@@ -1,7 +1,7 @@
 /**
  * British English Vault - Irregular Verbs Module
- * Searchable, audio-enabled interactive dictionary of irregular verbs (V1, V2, V3).
- * Includes: Core, Archaic & Rare, and Compound (Prefixed) verbs.
+ * Unified single table without horizontal shifting (100% width, zero overflow).
+ * Complete list: Core, Compound, and Archaic verbs.
  */
 
 import { IRREGULAR_VERBS, VERB_CATEGORIES } from './irregularVerbsData.js';
@@ -71,6 +71,7 @@ function bindGlobalEvents() {
     // Speak verb button
     const speakBtn = e.target.closest('.verb-speak-btn');
     if (speakBtn) {
+      e.stopPropagation();
       const v1 = speakBtn.getAttribute('data-v1') || '';
       const v2 = speakBtn.getAttribute('data-v2') || '';
       const v3 = speakBtn.getAttribute('data-v3') || '';
@@ -83,12 +84,11 @@ function bindGlobalEvents() {
       return;
     }
 
-    // Copy verb button
-    const copyBtn = e.target.closest('.verb-copy-btn');
-    if (copyBtn) {
-      const rowText = copyBtn.getAttribute('data-text') || '';
-      copyTextToClipboard(rowText, 'Verb forms copied to clipboard! 📋');
-      return;
+    // Row click to speak
+    const row = e.target.closest('.irregular-row');
+    if (row && !e.target.closest('button')) {
+      const btn = row.querySelector('.verb-speak-btn');
+      if (btn) btn.click();
     }
   });
 }
@@ -115,7 +115,7 @@ function renderIrregularVerbsView() {
         <div class="irregular-hero-text">
           <div class="section-badge-small"><i class="fa-solid fa-crown"></i> Complete English Grammar Reference</div>
           <h2>Irregular Verbs</h2>
-          <p>The definitive dictionary of English irregular verbs: Core Verbs, Archaic & Literary Forms, and Compound Prefixes with Base Form (V1), Past Simple (V2), and Past Participle (V3).</p>
+          <p>The complete master list of English irregular verbs: Core, Compound, and Archaic forms with Base Form (V1), Past Simple (V2), and Past Participle (V3).</p>
         </div>
       </div>
 
@@ -125,13 +125,6 @@ function renderIrregularVerbsView() {
           <div>
             <span class="metric-val">${IRREGULAR_VERBS.length}</span>
             <span class="metric-lbl">Total Verbs</span>
-          </div>
-        </div>
-        <div class="metric-pill">
-          <i class="fa-solid fa-layer-group"></i>
-          <div>
-            <span class="metric-val">3</span>
-            <span class="metric-lbl">Categories</span>
           </div>
         </div>
         <div class="metric-pill">
@@ -165,7 +158,7 @@ function renderIrregularVerbsView() {
       </button>
       <button type="button" class="cat-filter-btn ${selectedCategory === 'compound' ? 'active' : ''}" data-cat="compound">
         <i class="fa-solid fa-layer-group"></i>
-        <span>Compound & Prefixes</span>
+        <span>Compound Prefixes</span>
         <span class="cat-count-badge">${compoundCount}</span>
       </button>
       <button type="button" class="cat-filter-btn ${selectedCategory === 'archaic' ? 'active' : ''}" data-cat="archaic">
@@ -183,7 +176,7 @@ function renderIrregularVerbsView() {
           <input 
             type="text" 
             id="irregular-search-input" 
-            placeholder="Search in V1, V2, V3, or base root (e.g. understand, arose, eaten, redo)..." 
+            placeholder="Search any verb in V1, V2, V3, or base root (e.g. go, broke, eaten, undo)..." 
             value="${searchQuery}" 
             autocomplete="off"
             spellcheck="false"
@@ -210,13 +203,14 @@ function renderIrregularVerbsView() {
       </div>
     </div>
 
-    <!-- TABLE & RESULTS CONTAINER -->
+    <!-- UNIFIED TABLE (ONE TABLE, ZERO HORIZONTAL SCROLL) -->
     <div class="card irregular-table-card">
       <div class="table-meta-header">
         <div class="meta-title-col">
-          <span class="meta-badge"><i class="fa-solid fa-table-list"></i> Verb Conjugation Table</span>
+          <span class="meta-badge"><i class="fa-solid fa-table-list"></i> Irregular Verbs Table</span>
           <span class="meta-subtext" id="irregular-table-subtitle">Showing all ${IRREGULAR_VERBS.length} verbs</span>
         </div>
+        <span class="meta-subtext tip-text"><i class="fa-solid fa-volume-high"></i> Click row or speaker to hear UK pronunciation</span>
       </div>
 
       <div class="irregular-table-responsive">
@@ -227,7 +221,6 @@ function renderIrregularVerbsView() {
               <th class="col-v1">Base Form (V1)</th>
               <th class="col-v2">Past Simple (V2)</th>
               <th class="col-v3">Past Participle (V3)</th>
-              <th class="col-actions">Pronunciation</th>
             </tr>
           </thead>
           <tbody id="irregular-table-body">
@@ -295,7 +288,7 @@ function renderVerbsTable() {
 
   if (matchedCountEl) matchedCountEl.innerText = filtered.length;
   if (subtitleEl) {
-    let catText = selectedCategory === 'ALL' ? 'all categories' : (selectedCategory === 'core' ? 'Core' : (selectedCategory === 'compound' ? 'Compound Prefixes' : 'Archaic & Rare'));
+    let catText = selectedCategory === 'ALL' ? 'All' : (selectedCategory === 'core' ? 'Core' : (selectedCategory === 'compound' ? 'Compound Prefixes' : 'Archaic & Rare'));
     subtitleEl.innerText = `Showing ${filtered.length} of ${IRREGULAR_VERBS.length} verbs [${catText}]${searchQuery ? ` matching "${searchQuery}"` : ''}${selectedLetter !== 'ALL' ? ` (Letter: ${selectedLetter})` : ''}`;
   }
 
@@ -311,73 +304,48 @@ function renderVerbsTable() {
     const v1Highlighted = highlightText(item.v1, q);
     const v2Highlighted = highlightText(item.v2, q);
     const v3Highlighted = highlightText(item.v3, q);
-    const rowCopyText = `${item.v1} | ${item.v2} | ${item.v3}${item.root ? ` (Root: ${item.root})` : ''}`;
 
     // Meta badge for Compound or Archaic
     let metaBadge = '';
     if (item.category === 'compound') {
       metaBadge = `
-        <div class="compound-meta-row">
-          <span class="compound-root-tag" title="Compound verb derived from base root '${item.root}'">
-            <i class="fa-solid fa-code-branch"></i> Root: <strong>${item.root}</strong>
-          </span>
-          ${item.prefix ? `<span class="compound-prefix-tag">${item.prefix}</span>` : ''}
-        </div>
+        <span class="compound-root-tag" title="Compound verb derived from base root '${item.root}'">
+          <i class="fa-solid fa-code-branch"></i> ${item.root}
+        </span>
       `;
     } else if (item.category === 'archaic') {
       metaBadge = `
-        <div class="compound-meta-row">
-          <span class="archaic-tag" title="${item.note || 'Archaic / Historical form'}">
-            <i class="fa-solid fa-scroll"></i> ${item.note || 'Archaic'}
-          </span>
-        </div>
+        <span class="archaic-tag" title="${item.note || 'Archaic / Historical form'}">
+          ${item.note || 'Archaic'}
+        </span>
       `;
     }
 
     return `
-      <tr class="irregular-row cat-${item.category}">
+      <tr class="irregular-row cat-${item.category}" title="Click row to listen: ${item.v1} - ${item.v2} - ${item.v3}">
         <td class="col-num"><span class="row-index">${index + 1}</span></td>
         <td class="col-v1">
-          <div class="v1-wrapper">
-            <span class="v1-tag">V1</span>
-            <div class="v1-info-col">
+          <div class="v1-info-col">
+            <div class="v1-title-row">
               <strong class="v1-text">${v1Highlighted}</strong>
-              ${metaBadge}
+              <button 
+                type="button" 
+                class="inline-speak-btn verb-speak-btn" 
+                data-v1="${item.v1.replace(/"/g, '&quot;')}" 
+                data-v2="${item.v2.replace(/"/g, '&quot;')}" 
+                data-v3="${item.v3.replace(/"/g, '&quot;')}" 
+                title="Listen in British English: ${item.v1} - ${item.v2} - ${item.v3}">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
             </div>
+            ${metaBadge ? `<div class="compound-meta-row">${metaBadge}</div>` : ''}
           </div>
         </td>
         <td class="col-v2">
-          <div class="v2-wrapper">
-            <span class="form-tag v2-badge">V2</span>
-            <span class="v2-text">${v2Highlighted}</span>
-          </div>
+          <span class="v2-text">${v2Highlighted}</span>
         </td>
         <td class="col-v3">
-          <div class="v3-wrapper">
-            <span class="form-tag v3-badge">V3</span>
-            <span class="v3-text">${v3Highlighted}</span>
-          </div>
-        </td>
-        <td class="col-actions">
-          <div class="actions-group">
-            <button 
-              type="button" 
-              class="audio-btn-modern verb-speak-btn" 
-              data-v1="${item.v1.replace(/"/g, '&quot;')}" 
-              data-v2="${item.v2.replace(/"/g, '&quot;')}" 
-              data-v3="${item.v3.replace(/"/g, '&quot;')}" 
-              title="Listen in British English: ${item.v1} - ${item.v2} - ${item.v3}">
-              <span class="audio-wave-anim"><span></span><span></span><span></span></span>
-              <i class="fa-solid fa-volume-high audio-icon"></i>
-            </button>
-            <button 
-              type="button" 
-              class="icon-action-btn verb-copy-btn" 
-              data-text="${rowCopyText.replace(/"/g, '&quot;')}" 
-              title="Copy row to clipboard">
-              <i class="fa-regular fa-copy"></i>
-            </button>
-          </div>
+          <span class="v3-text">${v3Highlighted}</span>
         </td>
       </tr>
     `;
