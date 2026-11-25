@@ -1,12 +1,10 @@
 /**
  * British English Vault - Irregular Verbs Module
- * Unified single table without horizontal shifting (100% width, zero overflow).
- * Complete list: Core, Compound, and Archaic verbs.
+ * Clean, readable, unified reference table without audio playback or horizontal shifting.
+ * 100% in English.
  */
 
 import { IRREGULAR_VERBS, VERB_CATEGORIES } from './irregularVerbsData.js';
-import { speakText } from './speech.js';
-import { copyTextToClipboard } from './shareUtils.js';
 
 let searchQuery = '';
 let selectedLetter = 'ALL';
@@ -67,29 +65,6 @@ function bindGlobalEvents() {
       renderVerbsTable();
       return;
     }
-
-    // Speak verb button
-    const speakBtn = e.target.closest('.verb-speak-btn');
-    if (speakBtn) {
-      e.stopPropagation();
-      const v1 = speakBtn.getAttribute('data-v1') || '';
-      const v2 = speakBtn.getAttribute('data-v2') || '';
-      const v3 = speakBtn.getAttribute('data-v3') || '';
-      const speechText = `${v1}, ${v2}, ${v3}`;
-      
-      speakBtn.classList.add('speaking');
-      speakText(speechText, { rate: 0.85 }).finally(() => {
-        speakBtn.classList.remove('speaking');
-      });
-      return;
-    }
-
-    // Row click to speak
-    const row = e.target.closest('.irregular-row');
-    if (row && !e.target.closest('button')) {
-      const btn = row.querySelector('.verb-speak-btn');
-      if (btn) btn.click();
-    }
   });
 }
 
@@ -128,10 +103,10 @@ function renderIrregularVerbsView() {
           </div>
         </div>
         <div class="metric-pill">
-          <i class="fa-solid fa-headphones"></i>
+          <i class="fa-solid fa-layer-group"></i>
           <div>
-            <span class="metric-val">100%</span>
-            <span class="metric-lbl">UK Audio</span>
+            <span class="metric-val">3</span>
+            <span class="metric-lbl">Categories</span>
           </div>
         </div>
         <div class="metric-pill">
@@ -210,7 +185,6 @@ function renderIrregularVerbsView() {
           <span class="meta-badge"><i class="fa-solid fa-table-list"></i> Irregular Verbs Table</span>
           <span class="meta-subtext" id="irregular-table-subtitle">Showing all ${IRREGULAR_VERBS.length} verbs</span>
         </div>
-        <span class="meta-subtext tip-text"><i class="fa-solid fa-volume-high"></i> Click row or speaker to hear UK pronunciation</span>
       </div>
 
       <div class="irregular-table-responsive">
@@ -322,22 +296,11 @@ function renderVerbsTable() {
     }
 
     return `
-      <tr class="irregular-row cat-${item.category}" title="Click row to listen: ${item.v1} - ${item.v2} - ${item.v3}">
+      <tr class="irregular-row cat-${item.category}">
         <td class="col-num"><span class="row-index">${index + 1}</span></td>
         <td class="col-v1">
           <div class="v1-info-col">
-            <div class="v1-title-row">
-              <strong class="v1-text">${v1Highlighted}</strong>
-              <button 
-                type="button" 
-                class="inline-speak-btn verb-speak-btn" 
-                data-v1="${item.v1.replace(/"/g, '&quot;')}" 
-                data-v2="${item.v2.replace(/"/g, '&quot;')}" 
-                data-v3="${item.v3.replace(/"/g, '&quot;')}" 
-                title="Listen in British English: ${item.v1} - ${item.v2} - ${item.v3}">
-                <i class="fa-solid fa-volume-high"></i>
-              </button>
-            </div>
+            <strong class="v1-text">${v1Highlighted}</strong>
             ${metaBadge ? `<div class="compound-meta-row">${metaBadge}</div>` : ''}
           </div>
         </td>

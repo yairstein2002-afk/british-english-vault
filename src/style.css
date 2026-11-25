@@ -7741,7 +7741,6 @@ button, input, select, textarea {
   border-bottom: 1px solid var(--border-color);
   transition: all 0.16s ease;
   border-left: 3px solid transparent;
-  cursor: pointer;
 }
 
 .irregular-table tbody tr:last-child {
@@ -7774,13 +7773,6 @@ button, input, select, textarea {
   min-width: 0;
 }
 
-.v1-title-row {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex-wrap: wrap;
-}
-
 .v1-text {
   font-size: 1rem;
   font-weight: 700;
@@ -7797,49 +7789,6 @@ button, input, select, textarea {
   word-break: break-word;
   overflow-wrap: break-word;
   display: inline-block;
-}
-
-/* Inline Audio Speaker Button */
-.inline-speak-btn {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1px solid var(--border-color);
-  background: var(--bg-main);
-  color: var(--uk-blue);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  font-size: 0.72rem;
-  flex-shrink: 0;
-  padding: 0;
-}
-
-[data-theme="dark"] .inline-speak-btn {
-  color: var(--gold);
-  border-color: rgba(212, 175, 55, 0.25);
-}
-
-.inline-speak-btn:hover {
-  background: var(--uk-blue);
-  color: #fff;
-  border-color: var(--uk-blue);
-  transform: scale(1.08);
-}
-
-[data-theme="dark"] .inline-speak-btn:hover {
-  background: var(--gold);
-  color: #0b111e;
-  border-color: var(--gold);
-}
-
-.inline-speak-btn.speaking {
-  background: var(--uk-crimson) !important;
-  color: #fff !important;
-  border-color: var(--uk-crimson) !important;
-  animation: pulse 0.8s infinite alternate;
 }
 
 .compound-meta-row {
@@ -8040,11 +7989,6 @@ button, input, select, textarea {
   }
   .v2-text, .v3-text {
     font-size: 0.85rem;
-  }
-  .inline-speak-btn {
-    width: 22px;
-    height: 22px;
-    font-size: 0.65rem;
   }
 }
 
